@@ -7,7 +7,6 @@ import com.github.alexthe666.alexsmobs.config.AMConfig;
 import com.github.alexthe666.alexsmobs.misc.AMBlockPos;
 import com.github.alexthe666.alexsmobs.misc.AMSoundRegistry;
 import com.github.alexthe666.alexsmobs.misc.AMTagRegistry;
-import com.google.common.base.Predicate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -46,10 +45,10 @@ import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import javax.annotation.Nullable;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public class EntityFly extends Animal implements FlyingAnimal {
@@ -292,8 +291,7 @@ public class EntityFly extends Animal implements FlyingAnimal {
     }
 
     private class AnnoyZombieGoal extends Goal {
-        protected final Sorter theNearestAttackableTargetSorter;
-        protected final Predicate<? super Entity> targetEntitySelector;
+        protected final Predicate<Entity> targetEntitySelector;
         protected int executionChance = 8;
         protected boolean mustUpdate;
         private Entity targetEntity;
@@ -301,13 +299,11 @@ public class EntityFly extends Animal implements FlyingAnimal {
 
         AnnoyZombieGoal() {
             this.setFlags(EnumSet.of(Goal.Flag.MOVE));
-            this.theNearestAttackableTargetSorter = new Sorter(EntityFly.this);
-            this.targetEntitySelector = new Predicate<Entity>() {
-                @Override
-                public boolean apply(@Nullable Entity e) {
-                    return e.isAlive() && e.getType().builtInRegistryHolder().is(AMTagRegistry.FLY_TARGETS) && (!(e instanceof LivingEntity) || ((LivingEntity) e).getHealth() >= 2D);
-                }
-            };
+            this.targetEntitySelector = e ->
+                e != null
+                    && e.isAlive()
+                    && e.getType().builtInRegistryHolder().is(AMTagRegistry.FLY_TARGETS)
+                    && (!(e instanceof LivingEntity living) || living.getHealth() >= 2D);
         }
 
         @Override
@@ -328,7 +324,7 @@ public class EntityFly extends Animal implements FlyingAnimal {
             if (list.isEmpty()) {
                 return false;
             } else {
-                Collections.sort(list, this.theNearestAttackableTargetSorter);
+                list.sort(Comparator.comparingDouble(e -> EntityFly.this.distanceToSqr(e)));
                 this.targetEntity = list.get(0);
                 this.mustUpdate = false;
                 return true;
@@ -381,15 +377,6 @@ public class EntityFly extends Animal implements FlyingAnimal {
             double renderRadius = 5;
             AABB aabb = new AABB(-renderRadius, -renderRadius, -renderRadius, renderRadius, renderRadius, renderRadius);
             return aabb.move(renderCenter);
-        }
-
-
-        public record Sorter(Entity theEntity) implements Comparator<Entity> {
-            public int compare(Entity p_compare_1_, Entity p_compare_2_) {
-                final double d0 = this.theEntity.distanceToSqr(p_compare_1_);
-                final double d1 = this.theEntity.distanceToSqr(p_compare_2_);
-                return Double.compare(d0, d1);
-            }
         }
     }
 }

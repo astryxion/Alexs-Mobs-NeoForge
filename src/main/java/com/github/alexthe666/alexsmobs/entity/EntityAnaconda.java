@@ -101,7 +101,11 @@ public class EntityAnaconda extends Animal implements ISemiAquatic {
 
 
     public static AttributeSupplier.Builder bakeAttributes() {
-        return Monster.createMonsterAttributes().add(Attributes.TEMPT_RANGE, 10.0D).add(Attributes.MAX_HEALTH, 40.0D).add(Attributes.MOVEMENT_SPEED, 0.15F);
+        return Monster.createMonsterAttributes()
+                .add(Attributes.TEMPT_RANGE, 10.0D)
+                .add(Attributes.MAX_HEALTH, 40.0D)
+                .add(Attributes.KNOCKBACK_RESISTANCE, 0.5F)
+                .add(Attributes.MOVEMENT_SPEED, 0.15F);
     }
 
     public static boolean canAnacondaSpawn(EntityType type, LevelAccessor worldIn, EntitySpawnReason reason, BlockPos pos, RandomSource randomIn) {
@@ -348,7 +352,7 @@ public class EntityAnaconda extends Animal implements ISemiAquatic {
                     if (partParent instanceof EntityAnacondaPart) {
                         ((EntityAnacondaPart) partParent).setChildId(part.getUUID());
                     }
-                    part.setPos(part.tickMultipartPosition(this.getId(), partIndex, prevPos, this.getXRot(), prevReqRot, reqRot, false));
+                    part.setPos(part.tickMultipartPosition(partIndex, prevPos, this.getXRot(), prevReqRot, reqRot, false));
                     partParent = part;
                     level().addFreshEntity(part);
                     parts[i] = part;
@@ -366,20 +370,20 @@ public class EntityAnaconda extends Animal implements ISemiAquatic {
                     i++;
                 }
             }
-            AnacondaPartIndex partIndex = AnacondaPartIndex.HEAD;
-            Vec3 prev = this.position();
-            float xRot = this.getXRot();
-//                float yRot = this.getYRot();
-//                float headRot = Mth.wrapDegrees(this.getYRot());
-            for (int i = 0; i < segments; i++) {
-                if (this.parts[i] != null) {
-                    final float prevReqRot = calcPartRotation(i) + getYawForPart(i);
-                    final float reqRot = calcPartRotation(i + 1) + getYawForPart(i);
-                    parts[i].setStrangleProgress(this.strangleProgress);
-                    parts[i].copyDataFrom(this);
-                    prev = parts[i].tickMultipartPosition(this.getId(), partIndex, prev, xRot, prevReqRot, reqRot, true);
-                    partIndex = parts[i].getPartType();
-                    xRot = parts[i].getXRot();
+            if (tickCount > 1) {
+                AnacondaPartIndex partIndex = AnacondaPartIndex.HEAD;
+                Vec3 prev = this.position();
+                float xRot = this.getXRot();
+                for (int i = 0; i < segments; i++) {
+                    if (this.parts[i] != null) {
+                        final float prevReqRot = calcPartRotation(i) + getYawForPart(i);
+                        final float reqRot = calcPartRotation(i + 1) + getYawForPart(i);
+                        parts[i].setStrangleProgress(this.strangleProgress);
+                        parts[i].copyDataFrom(this);
+                        prev = parts[i].tickMultipartPosition(partIndex, prev, xRot, prevReqRot, reqRot, true);
+                        partIndex = parts[i].getPartType();
+                        xRot = parts[i].getXRot();
+                    }
                 }
             }
 

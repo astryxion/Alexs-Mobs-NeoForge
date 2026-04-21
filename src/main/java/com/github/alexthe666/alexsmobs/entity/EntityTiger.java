@@ -46,7 +46,6 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
@@ -55,6 +54,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.level.pathfinder.PathFinder;
+import net.minecraft.world.level.pathfinder.PathfindingContext;
 import net.minecraft.world.level.pathfinder.WalkNodeEvaluator;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -597,8 +597,13 @@ public class EntityTiger extends Animal implements ICustomCollisions, IAnimatedE
     }
 
     static class TigerNodeEvaluator extends WalkNodeEvaluator {
-        protected PathType getPathTypeOfMob(BlockGetter level, BlockPos pos, PathType typeIn) {
-            return typeIn == PathType.LEAVES || level.getBlockState(pos).getBlock() == Blocks.BAMBOO ? PathType.OPEN : typeIn /* TODO 1.21: getPathTypeOfMob API changed */;
+        @Override
+        public PathType getPathTypeOfMob(PathfindingContext context, int x, int y, int z, Mob mob) {
+            PathType base = super.getPathTypeOfMob(context, x, y, z, mob);
+            if (base == PathType.LEAVES || context.getBlockState(new BlockPos(x, y, z)).getBlock() == Blocks.BAMBOO) {
+                return PathType.OPEN;
+            }
+            return base;
         }
     }
 

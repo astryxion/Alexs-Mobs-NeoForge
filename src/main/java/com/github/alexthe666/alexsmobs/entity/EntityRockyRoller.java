@@ -42,6 +42,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.level.pathfinder.PathFinder;
+import net.minecraft.world.level.pathfinder.PathfindingContext;
 import net.minecraft.world.level.pathfinder.WalkNodeEvaluator;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -331,8 +332,12 @@ public class EntityRockyRoller extends Monster implements ICustomCollisions {
     }
 
     static class RockyRollerNodeEvaluator extends WalkNodeEvaluator {
-        protected PathType getPathTypeOfMob(BlockGetter level, BlockPos pos, PathType typeIn) {
-            return level.getBlockState(pos).getBlock() instanceof PointedDripstoneBlock ? PathType.OPEN : typeIn /* TODO 1.21: getPathTypeOfMob API changed */;
+        @Override
+        public PathType getPathTypeOfMob(PathfindingContext context, int x, int y, int z, Mob mob) {
+            if (context.getBlockState(new BlockPos(x, y, z)).getBlock() instanceof PointedDripstoneBlock) {
+                return PathType.OPEN;
+            }
+            return super.getPathTypeOfMob(context, x, y, z, mob);
         }
     }
 
