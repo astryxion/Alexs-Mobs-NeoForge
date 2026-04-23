@@ -23,6 +23,7 @@ import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.resources.model.cuboid.ItemTransform;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -33,6 +34,7 @@ import net.minecraft.util.Util;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
@@ -51,6 +53,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Special item rendering for 26.1: {@link ItemModel} + {@link SpecialModelRenderer} (replaces BEWLR).
@@ -62,11 +65,14 @@ public final class AMItemstackRenderer implements SpecialModelRenderer<AMItemsta
      * {@link #submit} without a {@link ThreadLocal}. ThreadLocals break here because multiple items can call
      * {@code ItemModel#update} before any {@code submit} runs (different hands, entities, GUI), so queued contexts
      * were paired with the wrong submit.
+     *
+     * @param itemOwner holder being rendered (e.g. shield blocking for that entity); may be {@code null}
      */
-    public record AmSpecialItemPayload(ItemStack stack, ItemDisplayContext displayContext) {}
+    public record AmSpecialItemPayload(ItemStack stack, ItemDisplayContext displayContext, @Nullable ItemOwner itemOwner) {}
 
     public static final List<String> ISTER_ITEM_MODEL_PATHS = List.of(
             "shield_of_the_deep",
+            "shield_of_the_deep_blocking",
             "mysterious_worm",
             "falconry_glove",
             "vine_lasso",
@@ -85,6 +91,59 @@ public final class AMItemstackRenderer implements SpecialModelRenderer<AMItemsta
 
     private static final ModelShieldOfTheDeep SHIELD_OF_THE_DEEP_MODEL = new ModelShieldOfTheDeep();
     private static final Identifier SHIELD_OF_THE_DEEP_TEXTURE = Identifier.parse("alexsmobs:textures/armor/shield_of_the_deep.png");
+    /** From {@code assets/alexsmobs/models/item/shield_of_the_deep.json}; translations in block space (JSON / 16). */
+    private static final ItemTransform SHIELD_OF_THE_DEEP_GUI = new ItemTransform(
+            new Vector3f(16.0F, -141.0F, 0.0F),
+            new Vector3f(0.0F, 2.25F / 16.0F, 0.0F),
+            new Vector3f(0.9F, 0.9F, 0.9F));
+    private static final ItemTransform SHIELD_OF_THE_DEEP_GROUND = new ItemTransform(
+            new Vector3f(0.0F, 0.0F, 0.0F),
+            new Vector3f(0.0F, 1.25F / 16.0F, 0.0F),
+            new Vector3f(0.5F, 0.5F, 0.5F));
+    private static final ItemTransform SHIELD_OF_THE_DEEP_HEAD = new ItemTransform(
+            new Vector3f(0.0F, 90.0F, 0.0F),
+            new Vector3f(0.0F, 2.25F / 16.0F, -1.25F / 16.0F),
+            new Vector3f(1.0F, 1.0F, 1.0F));
+    private static final ItemTransform SHIELD_OF_THE_DEEP_FIXED = new ItemTransform(
+            new Vector3f(0.0F, 90.0F, 0.0F),
+            new Vector3f(0.0F, 2.0F / 16.0F, 0.0F),
+            new Vector3f(1.0F, 1.0F, 1.0F));
+    /** Idle {@code shield_of_the_deep.json} {@code thirdperson_righthand}. */
+    private static final ItemTransform SHIELD_OF_THE_DEEP_IDLE_THIRD_PERSON_RIGHT_HAND = new ItemTransform(
+            new Vector3f(0.0F, 0.0F, 0.0F),
+            new Vector3f(2.5F / 16.0F, 0.0F, 2.75F / 16.0F),
+            new Vector3f(1.0F, 1.0F, 1.0F));
+    /** Idle {@code shield_of_the_deep.json} {@code thirdperson_lefthand}. */
+    private static final ItemTransform SHIELD_OF_THE_DEEP_IDLE_THIRD_PERSON_LEFT_HAND = new ItemTransform(
+            new Vector3f(0.0F, 180.0F, 0.0F),
+            new Vector3f(2.5F / 16.0F, 0.0F, 2.75F / 16.0F),
+            new Vector3f(1.0F, 1.0F, 1.0F));
+    /** Blocking {@code shield_of_the_deep_blocking.json} hand transforms (item model override while using). */
+    private static final ItemTransform SHIELD_OF_THE_DEEP_BLOCKING_THIRD_PERSON_RIGHT_HAND = new ItemTransform(
+            new Vector3f(45.0F, 55.0F, 0.0F),
+            new Vector3f(1.5F / 16.0F, 0.0F, 1.0F / 16.0F),
+            new Vector3f(1.0F, 1.0F, 1.0F));
+    private static final ItemTransform SHIELD_OF_THE_DEEP_BLOCKING_THIRD_PERSON_LEFT_HAND = new ItemTransform(
+            new Vector3f(45.0F, -135.0F, 0.0F),
+            new Vector3f(1.5F / 16.0F, 0.0F, 1.0F / 16.0F),
+            new Vector3f(1.0F, 1.0F, 1.0F));
+    /** From 1.21.1 {@code shield_of_the_deep_blocking.json} (flat shield FP pose, not vanilla wooden shield). */
+    private static final ItemTransform SHIELD_OF_THE_DEEP_BLOCKING_FIRST_PERSON_RIGHT_HAND = new ItemTransform(
+            new Vector3f(20.0F, 89.0F, 0.0F),
+            new Vector3f(2.0F / 16.0F, 5.0F / 16.0F, 2.0F / 16.0F),
+            new Vector3f(1.0F, 1.0F, 1.0F));
+    private static final ItemTransform SHIELD_OF_THE_DEEP_BLOCKING_FIRST_PERSON_LEFT_HAND = new ItemTransform(
+            new Vector3f(20.0F, -90.0F, 0.0F),
+            new Vector3f(0.0F, 5.0F / 16.0F, 2.0F / 16.0F),
+            new Vector3f(1.0F, 1.0F, 1.0F));
+    private static final ItemTransform SHIELD_OF_THE_DEEP_FIRST_PERSON_RIGHT_HAND = new ItemTransform(
+            new Vector3f(0.0F, 89.0F, 0.0F),
+            new Vector3f(2.0F / 16.0F, -1.0F / 16.0F, 0.0F),
+            new Vector3f(1.0F, 1.0F, 1.0F));
+    private static final ItemTransform SHIELD_OF_THE_DEEP_FIRST_PERSON_LEFT_HAND = new ItemTransform(
+            new Vector3f(0.0F, -90.0F, 0.0F),
+            new Vector3f(0.0F, -1.25F / 16.0F, 0.5F / 16.0F),
+            new Vector3f(1.0F, 1.0F, 1.0F));
     private static final ModelMysteriousWorm MYTERIOUS_WORM_MODEL = new ModelMysteriousWorm();
     private static final Identifier MYTERIOUS_WORM_TEXTURE = Identifier.parse("alexsmobs:textures/item/mysterious_worm_model.png");
     private static final ModelEndPirateAnchor ANCHOR_MODEL = new ModelEndPirateAnchor();
@@ -98,6 +157,50 @@ public final class AMItemstackRenderer implements SpecialModelRenderer<AMItemsta
     private static final Identifier TRANSMUTATION_TABLE_OVERLAY = Identifier.parse("alexsmobs:textures/entity/farseer/transmutation_table_overlay.png");
     private static final ModelTransmutationTable TRANSMUTATION_TABLE_MODEL = new ModelTransmutationTable(0F);
     private static final ModelTransmutationTable TRANSMUTATION_TABLE_OVERLAY_MODEL = new ModelTransmutationTable(0.01F);
+    /**
+     * Same values as {@code assets/alexsmobs/models/item/transmutation_table.json} hand display;
+     * translation components are in block space (JSON pixels / 16).
+     * For in-hand contexts, apply only after undoing {@link ItemTransform#NO_TRANSFORM} (see hand branch below).
+     */
+    private static final ItemTransform TRANSMUTATION_TABLE_THIRD_PERSON_HAND = new ItemTransform(
+            new Vector3f(75.0F, 315.0F, 0.0F),
+            new Vector3f(-2.0F / 16.0F, 2.5F / 16.0F, 0.0F),
+            new Vector3f(0.375F, 0.375F, 0.375F));
+    private static final ItemTransform TRANSMUTATION_TABLE_FIRST_PERSON_HAND = new ItemTransform(
+            new Vector3f(0.0F, 315.0F, 0.0F),
+            new Vector3f(-2.0F / 16.0F, 2.5F / 16.0F, 0.0F),
+            new Vector3f(0.375F, 0.375F, 0.375F));
+    /** Matches {@code transmutation_table.json} {@code display.gui} (rotation, scale, and built-in slot anchor). */
+    private static final ItemTransform TRANSMUTATION_TABLE_GUI = new ItemTransform(
+            new Vector3f(30.0F, 45.0F, 0.0F),
+            new Vector3f(0.0F, 0.0F, 0.0F),
+            new Vector3f(0.75F, 0.75F, 0.75F));
+    /** Values from {@code assets/alexsmobs/models/item/mysterious_worm.json}; translations in block space (JSON / 16). */
+    private static final ItemTransform MYSTERIOUS_WORM_GUI = new ItemTransform(
+            new Vector3f(30.0F, 45.0F, 0.0F),
+            new Vector3f(10.0F / 16.0F, 11.0F / 16.0F, 0.0F),
+            new Vector3f(0.8F, 0.8F, 0.8F));
+    private static final ItemTransform MYSTERIOUS_WORM_GROUND = new ItemTransform(
+            new Vector3f(0.0F, 0.0F, 0.0F),
+            new Vector3f(3.0F / 16.0F, 8.0F / 16.0F, 5.0F / 16.0F),
+            new Vector3f(0.5F, 0.5F, 0.5F));
+    private static final ItemTransform MYSTERIOUS_WORM_HEAD = new ItemTransform(
+            new Vector3f(0.0F, 180.0F, 0.0F),
+            new Vector3f(-15.0F / 16.0F, 54.0F / 16.0F, 5.0F / 16.0F),
+            new Vector3f(2.0F, 2.0F, 2.0F));
+    private static final ItemTransform MYSTERIOUS_WORM_FIXED = new ItemTransform(
+            new Vector3f(0.0F, 270.0F, 0.0F),
+            new Vector3f(-6.0F / 16.0F, 14.0F / 16.0F, 4.0F / 16.0F),
+            new Vector3f(0.8F, 0.8F, 0.8F));
+    /** {@code thirdperson_righthand}; pass {@code leftHand} to {@link ItemTransform#apply}. */
+    private static final ItemTransform MYSTERIOUS_WORM_THIRD_PERSON_HAND = new ItemTransform(
+            new Vector3f(75.0F, 180.0F, 0.0F),
+            new Vector3f(-5.0F / 16.0F, 5.0F / 16.0F, 10.0F / 16.0F),
+            new Vector3f(0.6F, 0.6F, 0.6F));
+    private static final ItemTransform MYSTERIOUS_WORM_FIRST_PERSON_HAND = new ItemTransform(
+            new Vector3f(0.0F, 220.0F, 0.0F),
+            new Vector3f(3.0F / 16.0F, 15.0F / 16.0F, -9.0F / 16.0F),
+            new Vector3f(0.8F, 0.8F, 0.8F));
     private static List<ItemStack> DIMENSIONAL_CARVER_SHARDS;
 
     private final Map<String, Entity> renderedEntites = new HashMap<>();
@@ -107,6 +210,31 @@ public final class AMItemstackRenderer implements SpecialModelRenderer<AMItemsta
 
     public static void incrementTick() {
         ticksExisted++;
+    }
+
+    /**
+     * Matches 1.21.1 {@code ItemProperties.register(..., "blocking")}: {@code getUseItem() == stack}.
+     * Also accepts {@link ItemStack#isSameItemSameComponents} when the render stack is not the same instance as the live hand stack.
+     */
+    private static boolean isShieldOfTheDeepBlocking(ItemStack stack, @Nullable ItemOwner owner) {
+        if (!stack.is(AMItemRegistry.SHIELD_OF_THE_DEEP.get())) {
+            return false;
+        }
+        if (owner != null) {
+            LivingEntity living = owner.asLivingEntity();
+            if (living != null && living.isUsingItem()) {
+                ItemStack inUse = living.getUseItem();
+                if (inUse == stack || ItemStack.isSameItemSameComponents(inUse, stack)) {
+                    return true;
+                }
+            }
+        }
+        Player player = Minecraft.getInstance().player;
+        if (player == null || !player.isUsingItem()) {
+            return false;
+        }
+        ItemStack inUse = player.getUseItem();
+        return inUse == stack || ItemStack.isSameItemSameComponents(inUse, stack);
     }
 
     private static float getScaleFor(EntityType<?> type, List<Pair<EntityType<?>, Float>> mobIcons) {
@@ -186,7 +314,7 @@ public final class AMItemstackRenderer implements SpecialModelRenderer<AMItemsta
 
     @Override
     public AmSpecialItemPayload extractArgument(ItemStack stack) {
-        return new AmSpecialItemPayload(stack, ItemDisplayContext.NONE);
+        return new AmSpecialItemPayload(stack, ItemDisplayContext.NONE, null);
     }
 
     @Override
@@ -209,7 +337,49 @@ public final class AMItemstackRenderer implements SpecialModelRenderer<AMItemsta
         ItemModelResolver itemModelResolver = Minecraft.getInstance().getItemModelResolver();
 
         if (stack.getItem() == AMItemRegistry.SHIELD_OF_THE_DEEP.get()) {
+            boolean blocking = isShieldOfTheDeepBlocking(stack, payload.itemOwner());
             matrixStackIn.pushPose();
+            if (transformType == ItemDisplayContext.GUI) {
+                matrixStackIn.translate(0.5F, 0.5F, 0.5F);
+                SHIELD_OF_THE_DEEP_GUI.apply(transformType.leftHand(), matrixStackIn.last());
+            } else if (transformType == ItemDisplayContext.GROUND) {
+                matrixStackIn.translate(0.5F, 0.5F, 0.5F);
+                SHIELD_OF_THE_DEEP_GROUND.apply(false, matrixStackIn.last());
+            } else if (transformType == ItemDisplayContext.FIXED) {
+                matrixStackIn.translate(0.5F, 0.5F, 0.5F);
+                SHIELD_OF_THE_DEEP_FIXED.apply(false, matrixStackIn.last());
+            } else if (transformType == ItemDisplayContext.HEAD) {
+                matrixStackIn.translate(0.5F, 0.5F, 0.5F);
+                SHIELD_OF_THE_DEEP_HEAD.apply(false, matrixStackIn.last());
+            } else if (transformType == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND) {
+                matrixStackIn.translate(0.5F, 0.5F, 0.5F);
+                if (blocking) {
+                    SHIELD_OF_THE_DEEP_BLOCKING_THIRD_PERSON_RIGHT_HAND.apply(false, matrixStackIn.last());
+                } else {
+                    SHIELD_OF_THE_DEEP_IDLE_THIRD_PERSON_RIGHT_HAND.apply(false, matrixStackIn.last());
+                }
+            } else if (transformType == ItemDisplayContext.THIRD_PERSON_LEFT_HAND) {
+                matrixStackIn.translate(0.5F, 0.5F, 0.5F);
+                if (blocking) {
+                    SHIELD_OF_THE_DEEP_BLOCKING_THIRD_PERSON_LEFT_HAND.apply(false, matrixStackIn.last());
+                } else {
+                    SHIELD_OF_THE_DEEP_IDLE_THIRD_PERSON_LEFT_HAND.apply(false, matrixStackIn.last());
+                }
+            } else if (transformType == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND) {
+                matrixStackIn.translate(0.5F, 0.5F, 0.5F);
+                if (blocking) {
+                    SHIELD_OF_THE_DEEP_BLOCKING_FIRST_PERSON_RIGHT_HAND.apply(false, matrixStackIn.last());
+                } else {
+                    SHIELD_OF_THE_DEEP_FIRST_PERSON_RIGHT_HAND.apply(false, matrixStackIn.last());
+                }
+            } else if (transformType == ItemDisplayContext.FIRST_PERSON_LEFT_HAND) {
+                matrixStackIn.translate(0.5F, 0.5F, 0.5F);
+                if (blocking) {
+                    SHIELD_OF_THE_DEEP_BLOCKING_FIRST_PERSON_LEFT_HAND.apply(false, matrixStackIn.last());
+                } else {
+                    SHIELD_OF_THE_DEEP_FIRST_PERSON_LEFT_HAND.apply(false, matrixStackIn.last());
+                }
+            }
             matrixStackIn.translate(0.4F, -0.75F, 0.5F);
             matrixStackIn.mulPose(Axis.YP.rotationDegrees(-180));
             RenderType cutout = AMRenderTypes.entityCutoutNoCull(SHIELD_OF_THE_DEEP_TEXTURE);
@@ -225,11 +395,38 @@ public final class AMItemstackRenderer implements SpecialModelRenderer<AMItemsta
         }
         if (stack.getItem() == AMItemRegistry.MYSTERIOUS_WORM.get()) {
             matrixStackIn.pushPose();
+            // Same pattern as transmutation table: layer applies NO_TRANSFORM; re-apply JSON display via ItemTransform.
+            if (transformType == ItemDisplayContext.GUI) {
+                matrixStackIn.translate(0.5F, 0.5F, 0.5F);
+                MYSTERIOUS_WORM_GUI.apply(transformType.leftHand(), matrixStackIn.last());
+            } else if (transformType == ItemDisplayContext.GROUND) {
+                matrixStackIn.translate(0.5F, 0.5F, 0.5F);
+                MYSTERIOUS_WORM_GROUND.apply(false, matrixStackIn.last());
+            } else if (transformType == ItemDisplayContext.FIXED) {
+                matrixStackIn.translate(0.5F, 0.5F, 0.5F);
+                MYSTERIOUS_WORM_FIXED.apply(false, matrixStackIn.last());
+            } else if (transformType == ItemDisplayContext.HEAD) {
+                matrixStackIn.translate(0.5F, 0.5F, 0.5F);
+                MYSTERIOUS_WORM_HEAD.apply(false, matrixStackIn.last());
+            } else if (transformType == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND
+                    || transformType == ItemDisplayContext.THIRD_PERSON_LEFT_HAND) {
+                matrixStackIn.translate(0.5F, 0.5F, 0.5F);
+                MYSTERIOUS_WORM_THIRD_PERSON_HAND.apply(
+                        transformType == ItemDisplayContext.THIRD_PERSON_LEFT_HAND,
+                        matrixStackIn.last());
+            } else if (transformType == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND
+                    || transformType == ItemDisplayContext.FIRST_PERSON_LEFT_HAND) {
+                matrixStackIn.translate(0.5F, 0.5F, 0.5F);
+                MYSTERIOUS_WORM_FIRST_PERSON_HAND.apply(
+                        transformType == ItemDisplayContext.FIRST_PERSON_LEFT_HAND,
+                        matrixStackIn.last());
+            }
             matrixStackIn.translate(0, -2F, 0);
             matrixStackIn.mulPose(Axis.YP.rotationDegrees(-180));
             MYTERIOUS_WORM_MODEL.animateStack(stack);
             bufferIn.submitCustomGeometry(matrixStackIn, AMRenderTypes.entityCutoutNoCull(MYTERIOUS_WORM_TEXTURE), (pose, consumer) ->
-                    MYTERIOUS_WORM_MODEL.renderToBuffer(matrixStackIn, consumer, combinedLightIn, combinedOverlayIn, -1));
+                AlexAdvancedEntityModel.withCitadelSubmitPose(pose, this.citadelPoseScratch, s ->
+                    MYTERIOUS_WORM_MODEL.renderToBuffer(s, consumer, combinedLightIn, combinedOverlayIn, -1)));
             matrixStackIn.popPose();
         }
         if (stack.getItem() == AMItemRegistry.FALCONRY_GLOVE.get()) {
@@ -278,9 +475,8 @@ public final class AMItemstackRenderer implements SpecialModelRenderer<AMItemsta
             // 26.1 SpecialModelRenderer path bypasses baked-model display transforms; re-apply JSON display transforms here.
             // Matches `assets/alexsmobs/models/item/transmutation_table.json`.
             if (transformType == ItemDisplayContext.GUI) {
-                matrixStackIn.mulPose(Axis.XP.rotationDegrees(30));
-                matrixStackIn.mulPose(Axis.YP.rotationDegrees(45));
-                matrixStackIn.scale(0.75F, 0.75F, 0.75F);
+                matrixStackIn.translate(0.5F, 0.5F, 0.5F);
+                TRANSMUTATION_TABLE_GUI.apply(transformType.leftHand(), matrixStackIn.last());
             } else if (transformType == ItemDisplayContext.GROUND) {
                 matrixStackIn.translate(0.0F, 3.0F / 16.0F, 0.0F);
                 matrixStackIn.scale(0.25F, 0.25F, 0.25F);
@@ -291,14 +487,16 @@ public final class AMItemstackRenderer implements SpecialModelRenderer<AMItemsta
                 matrixStackIn.mulPose(Axis.YP.rotationDegrees(180));
             } else if (transformType == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND
                     || transformType == ItemDisplayContext.THIRD_PERSON_LEFT_HAND) {
-                // Hand contexts in the 26.1 special-render path don't match the baked-model origin,
-                // so applying the full JSON hand translation/rotation pushes the model away from the hand.
-                // Keep the legacy anchoring below and only apply the intended hand scale.
-                matrixStackIn.scale(0.375F, 0.375F, 0.375F);
+                // Layer always applies NO_TRANSFORM first (-0.5,-0.5,-0.5). Full hand ItemTransform ends with the same
+                // corner offset, so without this undo the display transform is composed twice and tears the model apart.
+                matrixStackIn.translate(0.5F, 0.5F, 0.5F);
+                boolean leftHand = transformType == ItemDisplayContext.THIRD_PERSON_LEFT_HAND;
+                TRANSMUTATION_TABLE_THIRD_PERSON_HAND.apply(leftHand, matrixStackIn.last());
             } else if (transformType == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND
                     || transformType == ItemDisplayContext.FIRST_PERSON_LEFT_HAND) {
-                // Same rationale as third-person hand: only apply scale.
-                matrixStackIn.scale(0.375F, 0.375F, 0.375F);
+                matrixStackIn.translate(0.5F, 0.5F, 0.5F);
+                boolean leftHand = transformType == ItemDisplayContext.FIRST_PERSON_LEFT_HAND;
+                TRANSMUTATION_TABLE_FIRST_PERSON_HAND.apply(leftHand, matrixStackIn.last());
             }
             matrixStackIn.translate(0.5F, 1.6F, 0.5F);
             matrixStackIn.mulPose(Axis.XP.rotationDegrees(-180));
@@ -506,7 +704,7 @@ public final class AMItemstackRenderer implements SpecialModelRenderer<AMItemsta
                 state.appendModelIdentityElement(ItemStackRenderState.FoilType.STANDARD);
             }
             layer.setExtents(ItemStackRenderState.LayerRenderState.NO_EXTENTS_SUPPLIER);
-            layer.setupSpecialModel(AMItemstackRenderer.INSTANCE, new AmSpecialItemPayload(stack, displayContext));
+            layer.setupSpecialModel(AMItemstackRenderer.INSTANCE, new AmSpecialItemPayload(stack, displayContext, owner));
             state.appendModelIdentityElement(stack);
         }
     }

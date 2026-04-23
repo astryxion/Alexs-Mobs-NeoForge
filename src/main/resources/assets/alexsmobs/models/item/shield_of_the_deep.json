@@ -101,5 +101,13 @@
 				0
 			]
 		}
-	}
+	},
+	"overrides": [
+		{
+			"predicate": {
+				"blocking": 1
+			},
+			"model": "alexsmobs:item/shield_of_the_deep_blocking"
+		}
+	]
 }

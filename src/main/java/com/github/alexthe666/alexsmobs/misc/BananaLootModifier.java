@@ -75,4 +75,9 @@ public class BananaLootModifier implements IGlobalLootModifier {
     public MapCodec<? extends IGlobalLootModifier> codec() {
         return CODEC.get();
     }
+
+    @Override
+    public int priority() {
+        return 0;
+    }
 }

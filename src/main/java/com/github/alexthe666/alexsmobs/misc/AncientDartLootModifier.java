@@ -58,4 +58,9 @@ public class AncientDartLootModifier implements IGlobalLootModifier {
         return CODEC.get();
     }
 
+    @Override
+    public int priority() {
+        return 0;
+    }
+
 }

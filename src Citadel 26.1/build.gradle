@@ -7,10 +7,6 @@ plugins {
     id 'idea'
 }
 
-// Root project redirects build outputs outside OneDrive to avoid "Files On-Demand" placeholder issues.
-// For Citadel, we want the jar in this subproject's local `build/libs/`.
-layout.buildDirectory.set(layout.projectDirectory.dir('build'))
-
 def rootGradleProps = new Properties()
 file("${rootDir}/gradle.properties").withInputStream { rootGradleProps.load(it) }
 def neoVer = rootGradleProps.getProperty('neo_version')
