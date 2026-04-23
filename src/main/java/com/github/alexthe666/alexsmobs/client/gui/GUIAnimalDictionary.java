@@ -4,6 +4,7 @@ import com.github.alexthe666.alexsmobs.client.render.RenderLaviathan;
 import com.github.alexthe666.alexsmobs.client.render.RenderMurmurBody;
 import com.github.alexthe666.alexsmobs.client.render.RenderUnderminer;
 import com.github.alexthe666.citadel.client.gui.GuiBasicBook;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -31,6 +32,8 @@ public class GUIAnimalDictionary extends GuiBasicBook {
         // No dimmed pane (1:1 with old renderBackground), but we must still prime the GUI stratum — an empty body
         // prevents book text, models, and widgets from compositing on 26.1.
         this.extractTransparentBackground(guiGraphics);
+        // Match Screen.extractBackground in-game tail (subtitles deferred into this pass).
+        Minecraft.getInstance().gui.extractDeferredSubtitles();
     }
 
     @Override

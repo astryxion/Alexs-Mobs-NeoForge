@@ -1,6 +1,7 @@
 package com.github.alexthe666.alexsmobs.client.render;
 
 import com.github.alexthe666.alexsmobs.client.AlexsMobsClientKeys;
+import com.github.alexthe666.alexsmobs.client.model.AlexAdvancedEntityModel;
 import com.github.alexthe666.alexsmobs.client.model.ModelSpectre;
 import com.github.alexthe666.alexsmobs.entity.EntitySpectre;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -64,8 +65,10 @@ public class RenderSpectre extends MobRenderer<EntitySpectre, LivingEntityRender
             }
             this.getParentModel().setupAnim(state);
             int overlay = LivingEntityRenderer.getOverlayCoords(state, 0.0F);
+            PoseStack citadelPoseStack = new PoseStack();
             collector.submitCustomGeometry(matrixStackIn, RenderTypes.eyes(TEXTURE_EYES), (pose, ivertexbuilder) ->
-                this.getParentModel().renderCitadelToBuffer(matrixStackIn, ivertexbuilder, 15728640, overlay, -1)
+                AlexAdvancedEntityModel.withCitadelSubmitPose(pose, citadelPoseStack, scratch ->
+                    this.getParentModel().renderCitadelToBuffer(scratch, ivertexbuilder, 15728640, overlay, -1))
             );
         }
     }
@@ -88,12 +91,15 @@ public class RenderSpectre extends MobRenderer<EntitySpectre, LivingEntityRender
             this.getParentModel().setupAnim(state);
             int overlay = LivingEntityRenderer.getOverlayCoords(state, 0);
             int alphaColor = AMColorUtil.packColor(1.0F, 1.0F, 1.0F, parentRenderer.getAlphaForRender(entitylivingbaseIn, partialTicks));
+            PoseStack citadelPoseStack = new PoseStack();
             collector.submitCustomGeometry(matrixStackIn, AMRenderTypes.getSpectreBones(TEXTURE), (pose, lvt_11_1_) ->
-                this.getParentModel().renderCitadelToBuffer(matrixStackIn, lvt_11_1_, 15728640, overlay, alphaColor)
+                AlexAdvancedEntityModel.withCitadelSubmitPose(pose, citadelPoseStack, scratch ->
+                    this.getParentModel().renderCitadelToBuffer(scratch, lvt_11_1_, 15728640, overlay, alphaColor))
             );
             if (entitylivingbaseIn.isLeashed()) {
                 collector.submitCustomGeometry(matrixStackIn, AMRenderTypes.entityCutoutNoCull(TEXTURE_LEAD), (pose, lead) ->
-                    this.getParentModel().renderCitadelToBuffer(matrixStackIn, lead, 15728640, overlay, -1)
+                    AlexAdvancedEntityModel.withCitadelSubmitPose(pose, citadelPoseStack, scratch ->
+                        this.getParentModel().renderCitadelToBuffer(scratch, lead, 15728640, overlay, -1))
                 );
             }
         }

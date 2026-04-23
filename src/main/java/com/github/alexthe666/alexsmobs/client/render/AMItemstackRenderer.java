@@ -275,16 +275,44 @@ public final class AMItemstackRenderer implements SpecialModelRenderer<AMItemsta
         }
         if (stack.getItem() == AMBlockRegistry.TRANSMUTATION_TABLE.get().asItem()) {
             matrixStackIn.pushPose();
+            // 26.1 SpecialModelRenderer path bypasses baked-model display transforms; re-apply JSON display transforms here.
+            // Matches `assets/alexsmobs/models/item/transmutation_table.json`.
+            if (transformType == ItemDisplayContext.GUI) {
+                matrixStackIn.mulPose(Axis.XP.rotationDegrees(30));
+                matrixStackIn.mulPose(Axis.YP.rotationDegrees(45));
+                matrixStackIn.scale(0.75F, 0.75F, 0.75F);
+            } else if (transformType == ItemDisplayContext.GROUND) {
+                matrixStackIn.translate(0.0F, 3.0F / 16.0F, 0.0F);
+                matrixStackIn.scale(0.25F, 0.25F, 0.25F);
+            } else if (transformType == ItemDisplayContext.FIXED) {
+                matrixStackIn.mulPose(Axis.YP.rotationDegrees(180));
+                matrixStackIn.scale(0.5F, 0.5F, 0.5F);
+            } else if (transformType == ItemDisplayContext.HEAD) {
+                matrixStackIn.mulPose(Axis.YP.rotationDegrees(180));
+            } else if (transformType == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND
+                    || transformType == ItemDisplayContext.THIRD_PERSON_LEFT_HAND) {
+                // Hand contexts in the 26.1 special-render path don't match the baked-model origin,
+                // so applying the full JSON hand translation/rotation pushes the model away from the hand.
+                // Keep the legacy anchoring below and only apply the intended hand scale.
+                matrixStackIn.scale(0.375F, 0.375F, 0.375F);
+            } else if (transformType == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND
+                    || transformType == ItemDisplayContext.FIRST_PERSON_LEFT_HAND) {
+                // Same rationale as third-person hand: only apply scale.
+                matrixStackIn.scale(0.375F, 0.375F, 0.375F);
+            }
             matrixStackIn.translate(0.5F, 1.6F, 0.5F);
             matrixStackIn.mulPose(Axis.XP.rotationDegrees(-180));
             TRANSMUTATION_TABLE_MODEL.resetToDefaultPose();
             bufferIn.submitCustomGeometry(matrixStackIn, AMRenderTypes.entityCutoutNoCull(TRANSMUTATION_TABLE_TEXTURE), (pose, consumer) ->
-                    TRANSMUTATION_TABLE_MODEL.renderToBuffer(matrixStackIn, consumer, combinedLightIn, combinedOverlayIn, -1));
+                AlexAdvancedEntityModel.withCitadelSubmitPose(pose, this.citadelPoseScratch, s ->
+                    TRANSMUTATION_TABLE_MODEL.renderToBuffer(s, consumer, combinedLightIn, combinedOverlayIn, -1)));
             bufferIn.submitCustomGeometry(matrixStackIn, RenderTypes.entityTranslucentEmissive(TRANSMUTATION_TABLE_GLOW_TEXTURE), (pose, consumer) ->
-                    TRANSMUTATION_TABLE_MODEL.renderToBuffer(matrixStackIn, consumer, combinedLightIn, combinedOverlayIn, -1));
+                AlexAdvancedEntityModel.withCitadelSubmitPose(pose, this.citadelPoseScratch, s ->
+                    TRANSMUTATION_TABLE_MODEL.renderToBuffer(s, consumer, combinedLightIn, combinedOverlayIn, -1)));
             TRANSMUTATION_TABLE_OVERLAY_MODEL.resetToDefaultPose();
             bufferIn.submitCustomGeometry(matrixStackIn, RenderTypes.eyes(TRANSMUTATION_TABLE_OVERLAY), (pose, consumer) ->
-                    TRANSMUTATION_TABLE_OVERLAY_MODEL.renderToBuffer(matrixStackIn, consumer, combinedLightIn, combinedOverlayIn, -1));
+                AlexAdvancedEntityModel.withCitadelSubmitPose(pose, this.citadelPoseScratch, s ->
+                    TRANSMUTATION_TABLE_OVERLAY_MODEL.renderToBuffer(s, consumer, combinedLightIn, combinedOverlayIn, -1)));
             matrixStackIn.popPose();
         }
         if (stack.getItem() == AMItemRegistry.SHATTERED_DIMENSIONAL_CARVER.get()) {
