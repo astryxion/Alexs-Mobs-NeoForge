@@ -34,7 +34,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
-
+import org.joml.Matrix3f;
 public class RenderMungus extends MobRenderer<EntityMungus, CitadelLivingRenderState, CitadelEntityModelBridge<EntityMungus>> {
     private static final Identifier TEXTURE = Identifier.parse("alexsmobs:textures/entity/mungus.png");
     private static final Identifier BEAM_TEXTURE = Identifier.parse("alexsmobs:textures/entity/mungus_beam.png");
@@ -70,8 +70,19 @@ public class RenderMungus extends MobRenderer<EntityMungus, CitadelLivingRenderS
         return mungus != null && mungus.isReverting();
     }
 
-    private static void vertex(VertexConsumer consumer, Matrix4f matrix, float x, float y, float z, int r, int g, int b, float u, float v) {
-        consumer.addVertex(matrix, x, y, z).setColor(r, g, b, 255).setUv(u, v).setOverlay(OverlayTexture.NO_OVERLAY).setLight(LightCoordsUtil.FULL_BRIGHT);
+    private static void vertex(VertexConsumer consumer,
+                           Matrix4f poseMatrix,
+                           PoseStack.Pose pose,
+                           float x, float y, float z,
+                           int r, int g, int b,
+                           float u, float v) {
+
+        consumer.addVertex(poseMatrix, x, y, z)
+            .setColor(r, g, b, 255)
+            .setUv(u, v)
+            .setOverlay(OverlayTexture.NO_OVERLAY)
+            .setLight(LightCoordsUtil.FULL_BRIGHT)
+            .setNormal(pose, 0.0F, 1.0F, 0.0F);
     }
 
     @Override
@@ -230,24 +241,50 @@ public class RenderMungus extends MobRenderer<EntityMungus, CitadelLivingRenderS
             float f30 = f4 * 0.5F + f29;
             PoseStack.Pose matrixstack$entry = poseStack.last();
             Matrix4f matrix4f = matrixstack$entry.pose();
-            collector.submitCustomGeometry(poseStack, beamType, (pose, ivertexbuilder) -> {
-                vertex(ivertexbuilder, matrix4f, f19, f4, f20, j, k, l, 0.4999F, f30);
-                vertex(ivertexbuilder, matrix4f, f19, 0.0F, f20, j, k, l, 0.4999F, f29);
-                vertex(ivertexbuilder, matrix4f, f21, 0.0F, f22, j, k, l, 0.0F, f29);
-                vertex(ivertexbuilder, matrix4f, f21, f4, f22, j, k, l, 0.0F, f30);
-                vertex(ivertexbuilder, matrix4f, f23, f4, f24, j, k, l, 0.4999F, f30);
-                vertex(ivertexbuilder, matrix4f, f23, 0.0F, f24, j, k, l, 0.4999F, f29);
-                vertex(ivertexbuilder, matrix4f, f25, 0.0F, f26, j, k, l, 0.0F, f29);
-                vertex(ivertexbuilder, matrix4f, f25, f4, f26, j, k, l, 0.0F, f30);
-                float f31 = 0.0F;
-                if (entityIn.tickCount % 4 > 1) {
-                    f31 = 0.5F;
-                }
+            collector.submitCustomGeometry(poseStack, beamType, (pose, consumer) -> {
 
-                vertex(ivertexbuilder, matrix4f, f11, f4, f12, j, k, l, 0.5F, f31 + 0.5F);
-                vertex(ivertexbuilder, matrix4f, f13, f4, f14, j, k, l, 1.0F, f31 + 0.5F);
-                vertex(ivertexbuilder, matrix4f, f17, f4, f18, j, k, l, 1.0F, f31);
-                vertex(ivertexbuilder, matrix4f, f15, f4, f16, j, k, l, 0.5F, f31);
+                Matrix4f mat = pose.pose();
+                Matrix3f normalMatrix = pose.normal();
+
+                vertex(consumer, mat, pose,
+                        f19, f4, f20,
+                        j, k, l,
+                        0.4999F, f30);
+
+                vertex(consumer, mat, pose,
+                        f19, 0.0F, f20,
+                        j, k, l,
+                        0.4999F, f29);
+
+                vertex(consumer, mat, pose,
+                        f21, 0.0F, f22,
+                        j, k, l,
+                        0.0F, f29);
+
+                vertex(consumer, mat, pose,
+                        f21, f4, f22,
+                        j, k, l,
+                        0.0F, f30);
+
+                vertex(consumer, mat, pose,
+                        f23, f4, f24,
+                        j, k, l,
+                        0.4999F, f30);
+
+                vertex(consumer, mat, pose,
+                        f23, 0.0F, f24,
+                        j, k, l,
+                        0.4999F, f29);
+
+                vertex(consumer, mat, pose,
+                        f25, 0.0F, f26,
+                        j, k, l,
+                        0.0F, f29);
+
+                vertex(consumer, mat, pose,
+                        f25, f4, f26,
+                        j, k, l,
+                        0.0F, f30);
             });
             poseStack.popPose();
         }
