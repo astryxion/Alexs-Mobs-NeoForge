@@ -351,8 +351,8 @@ public class EntityBaldEagle extends TamableAnimal implements IFollower, IFalcon
                     ItemStackTemplate remainderTemplate = itemstack.getItem().getCraftingRemainder();
                     if (remainderTemplate != null) {
                         ItemStack remainder = remainderTemplate.create();
-                        if (!remainder.isEmpty()) {
-                            this.spawnAtLocation((ServerLevel) this.level(), remainder);
+                        if (!remainder.isEmpty() && this.level() instanceof ServerLevel serverLevel) {
+                            this.spawnAtLocation(serverLevel, remainder);
                         }
                     }
                 }
@@ -387,7 +387,9 @@ public class EntityBaldEagle extends TamableAnimal implements IFollower, IFalcon
                         itemstack.hurtAndBreak(1, (ServerPlayer) player, EquipmentSlot.MAINHAND);
                     }
                 }
-                this.spawnAtLocation((ServerLevel) this.level(), AMItemRegistry.FALCONRY_HOOD.get());
+                if (this.level() instanceof ServerLevel serverLevel) {
+                    this.spawnAtLocation(serverLevel, AMItemRegistry.FALCONRY_HOOD.get());
+                }
                 this.setCap(false);
                 return InteractionResult.SUCCESS;
             } else if (!this.isBaby() && getRidingFalcons(player) <= 0 && (player.getItemInHand(InteractionHand.MAIN_HAND).getItem() == AMItemRegistry.FALCONRY_GLOVE.get() || player.getItemInHand(InteractionHand.OFF_HAND).getItem() == AMItemRegistry.FALCONRY_GLOVE.get())) {

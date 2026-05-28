@@ -222,7 +222,12 @@ public class EntityCrow extends TamableAnimal implements ITargetsDroppedItems {
                 this.yHeadRot = ((Player) riding).yHeadRot;
                 this.yRotO = ((Player) riding).yHeadRot;
                 this.setPos(riding.getX() + extraX, riding.getY() + extraY, riding.getZ() + extraZ);
-                if (!riding.isAlive() || boardingCooldown == 0 && riding.isShiftKeyDown() || ((Player) riding).isFallFlying() || this.getTarget() != null && this.getTarget().isAlive()) {
+                final boolean crouchDismount = boardingCooldown == 0 && riding.isShiftKeyDown();
+                if (!riding.isAlive() || crouchDismount || ((Player) riding).isFallFlying() || this.getTarget() != null && this.getTarget().isAlive()) {
+                    if (crouchDismount) {
+                        // Transition back to normal crow-follow behavior/animation after player crouch dismount.
+                        this.setFlying(true);
+                    }
                     this.removeVehicle();
                     if (!this.level().isClientSide()) {
                         AlexsMobs.sendMSGToAll(new MessageCrowDismount(this.getId(), riding.getId()));
@@ -253,7 +258,9 @@ public class EntityCrow extends TamableAnimal implements ITargetsDroppedItems {
         final ItemStack itemstack = player.getItemInHand(hand);
         final InteractionResult type = super.mobInteract(player, hand);
         if (!this.getMainHandItem().isEmpty() && type != InteractionResult.SUCCESS) {
-            this.spawnAtLocation((ServerLevel) this.level(), this.getMainHandItem().copy());
+            if (this.level() instanceof ServerLevel serverLevel) {
+                this.spawnAtLocation(serverLevel, this.getMainHandItem().copy());
+            }
             this.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
             return InteractionResult.SUCCESS;
         } else {
@@ -278,13 +285,17 @@ public class EntityCrow extends TamableAnimal implements ITargetsDroppedItems {
                 this.setOrderedToSit(sit);
                 return InteractionResult.SUCCESS;
             }
-            return super.mobInteract(player, hand);
+            return type;
         }
     }
 
 
     public void tick() {
         super.tick();
+        if (this.isPassenger() && this.isFlying()) {
+            // Perched crows should not remain in wing-flap flight state.
+            this.setFlying(false);
+        }
         this.prevAttackProgress = attackProgress;
         prevFlyProgress = flyProgress;
         this.prevSitProgress = this.sitProgress;
@@ -355,8 +366,8 @@ public class EntityCrow extends TamableAnimal implements ITargetsDroppedItems {
                 ItemStackTemplate remainderTemplate = this.getMainHandItem().getItem().getCraftingRemainder();
                 if (remainderTemplate != null) {
                     ItemStack remainder = remainderTemplate.create();
-                    if (!remainder.isEmpty()) {
-                        this.spawnAtLocation((ServerLevel) this.level(), remainder);
+                    if (!remainder.isEmpty() && this.level() instanceof ServerLevel serverLevel) {
+                        this.spawnAtLocation(serverLevel, remainder);
                     }
                 }
                 this.getMainHandItem().shrink(1);
@@ -618,8 +629,8 @@ public class EntityCrow extends TamableAnimal implements ITargetsDroppedItems {
     public void onGetItem(ItemEntity e) {
         final ItemStack duplicate = e.getItem().copy();
         duplicate.setCount(1);
-        if (!this.getItemInHand(InteractionHand.MAIN_HAND).isEmpty() && !this.level().isClientSide()) {
-            this.spawnAtLocation((ServerLevel) this.level(), this.getItemInHand(InteractionHand.MAIN_HAND), 0.0F);
+        if (!this.getItemInHand(InteractionHand.MAIN_HAND).isEmpty() && this.level() instanceof ServerLevel serverLevel) {
+            this.spawnAtLocation(serverLevel, this.getItemInHand(InteractionHand.MAIN_HAND), 0.0F);
         }
         this.setItemInHand(InteractionHand.MAIN_HAND, duplicate);
         Entity itemThrower = e.getOwner();

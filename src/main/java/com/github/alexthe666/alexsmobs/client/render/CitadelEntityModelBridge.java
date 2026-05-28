@@ -49,6 +49,17 @@ public final class CitadelEntityModelBridge<E extends LivingEntity> extends Enti
     }
 
     /**
+     * Convenience overload for deferred submit callbacks that provide a baked pose instead of a mutable stack.
+     */
+    public void renderCitadelToBuffer(PoseStack.Pose pose, VertexConsumer buffer, int packedLight, int packedOverlay, int color) {
+        PoseStack stack = new PoseStack();
+        stack.pushPose();
+        stack.last().set(pose);
+        this.citadel.renderToBuffer(stack, buffer, packedLight, packedOverlay, color);
+        stack.popPose();
+    }
+
+    /**
      * Sets {@link AlexAdvancedEntityModel#young} on the wrapped Citadel model (replaces removed {@code EntityModel#young}).
      */
     public void setCitadelYoung(boolean young) {

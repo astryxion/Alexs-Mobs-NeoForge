@@ -53,6 +53,8 @@ public class CrowAIFollowOwner extends Goal {
             return false;
         } else if (lvt_1_1_.isSpectator()) {
             return false;
+        } else if (lvt_1_1_.isShiftKeyDown()) {
+            return false;
         } else if (this.crow.isSitting() || crow.isPassenger()) {
             return false;
         } else if (crow.getCommand() != 1) {
@@ -67,6 +69,8 @@ public class CrowAIFollowOwner extends Goal {
 
     public boolean canContinueToUse() {
         if (this.crow.isSitting()) {
+            return false;
+        } else if (this.owner != null && this.owner.isShiftKeyDown()) {
             return false;
         } else {
             return crow.getCommand() == 1 && !crow.isPassenger() && (crow.getTarget() == null || !crow.getTarget().isAlive());
@@ -111,7 +115,7 @@ public class CrowAIFollowOwner extends Goal {
                 }
                 if(circlingTime > maxCircleTime && crow.getRidingCrows(owner) < 2){
                     crow.getMoveControl().setWantedPosition(owner.getX(), owner.getY() + owner.getEyeHeight() + 0.2F, owner.getZ(), 0.7F);
-                    if(crow.distanceTo(owner) < 2){
+                    if(crow.distanceTo(owner) < 2 && !owner.isShiftKeyDown()){
                         crow.startRiding(owner, true, false);
                         if (!crow.level().isClientSide()) {
                             AlexsMobs.sendMSGToAll(new MessageCrowMountPlayer(crow.getId(), owner.getId()));

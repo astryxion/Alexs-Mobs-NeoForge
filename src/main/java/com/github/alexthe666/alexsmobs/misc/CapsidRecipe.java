@@ -16,12 +16,18 @@ import java.lang.reflect.Type;
 
 public class CapsidRecipe {
     private final NonNullList<Ingredient> ingredients;
-    private ItemStack result = ItemStack.EMPTY;
-    private int time = 0;
+    private final Item resultItem;
+    private final int resultCount;
+    private final int time;
 
     public CapsidRecipe(NonNullList<Ingredient> ingredients, ItemStack result, int time) {
-        this.result = result;
+        this(ingredients, result.getItem(), result.getCount(), time);
+    }
+
+    public CapsidRecipe(NonNullList<Ingredient> ingredients, Item resultItem, int resultCount, int time) {
         this.ingredients = ingredients;
+        this.resultItem = resultItem;
+        this.resultCount = resultCount;
         this.time = time;
     }
 
@@ -29,18 +35,19 @@ public class CapsidRecipe {
         NonNullList<Ingredient> nonnulllist = NonNullList.create();
 
         for (int i = 0; i < ingredientArray.size(); ++i) {
-            Ingredient ingredient = Ingredient.CODEC.decode(com.mojang.serialization.JsonOps.INSTANCE, ingredientArray.get(i))
-                    .getOrThrow(msg -> new JsonParseException(String.valueOf(msg)))
-                    .getFirst();
-            if (!ingredient.isEmpty()) {
-                nonnulllist.add(ingredient);
-            }
+            Ingredient.CODEC.parse(com.mojang.serialization.JsonOps.INSTANCE, ingredientArray.get(i))
+                    .result()
+                    .ifPresent(ingredient -> {
+                        if (!ingredient.isEmpty()) {
+                            nonnulllist.add(ingredient);
+                        }
+                    });
         }
         return nonnulllist;
     }
 
     public ItemStack getResult() {
-        return result;
+        return resultItem == Items.AIR ? ItemStack.EMPTY : new ItemStack(resultItem, resultCount);
     }
 
     public NonNullList<Ingredient> getIngredients() {
@@ -72,16 +79,16 @@ public class CapsidRecipe {
         public CapsidRecipe deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             JsonObject jsonobject = json.getAsJsonObject();
             int time = JsonUtils.getInt(jsonobject, "time");
-            ItemStack result = ItemStack.EMPTY;
+            Item resultItem = Items.AIR;
+            int count = 1;
             if (jsonobject.has("result")) {
                 JsonObject resultObj = JsonUtils.getJsonObject(jsonobject, "result");
                 net.minecraft.resources.Identifier itemId = net.minecraft.resources.Identifier.parse(resultObj.get("item").getAsString());
-                Item item = BuiltInRegistries.ITEM.get(itemId).map(Holder::value).orElse(Items.AIR);
-                int count = resultObj.has("count") ? resultObj.get("count").getAsInt() : 1;
-                result = new ItemStack(item, count);
+                resultItem = BuiltInRegistries.ITEM.get(itemId).map(Holder::value).orElse(Items.AIR);
+                count = resultObj.has("count") ? resultObj.get("count").getAsInt() : 1;
             }
             NonNullList<Ingredient> nonnulllist = readIngredients(JsonUtils.getJsonArray(jsonobject, "ingredients"));
-            return new CapsidRecipe(nonnulllist, result, time);
+            return new CapsidRecipe(nonnulllist, resultItem, count, time);
         }
 
     }

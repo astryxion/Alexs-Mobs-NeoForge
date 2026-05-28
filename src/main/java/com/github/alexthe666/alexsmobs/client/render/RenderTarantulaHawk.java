@@ -131,11 +131,15 @@ public class RenderTarantulaHawk extends MobRenderer<
             int finalOverlay = overlay;
             boolean baby = entityFix != null && entityFix.isBaby();
             collector.submitCustomGeometry(poseStack, renderType, (pose, consumer) -> {
+                PoseStack stack = new PoseStack();
+                stack.pushPose();
+                stack.last().set(pose);
                 if (baby) {
-                    MODEL_BABY.renderToBuffer(poseStack, consumer, state.lightCoords, finalOverlay, finalTint);
+                    MODEL_BABY.renderToBuffer(stack, consumer, state.lightCoords, finalOverlay, finalTint);
                 } else {
-                    MODEL.renderToBuffer(poseStack, consumer, state.lightCoords, finalOverlay, finalTint);
+                    MODEL.renderToBuffer(stack, consumer, state.lightCoords, finalOverlay, finalTint);
                 }
+                stack.popPose();
             });
         }
         if (this.shouldRenderLayers(state) && !this.layers.isEmpty()) {

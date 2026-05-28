@@ -140,17 +140,44 @@ public class EntitySpectre extends Animal implements FlyingAnimal {
     protected void checkFallDamage(double y, boolean onGroundIn, BlockState state, BlockPos pos) {
     }
 
+    private boolean isLeashedToEntity() {
+        Entity holder = this.getLeashHolder();
+        return holder != null && !(holder instanceof LeashFenceKnotEntity);
+    }
+
+    private void updateFacingFromVelocity() {
+        Vec3 motion = this.getDeltaMovement();
+        if (motion.lengthSqr() > 1.0E-4D) {
+            this.setYRot(-((float) Mth.atan2(motion.x, motion.z)) * Mth.RAD_TO_DEG);
+            this.yBodyRot = this.getYRot();
+        }
+        this.birdPitch = (float) -((float) motion.y * 0.5F * (double) Mth.RAD_TO_DEG);
+    }
+
+    private void updateFacingTowardHolder(Entity holder) {
+        double dx = holder.getX() - this.getX();
+        double dz = holder.getZ() - this.getZ();
+        if (dx * dx + dz * dz > 1.0E-4D) {
+            float targetYaw = (float) (Mth.atan2(dx, dz) * Mth.RAD_TO_DEG);
+            this.setYRot(Mth.approachDegrees(this.getYRot(), targetYaw, 12.0F));
+            this.yBodyRot = this.getYRot();
+        }
+        double dy = holder.getEyeY() - this.getEyeY();
+        float horizDist = Mth.sqrt((float) (dx * dx + dz * dz));
+        float targetPitch = (float) (-(Mth.atan2(dy, horizDist) * Mth.RAD_TO_DEG) * 0.5F);
+        this.birdPitch = Mth.lerp(0.25F, this.birdPitch, targetPitch);
+    }
+
     public void tick() {
         super.tick();
-        Vec3 vector3d1 = this.getDeltaMovement();
-        this.setYRot( -((float) Mth.atan2(vector3d1.x, vector3d1.z)) * Mth.RAD_TO_DEG);
-        this.yBodyRot = this.getYRot();
-
         prevBirdPitch = this.birdPitch;
         noPhysics = true;
-        this.birdPitch = (float) -((float) this.getDeltaMovement().y * 0.5F * (double) Mth.RAD_TO_DEG);
-        if (this.getLeashHolder() != null && !(this.getLeashHolder() instanceof LeashFenceKnotEntity)) {
+
+        if (this.isLeashedToEntity()) {
             Entity entity = this.getLeashHolder();
+            this.getNavigation().stop();
+            this.tickLeashedMovement();
+
             float f = this.distanceTo(entity);
             if (f > 10) {
                 final double d0 = (this.getX() - entity.getX()) / (double) f;
@@ -165,18 +192,25 @@ public class EntitySpectre extends Animal implements FlyingAnimal {
             if (entity.isShiftKeyDown()) {
                 this.dropLeash();
             }
+            this.updateFacingTowardHolder(entity);
+        } else {
+            this.updateFacingFromVelocity();
         }
-        if (this.getLeashHolder() != null && !this.getLeashHolder().isPassenger() && !(this.getLeashHolder() instanceof LeashFenceKnotEntity)) {
-            float fLeash = this.distanceTo(this.getLeashHolder());
-            if (fLeash > 30) {
-                Entity holder = this.getLeashHolder();
-                double lvt_3_1_ = (holder.getX() - this.getX()) / (double) fLeash;
-                double lvt_5_1_ = (holder.getY() - this.getY()) / (double) fLeash;
-                double lvt_7_1_ = (holder.getZ() - this.getZ()) / (double) fLeash;
-                this.setDeltaMovement(this.getDeltaMovement().add(Math.copySign(lvt_3_1_ * lvt_3_1_ * 0.4D, lvt_3_1_), Math.copySign(lvt_5_1_ * lvt_5_1_ * 0.4D, lvt_5_1_), Math.copySign(lvt_7_1_ * lvt_7_1_ * 0.4D, lvt_7_1_)));
-            }
+    }
+
+    private void tickLeashedMovement() {
+        Entity holder = this.getLeashHolder();
+        if (holder == null || holder.isPassenger()) {
+            return;
         }
-        if (this.getLeashHolder() != null && (!this.isAlive() || !this.getLeashHolder().isAlive())) {
+        float f = this.distanceTo(holder);
+        if (f > 30) {
+            double dx = (holder.getX() - this.getX()) / (double) f;
+            double dy = (holder.getY() - this.getY()) / (double) f;
+            double dz = (holder.getZ() - this.getZ()) / (double) f;
+            this.setDeltaMovement(this.getDeltaMovement().add(Math.copySign(dx * dx * 0.4D, dx), Math.copySign(dy * dy * 0.4D, dy), Math.copySign(dz * dz * 0.4D, dz)));
+        }
+        if (!this.isAlive() || !holder.isAlive()) {
             this.dropLeash();
         }
     }
@@ -205,6 +239,9 @@ public class EntitySpectre extends Animal implements FlyingAnimal {
         }
 
         public void tick() {
+            if (parentEntity.isLeashedToEntity()) {
+                return;
+            }
             if (this.operation == MoveControl.Operation.MOVE_TO) {
                 Vec3 vector3d = new Vec3(this.wantedX - parentEntity.getX(), this.wantedY - parentEntity.getY(), this.wantedZ - parentEntity.getZ());
                 double d5 = vector3d.length();
@@ -255,7 +292,7 @@ public class EntitySpectre extends Animal implements FlyingAnimal {
         }
 
         public boolean canUse() {
-            if (parentEntity.lurePos != null) {
+            if (parentEntity.lurePos != null || parentEntity.isLeashedToEntity()) {
                 return false;
             }
             MoveControl movementcontroller = this.parentEntity.getMoveControl();
@@ -272,7 +309,7 @@ public class EntitySpectre extends Animal implements FlyingAnimal {
         }
 
         public boolean canContinueToUse() {
-            return parentEntity.lurePos == null;
+            return parentEntity.lurePos == null && !parentEntity.isLeashedToEntity();
         }
 
         public void stop() {
