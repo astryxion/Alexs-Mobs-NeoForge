@@ -35,7 +35,7 @@ public class BlockEnderResidue extends TransparentBlock {
     public static final BooleanProperty SLOW_DECAY = BooleanProperty.create("slow_decay");
 
     public static BlockBehaviour.Properties defaultProperties() {
-        return BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_LIGHT_BLUE).noOcclusion().postProcess((state, getter, pos) -> pos).emissiveRendering((state, getter, pos) -> true).lightLevel((i) -> 3).strength(0.2F).sound(SoundType.AMETHYST).randomTicks().noOcclusion();
+        return BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_LIGHT_BLUE).noOcclusion().postProcess((state, getter, pos) -> pos).emissiveRendering(state -> true).lightLevel((i) -> 3).strength(0.2F).sound(SoundType.AMETHYST).randomTicks().noOcclusion();
     }
 
     public BlockEnderResidue(BlockBehaviour.Properties props) {

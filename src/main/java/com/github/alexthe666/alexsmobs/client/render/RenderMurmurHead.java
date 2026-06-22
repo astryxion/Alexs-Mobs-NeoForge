@@ -9,7 +9,7 @@ import com.github.alexthe666.alexsmobs.misc.AMBlockPos;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -166,8 +166,8 @@ public class RenderMurmurHead extends MobRenderer<EntityMurmurHead, LivingEntity
     private int getLightColor(EntityMurmurHead head, Vec3 vec3) {
         BlockPos blockpos = AMBlockPos.fromVec3(vec3);
         if (head.level().hasChunkAt(blockpos)) {
-            int i = LevelRenderer.getLightCoords(head.level(), blockpos);
-            int j = LevelRenderer.getLightCoords(head.level(), blockpos.above());
+            int i = LightCoordsUtil.getLightCoords(head.level(), blockpos);
+            int j = LightCoordsUtil.getLightCoords(head.level(), blockpos.above());
             int k = i & 255;
             int l = j & 255;
             int i1 = i >> 16 & 255;

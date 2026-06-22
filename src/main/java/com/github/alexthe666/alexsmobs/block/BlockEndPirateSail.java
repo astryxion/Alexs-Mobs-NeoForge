@@ -33,7 +33,7 @@ public class BlockEndPirateSail extends Block {
     public static final MapCodec<BlockEndPirateSail> CODEC = simpleCodec(BlockEndPirateSail::new);
 
     public static BlockBehaviour.Properties defaultProperties() {
-        return BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLUE).noOcclusion().emissiveRendering((a, b, c) -> true).sound(SoundType.WOOL).lightLevel((state) -> 5).requiresCorrectToolForDrops().strength(0.4F);
+        return BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLUE).noOcclusion().emissiveRendering(state -> true).sound(SoundType.WOOL).lightLevel((state) -> 5).requiresCorrectToolForDrops().strength(0.4F);
     }
 
     public BlockEndPirateSail(BlockBehaviour.Properties props) {

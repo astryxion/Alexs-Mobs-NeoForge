@@ -295,7 +295,7 @@ public class EntityOrca extends TamableAnimal implements IAnimatedEntity {
                     this.playSound(SoundEvents.DOLPHIN_ATTACK, 1.0F, 1.0F);
                 }
                 final float yRotRad = this.getYRot() * Mth.DEG_TO_RAD;
-                attackTarget.knockback(1F, Mth.sin(yRotRad), -Mth.cos(yRotRad));
+                attackTarget.knockback(1F, Mth.sin(yRotRad), -Mth.cos(yRotRad), this.damageSources().mobAttack(this), 1.0F);
                 float knockbackResist = (float) Mth.clamp((1.0D - this.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE)), 0, 1);
                 this.getTarget().setDeltaMovement(this.getTarget().getDeltaMovement().add(0, knockbackResist * 0.4F, 0));
 

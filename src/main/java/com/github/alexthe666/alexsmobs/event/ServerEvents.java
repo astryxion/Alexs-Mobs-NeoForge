@@ -308,7 +308,7 @@ public class ServerEvents {
         if (event.getTarget() instanceof LivingEntity living) {
             if (event.getEntity().getItemBySlot(EquipmentSlot.HEAD).getItem() == AMItemRegistry.MOOSE_HEADGEAR.get()) {
                 living.knockback(1F, Mth.sin(event.getEntity().getYRot() * Mth.DEG_TO_RAD),
-                        -Mth.cos(event.getEntity().getYRot() * Mth.DEG_TO_RAD));
+                        -Mth.cos(event.getEntity().getYRot() * Mth.DEG_TO_RAD), event.getEntity().damageSources().mobAttack(event.getEntity()), 1.0F);
             }
             if (event.getEntity().hasEffect(AMEffectRegistry.TIGERS_BLESSING)
                     && !event.getTarget().isAlliedTo(event.getEntity()) && !(event.getTarget() instanceof EntityTiger)) {
@@ -334,7 +334,7 @@ public class ServerEvents {
 
     @SubscribeEvent
     public static void onStruckByLightning(EntityStruckByLightningEvent event) {
-        if (event.getEntity().getType() == EntityType.SQUID && !event.getEntity().level().isClientSide()) {
+        if (event.getEntity().getType() == EntityTypes.SQUID && !event.getEntity().level().isClientSide()) {
             ServerLevel level = (ServerLevel) event.getEntity().level();
             event.setCanceled(true);
             EntityGiantSquid squid = AMEntityRegistry.GIANT_SQUID.get().create(level, EntitySpawnReason.CONVERSION);
@@ -622,7 +622,7 @@ public class ServerEvents {
                     if (attacker.distanceTo(player) < attacker.getBbWidth() + player.getBbWidth() + 0.5F) {
                         attacker.hurt(attacker.damageSources().thorns(player), 1F);
                         attacker.knockback(0.5F, Mth.sin((attacker.getYRot() + 180) * Mth.DEG_TO_RAD),
-                                -Mth.cos((attacker.getYRot() + 180) * Mth.DEG_TO_RAD));
+                                -Mth.cos((attacker.getYRot() + 180) * Mth.DEG_TO_RAD), attacker.damageSources().thorns(player), 1.0F);
                     }
                 }
             }

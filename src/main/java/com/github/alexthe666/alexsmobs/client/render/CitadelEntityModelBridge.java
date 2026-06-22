@@ -38,7 +38,6 @@ public final class CitadelEntityModelBridge<E extends LivingEntity> extends Enti
         this.citadel.renderToBuffer(poseStack, buffer, packedLight, packedOverlay, color);
     }
 
-    @Override
     public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay) {
         this.citadel.renderToBuffer(poseStack, buffer, packedLight, packedOverlay, -1);
     }

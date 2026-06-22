@@ -97,22 +97,22 @@ public class EntityElephant extends TamableAnimal implements ITargetsDroppedItem
     private static final EntityDataAccessor<Integer> CARPET_COLOR = SynchedEntityData.defineId(EntityElephant.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> TRADER = SynchedEntityData.defineId(EntityElephant.class, EntityDataSerializers.BOOLEAN);
     public static final Map<DyeColor, Item> DYE_COLOR_ITEM_MAP = Util.make(Maps.newHashMap(), (map) -> {
-        map.put(DyeColor.WHITE, Items.WHITE_CARPET);
-        map.put(DyeColor.ORANGE, Items.ORANGE_CARPET);
-        map.put(DyeColor.MAGENTA, Items.MAGENTA_CARPET);
-        map.put(DyeColor.LIGHT_BLUE, Items.LIGHT_BLUE_CARPET);
-        map.put(DyeColor.YELLOW, Items.YELLOW_CARPET);
-        map.put(DyeColor.LIME, Items.LIME_CARPET);
-        map.put(DyeColor.PINK, Items.PINK_CARPET);
-        map.put(DyeColor.GRAY, Items.GRAY_CARPET);
-        map.put(DyeColor.LIGHT_GRAY, Items.LIGHT_GRAY_CARPET);
-        map.put(DyeColor.CYAN, Items.CYAN_CARPET);
-        map.put(DyeColor.PURPLE, Items.PURPLE_CARPET);
-        map.put(DyeColor.BLUE, Items.BLUE_CARPET);
-        map.put(DyeColor.BROWN, Items.BROWN_CARPET);
-        map.put(DyeColor.GREEN, Items.GREEN_CARPET);
-        map.put(DyeColor.RED, Items.RED_CARPET);
-        map.put(DyeColor.BLACK, Items.BLACK_CARPET);
+        map.put(DyeColor.WHITE, Items.CARPET.white());
+        map.put(DyeColor.ORANGE, Items.CARPET.orange());
+        map.put(DyeColor.MAGENTA, Items.CARPET.magenta());
+        map.put(DyeColor.LIGHT_BLUE, Items.CARPET.lightBlue());
+        map.put(DyeColor.YELLOW, Items.CARPET.yellow());
+        map.put(DyeColor.LIME, Items.CARPET.lime());
+        map.put(DyeColor.PINK, Items.CARPET.pink());
+        map.put(DyeColor.GRAY, Items.CARPET.gray());
+        map.put(DyeColor.LIGHT_GRAY, Items.CARPET.lightGray());
+        map.put(DyeColor.CYAN, Items.CARPET.cyan());
+        map.put(DyeColor.PURPLE, Items.CARPET.purple());
+        map.put(DyeColor.BLUE, Items.CARPET.blue());
+        map.put(DyeColor.BROWN, Items.CARPET.brown());
+        map.put(DyeColor.GREEN, Items.CARPET.green());
+        map.put(DyeColor.RED, Items.CARPET.red());
+        map.put(DyeColor.BLACK, Items.CARPET.black());
     });
     private static final Identifier TRADER_LOOT = Identifier.fromNamespaceAndPath("alexsmobs", "gameplay/trader_elephant_chest");
     public boolean forcedSit = false;
@@ -387,7 +387,7 @@ public class EntityElephant extends TamableAnimal implements ITargetsDroppedItem
                 this.setAnimation(ANIMATION_FLING);
             }
             if (this.distanceTo(target) < 2.1D && charging) {
-                target.knockback(1F, target.getX() - this.getX(), target.getZ() - this.getZ());
+                target.knockback(1F, target.getX() - this.getX(), target.getZ() - this.getZ(), this.damageSources().mobAttack(this), 1.0F);
                 target.needsSync = true;
                 target.setDeltaMovement(target.getDeltaMovement().add(0, 0.7F, 0));
                 if (this.level() instanceof ServerLevel serverLevel) {
@@ -399,7 +399,7 @@ public class EntityElephant extends TamableAnimal implements ITargetsDroppedItem
             }
             double dist = this.distanceTo(target);
             if (dist < 4.5D + maxAttackMod && this.getAnimation() == ANIMATION_FLING && this.getAnimationTick() == 15) {
-                target.knockback(1F, target.getX() - this.getX(), target.getZ() - this.getZ());
+                target.knockback(1F, target.getX() - this.getX(), target.getZ() - this.getZ(), this.damageSources().mobAttack(this), 1.0F);
                 target.setDeltaMovement(target.getDeltaMovement().add(0, 0.3F, 0));
                 launch(target, false);
                 if (this.level() instanceof ServerLevel serverLevel) {
@@ -407,7 +407,7 @@ public class EntityElephant extends TamableAnimal implements ITargetsDroppedItem
                 }
             }
             if (dist < 4.5D + maxAttackMod && this.getAnimation() == ANIMATION_STOMP && this.getAnimationTick() == 17) {
-                target.knockback(0.3F, target.getX() - this.getX(), target.getZ() - this.getZ());
+                target.knockback(0.3F, target.getX() - this.getX(), target.getZ() - this.getZ(), this.damageSources().mobAttack(this), 1.0F);
                 if (this.level() instanceof ServerLevel serverLevel) {
                     target.hurtServer(serverLevel, this.damageSources().mobAttack(this), (float) this.getAttribute(Attributes.ATTACK_DAMAGE).getBaseValue());
                 }

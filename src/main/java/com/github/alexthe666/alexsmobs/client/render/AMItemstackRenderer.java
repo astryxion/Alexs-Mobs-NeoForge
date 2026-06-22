@@ -205,11 +205,19 @@ public final class AMItemstackRenderer implements SpecialModelRenderer<AMItemsta
 
     private final Map<String, Entity> renderedEntites = new HashMap<>();
     private final List<EntityType<?>> blockedRenderEntities = new ArrayList<>();
+    /** Client-only tab preview entities are never added to the level; 26.2 requires {@link Entity#setId(int)} before render. */
+    private static int nextTabPreviewEntityId = -10000;
     /** Citadel {@link ModelShieldOfTheDeep} draws from {@link PoseStack#last()}; must match {@code submitCustomGeometry} pose at replay. */
     private final PoseStack citadelPoseScratch = new PoseStack();
 
     public static void incrementTick() {
         ticksExisted++;
+    }
+
+    private static Entity createTabPreviewEntity(EntityType<?> type, Level level) {
+        Entity entity = type.create(level, EntitySpawnReason.MOB_SUMMONED);
+        entity.setId(nextTabPreviewEntityId--);
+        return entity;
     }
 
     /**
@@ -561,7 +569,7 @@ public final class AMItemstackRenderer implements SpecialModelRenderer<AMItemsta
                     }
                     if (this.renderedEntites.get(index) == null && !blockedRenderEntities.contains(local)) {
                         try {
-                            Entity entity = local.create(level, EntitySpawnReason.MOB_SUMMONED);
+                            Entity entity = createTabPreviewEntity(local, level);
                             if (entity instanceof EntityBlobfish) {
                                 ((EntityBlobfish) entity).setDepressurized(true);
                             }
@@ -580,7 +588,7 @@ public final class AMItemstackRenderer implements SpecialModelRenderer<AMItemsta
                     if (type != null) {
                         if (this.renderedEntites.get(type.getDescriptionId()) == null && !blockedRenderEntities.contains(type)) {
                             try {
-                                Entity entity = type.create(level, EntitySpawnReason.MOB_SUMMONED);
+                                Entity entity = createTabPreviewEntity(type, level);
                                 if (entity instanceof EntityBlobfish) {
                                     ((EntityBlobfish) entity).setDepressurized(true);
                                 }

@@ -11,7 +11,7 @@ import com.github.alexthe666.alexsmobs.entity.ai.BoneSerpentPathNavigator;
 import com.github.alexthe666.alexsmobs.item.AMItemRegistry;
 import com.github.alexthe666.alexsmobs.misc.AMBlockPos;
 import com.github.alexthe666.alexsmobs.misc.AMTagRegistry;
-import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.advancements.triggers.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.Direction;
@@ -38,7 +38,7 @@ import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.RandomStrollGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.util.LandRandomPos;
-import net.minecraft.world.entity.animal.Bucketable;
+import net.minecraft.world.entity.Bucketable;
 import net.minecraft.world.entity.animal.fish.WaterAnimal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
@@ -333,7 +333,7 @@ public class EntityStradpole extends WaterAnimal implements Bucketable {
         if (entity instanceof LivingEntity && !this.level().isClientSide() && raytraceresult.getEntity() instanceof LivingEntity target) {
             if(!target.isBlocking()){
                 target.hurt(damageSources().mobProjectile(this, (LivingEntity)entity), 3.0F);
-                target.knockback(0.7F, entity.getX() - this.getX(), entity.getZ() - this.getZ());
+                target.knockback(0.7F, entity.getX() - this.getX(), entity.getZ() - this.getZ(), this.damageSources().mobAttack(this), 1.0F);
             }else{
                 if (this.getTarget() instanceof Player) {
                     this.damageShieldFor(((Player) this.getTarget()), 3.0F);

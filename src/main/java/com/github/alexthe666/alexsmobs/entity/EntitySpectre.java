@@ -25,7 +25,6 @@ import net.minecraft.world.entity.ai.control.MoveControl;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.animal.Animal;
-import net.minecraft.world.entity.animal.FlyingAnimal;
 import net.minecraft.world.entity.decoration.LeashFenceKnotEntity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
@@ -42,7 +41,7 @@ import net.minecraft.world.phys.Vec3;
 import javax.annotation.Nullable;
 import java.util.EnumSet;
 
-public class EntitySpectre extends Animal implements FlyingAnimal {
+public class EntitySpectre extends Animal {
 
     private static final EntityDataAccessor<Integer> CARDINAL_ORDINAL = SynchedEntityData.defineId(EntitySpectre.class, EntityDataSerializers.INT);
     public float birdPitch = 0;
@@ -225,7 +224,6 @@ public class EntitySpectre extends Animal implements FlyingAnimal {
         this.setCardinalInt(2 + random.nextInt(3));
     }
 
-    @Override
     public boolean isFlying() {
         return true;
     }

@@ -3,8 +3,8 @@ package com.github.alexthe666.alexsmobs.entity.ai;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.ai.control.FlyingMoveControl;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.entity.animal.FlyingAnimal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
@@ -71,7 +71,7 @@ public class TameableAIRide extends Goal {
     }
 
     public double modifyYPosition(double lookVecY) {
-        return tameableEntity instanceof FlyingAnimal ? lookVecY * 10 : 0;
+        return tameableEntity.getMoveControl() instanceof FlyingMoveControl ? lookVecY * 10 : 0;
     }
 
     public boolean shouldMoveForward() {

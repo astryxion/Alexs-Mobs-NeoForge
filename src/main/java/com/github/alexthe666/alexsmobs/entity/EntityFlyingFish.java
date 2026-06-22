@@ -27,8 +27,7 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.PanicGoal;
 import net.minecraft.world.entity.ai.goal.TryFindWaterGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
-import net.minecraft.world.entity.animal.Bucketable;
-import net.minecraft.world.entity.animal.FlyingAnimal;
+import net.minecraft.world.entity.Bucketable;
 import net.minecraft.world.entity.animal.fish.WaterAnimal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
@@ -47,7 +46,7 @@ import javax.annotation.Nullable;
 import java.util.EnumSet;
 import java.util.List;
 
-public class EntityFlyingFish extends WaterAnimal implements FlyingAnimal, Bucketable {
+public class EntityFlyingFish extends WaterAnimal implements Bucketable {
 
     private static final EntityDataAccessor<Boolean> GLIDING = SynchedEntityData.defineId(EntityFlyingFish.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> VARIANT = SynchedEntityData.defineId(EntityFlyingFish.class, EntityDataSerializers.INT);
@@ -244,7 +243,6 @@ public class EntityFlyingFish extends WaterAnimal implements FlyingAnimal, Bucke
         return result.getBlockPos().equals(destinationBlock);
     }
 
-    @Override
     public boolean isFlying() {
         return true;
     }

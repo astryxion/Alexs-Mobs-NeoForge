@@ -222,7 +222,7 @@ public class EntityGeladaMonkey extends Animal implements IAnimatedEntity, IHerd
                 this.setSitting(false);
             }
             if (this.getTarget() != null && (this.getAnimation() == ANIMATION_SWIPE_L || this.getAnimation() == ANIMATION_SWIPE_R) && this.getAnimationTick() == 7 && this.hasLineOfSight(this.getTarget()) && this.distanceTo(this.getTarget()) < this.getBbHeight() + this.getTarget().getBbHeight() + 1) {
-                getTarget().knockback(0.4F, getTarget().getX() - this.getX(), getTarget().getZ() - this.getZ());
+                getTarget().knockback(0.4F, getTarget().getX() - this.getX(), getTarget().getZ() - this.getZ(), this.damageSources().mobAttack(this), 1.0F);
                 float dmg = (float) this.getAttribute(Attributes.ATTACK_DAMAGE).getBaseValue();
                 if (this.isLeader() && getTarget() instanceof EntityGeladaMonkey monkey) {
                     if (monkey.isLeader()) {

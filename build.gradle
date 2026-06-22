@@ -22,13 +22,13 @@ group = mod_group_id
 // OneDrive "Files On-Demand" can create placeholder reparse points inside build/ that Gradle (correctly)
 // rejects as "not a regular file". Keep all Gradle build outputs outside the synced folder.
 def _localAppData = System.getenv('LOCALAPPDATA')
-def _externalBuildRoot = _localAppData ? file("${_localAppData}/alexsmobs-neoforge-26.1-gradle") : file("${rootDir}/.gradle-local-build")
+def _externalBuildRoot = _localAppData ? file("${_localAppData}/alexsmobs-neoforge-26.2-gradle") : file("${rootDir}/.gradle-local-build")
 allprojects { p ->
     p.layout.buildDirectory.set(file("${_externalBuildRoot}/${p.path.replace(':', '_')}"))
 }
 
 // User request: write Alex's Mobs jar to the normal local `build/libs/` path.
-// (Citadel already overrides its own build dir in `src Citadel 26.1/build.gradle`.)
+// (Citadel already overrides its own build dir in `src Citadel 26.2/build.gradle`.)
 layout.buildDirectory.set(layout.projectDirectory.dir('build'))
 
 sourceSets.main.resources {
@@ -147,7 +147,7 @@ configurations {
 
 dependencies {
     if (useCitadelSubproject) {
-        // Edit Citadel in-place under src Citadel 26.1; no jar swap needed for dev (see gradle.properties use_citadel_subproject).
+        // Edit Citadel in-place under src Citadel 26.2; no jar swap needed for dev (see gradle.properties use_citadel_subproject).
         implementation project(':citadel')
     } else {
         // Citadel artifact name varies (citadel-26.1-*.jar vs citadelneoforge-26.1-*.jar). Pick the only/newest jar in libs/.
@@ -157,7 +157,7 @@ dependencies {
         }
         if (citadelJars.isEmpty()) {
             throw new GradleException(
-                    "No Citadel jar in libs/. Set use_citadel_subproject=true in gradle.properties to use the :citadel subproject, or add a NeoForge 26.1 Citadel jar (e.g. citadelneoforge-26.1-1.0.1.jar)."
+                    "No Citadel jar in libs/. Set use_citadel_subproject=true in gradle.properties to use the :citadel subproject, or add a NeoForge 26.2 Citadel jar (e.g. citadelneoforge-26.2-1.0.0.jar)."
             )
         }
         if (citadelJars.size() > 1) {

@@ -243,7 +243,7 @@ public class EntitySkreecher extends Monster {
                     }
                     Holder<Biome> holder = level().getBiome(spawnAt);
                     if(!this.level().isClientSide() && getNearbyWardens().isEmpty() && holder.is(AMTagRegistry.SKREECHERS_CAN_SPAWN_WARDENS) && this.level() instanceof ServerLevel serverLevel){
-                        Warden warden = EntityType.WARDEN.create(serverLevel, EntitySpawnReason.TRIGGERED);
+                        Warden warden = EntityTypes.WARDEN.create(serverLevel, EntitySpawnReason.TRIGGERED);
                         if (warden != null) {
                             warden.snapTo(this.getX(), spawnAt.getY() + 1, this.getZ(), this.getYRot(), 0.0F);
                             warden.finalizeSpawn(serverLevel, serverLevel.getCurrentDifficultyAt(this.blockPosition()), EntitySpawnReason.TRIGGERED, null);

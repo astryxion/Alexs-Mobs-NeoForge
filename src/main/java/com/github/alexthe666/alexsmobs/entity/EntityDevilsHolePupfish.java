@@ -36,8 +36,7 @@ import net.minecraft.world.entity.ai.goal.PanicGoal;
 import net.minecraft.world.entity.ai.goal.TryFindWaterGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.navigation.WaterBoundPathNavigation;
-import net.minecraft.world.entity.animal.Bucketable;
-import net.minecraft.world.entity.animal.FlyingAnimal;
+import net.minecraft.world.entity.Bucketable;
 import net.minecraft.world.entity.animal.fish.WaterAnimal;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
@@ -63,7 +62,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-public class EntityDevilsHolePupfish extends WaterAnimal implements FlyingAnimal, Bucketable {
+public class EntityDevilsHolePupfish extends WaterAnimal implements Bucketable {
 
     public static final Identifier PUPFISH_REWARD = Identifier.fromNamespaceAndPath("alexsmobs", "gameplay/pupfish_reward");
     private static final EntityDataAccessor<Boolean> FROM_BUCKET = SynchedEntityData.defineId(EntityDevilsHolePupfish.class, EntityDataSerializers.BOOLEAN);
@@ -351,7 +350,6 @@ public class EntityDevilsHolePupfish extends WaterAnimal implements FlyingAnimal
     protected void playStepSound(BlockPos pos, BlockState state) {
     }
 
-    @Override
     public boolean isFlying() {
         return false;
     }

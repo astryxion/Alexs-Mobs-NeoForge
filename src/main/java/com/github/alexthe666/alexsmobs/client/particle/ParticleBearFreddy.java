@@ -24,7 +24,7 @@ import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 public class ParticleBearFreddy extends Particle {
-    public static final ParticleRenderType BEAR_FREDDY = new ParticleRenderType("alexsmobs_bear_freddy");
+    public static final ParticleRenderType BEAR_FREDDY = new ParticleRenderType("alexsmobs_bear_freddy", "AF");
     private final ModelGrizzlyBear model = new ModelGrizzlyBear();
 
     ParticleBearFreddy(ClientLevel lvl, double x, double y, double z) {
@@ -40,7 +40,7 @@ public class ParticleBearFreddy extends Particle {
     }
 
     void submitBear(SubmitNodeCollector collector, float partialTick) {
-        Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
+        Camera camera = Minecraft.getInstance().gameRenderer.mainCamera();
         float f = ((float) this.age + partialTick) / (float) this.lifetime;
         float initalFlip = Math.min(f, 0.1F) / 0.1F;
         float laterFlip = Mth.clamp(f - 0.1F, 0F, 0.1F) / 0.1F;
@@ -72,7 +72,7 @@ public class ParticleBearFreddy extends Particle {
         @Override
         public ParticleGroupRenderState extractRenderState(Frustum frustum, Camera camera, float partialTick) {
             List<ParticleBearFreddy> list = new ArrayList<>();
-            for (ParticleBearFreddy p : this.getAll()) {
+            for (ParticleBearFreddy p : this.particles) {
                 if (frustum.pointInFrustum(p.x, p.y, p.z)) {
                     list.add(p);
                 }

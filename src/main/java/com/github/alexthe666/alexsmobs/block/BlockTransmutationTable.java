@@ -53,7 +53,7 @@ public class BlockTransmutationTable extends BaseEntityBlock implements AMSpecia
     private static final VoxelShape EW_AABB = Shapes.or(BASE_AABB, ARMS_EW);
 
     public static BlockBehaviour.Properties defaultProperties() {
-        return BlockBehaviour.Properties.of().pushReaction(PushReaction.BLOCK).mapColor(DyeColor.BLACK).noOcclusion().lightLevel((block) -> 2).emissiveRendering((block, world, pos) -> true).sound(SoundType.STONE).strength(1F).requiresCorrectToolForDrops();
+        return BlockBehaviour.Properties.of().pushReaction(PushReaction.BLOCK).mapColor(DyeColor.BLACK).noOcclusion().lightLevel((block) -> 2).emissiveRendering(state -> true).sound(SoundType.STONE).strength(1F).requiresCorrectToolForDrops();
     }
 
     public BlockTransmutationTable(BlockBehaviour.Properties props) {

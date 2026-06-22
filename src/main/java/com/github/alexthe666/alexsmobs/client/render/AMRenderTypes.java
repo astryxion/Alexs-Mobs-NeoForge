@@ -1,6 +1,7 @@
 package com.github.alexthe666.alexsmobs.client.render;
 
 import com.github.alexthe666.alexsmobs.AlexsMobs;
+import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.pipeline.BlendFunction;
 import com.mojang.blaze3d.pipeline.ColorTargetState;
 import com.mojang.blaze3d.pipeline.DepthStencilState;
@@ -8,9 +9,12 @@ import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.blaze3d.vertex.VertexMultiConsumer;
+import com.mojang.blaze3d.vertex.VertexSorting;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.BindGroupLayouts;
+import net.minecraft.client.renderer.StagedVertexBuffer;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.util.Util;
 import net.minecraft.client.renderer.rendertype.OutputTarget;
@@ -169,7 +173,6 @@ public final class AMRenderTypes {
                 .withTexture("Sampler0", texture)
                 .useOverlay()
                 .setTextureTransform(GHOST_TRANSPARENCY)
-                .bufferSize(262144)
                 .createRenderSetup();
         return RenderType.create("ghost_am", setup);
     }
@@ -211,10 +214,11 @@ public final class AMRenderTypes {
             .withShaderDefine("NO_OVERLAY")
             .withShaderDefine("NO_CARDINAL_LIGHTING")
             .withShaderDefine("APPLY_TEXTURE_MATRIX")
-            .withSampler("Sampler0")
+            .withBindGroupLayout(BindGroupLayouts.SAMPLER0)
             .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
             .withCull(false)
-            .withVertexFormat(DefaultVertexFormat.ENTITY, VertexFormat.Mode.QUADS)
+            .withVertexBinding(0, DefaultVertexFormat.ENTITY)
+            .withPrimitiveTopology(PrimitiveTopology.QUADS)
             .withDepthStencilState(DepthStencilState.DEFAULT)
             .build();
 
@@ -237,12 +241,14 @@ public final class AMRenderTypes {
     /**
      * Same visual pipeline as 1.21.1 {@code getGhostPickaxe}: item-entity translucent entity shader, lightning blend,
      * no cull, item-entity output target (see {@link RenderTypes} {@code ENTITY_TRANSLUCENT_CULL_ITEM_TARGET} but with
-     * {@link BlendFunction#LIGHTNING}). Registered on the mod bus via {@code ClientProxy}.
+     * {@link RenderTypes#entityTranslucentCullItemTarget} ({@link RenderPipelines#ENTITY_TRANSLUCENT_CULL}) but with
+     * {@link BlendFunction#LIGHTNING} and no cull. {@link BindGroupLayouts#SAMPLER1} matches vanilla translucent-cull
+     * item-entity layout without duplicating {@code Sampler0} from {@link RenderPipelines#ENTITY_SNIPPET}.
      */
     public static final RenderPipeline GHOST_PICKAXE_PIPELINE = RenderPipeline.builder(RenderPipelines.ENTITY_SNIPPET)
             .withLocation(Identifier.parse("alexsmobs:pipeline/ghost_pickaxe"))
             .withShaderDefine("ALPHA_CUTOUT", 0.1F)
-            .withSampler("Sampler1")
+            .withBindGroupLayout(BindGroupLayouts.SAMPLER1)
             .withColorTargetState(new ColorTargetState(BlendFunction.LIGHTNING))
             .withCull(false)
             .build();
@@ -279,11 +285,109 @@ public final class AMRenderTypes {
         return RenderType.create("farseer_beam", setup);
     }
 
+    public static class BufferSource {
+        private final StagedVertexBuffer stagedVertexBuffer;
+        private final Map<RenderType, StagedVertexBuffer.Draw> draws = new HashMap<>();
+
+        public BufferSource(StagedVertexBuffer stagedVertexBuffer) {
+            this.stagedVertexBuffer = stagedVertexBuffer;
+        }
+
+        public VertexConsumer getBuffer(RenderType renderType) {
+            StagedVertexBuffer.Draw draw = draws.computeIfAbsent(renderType, rt -> {
+                VertexSorting sorting = rt.sortOnUpload() ? VertexSorting.byDistance(0.0F, 0.0F, 0.0F) : null;
+                return stagedVertexBuffer.appendDraw(rt.format(), rt.primitiveTopology(), sorting);
+            });
+            return stagedVertexBuffer.getVertexBuilder(draw);
+        }
+
+        public void endBatch() {
+            if (draws.isEmpty()) {
+                return;
+            }
+            stagedVertexBuffer.upload();
+            for (Map.Entry<RenderType, StagedVertexBuffer.Draw> entry : draws.entrySet()) {
+                StagedVertexBuffer.ExecuteInfo info = stagedVertexBuffer.getExecuteInfo(entry.getValue());
+                if (info != null) {
+                    entry.getKey().prepare().drawFromBuffer(info);
+                }
+            }
+            stagedVertexBuffer.endDraw();
+            draws.clear();
+        }
+    }
+
+    private static final class MergedVertexConsumer implements VertexConsumer {
+        private final VertexConsumer first;
+        private final VertexConsumer second;
+
+        private MergedVertexConsumer(VertexConsumer first, VertexConsumer second) {
+            this.first = first;
+            this.second = second;
+        }
+
+        @Override
+        public VertexConsumer addVertex(float x, float y, float z) {
+            this.first.addVertex(x, y, z);
+            this.second.addVertex(x, y, z);
+            return this;
+        }
+
+        @Override
+        public VertexConsumer setColor(int r, int g, int b, int a) {
+            this.first.setColor(r, g, b, a);
+            this.second.setColor(r, g, b, a);
+            return this;
+        }
+
+        @Override
+        public VertexConsumer setColor(int color) {
+            this.first.setColor(color);
+            this.second.setColor(color);
+            return this;
+        }
+
+        @Override
+        public VertexConsumer setUv(float u, float v) {
+            this.first.setUv(u, v);
+            this.second.setUv(u, v);
+            return this;
+        }
+
+        @Override
+        public VertexConsumer setUv1(int u, int v) {
+            this.first.setUv1(u, v);
+            this.second.setUv1(u, v);
+            return this;
+        }
+
+        @Override
+        public VertexConsumer setUv2(int u, int v) {
+            this.first.setUv2(u, v);
+            this.second.setUv2(u, v);
+            return this;
+        }
+
+        @Override
+        public VertexConsumer setNormal(float x, float y, float z) {
+            this.first.setNormal(x, y, z);
+            this.second.setNormal(x, y, z);
+            return this;
+        }
+
+        @Override
+        public VertexConsumer setLineWidth(float width) {
+            this.first.setLineWidth(width);
+            this.second.setLineWidth(width);
+            return this;
+        }
+    }
+
     public static VertexConsumer createMergedVertexConsumer(VertexConsumer consumer1, VertexConsumer consumer2) {
         VertexConsumer vertexConsumer = consumer2;
         if (!encounteredMultiConsumerError) {
             try {
-                vertexConsumer = VertexMultiConsumer.create(consumer1, consumer2);
+                vertexConsumer = new MergedVertexConsumer(consumer1, consumer2);
             } catch (Exception e) {
                 AlexsMobs.LOGGER.warn("Encountered issue mixing two render types together. Likely an issue with Optifine or other rendering mod. This warning will only display once.");
                 encounteredMultiConsumerError = true;
@@ -293,7 +397,7 @@ public final class AMRenderTypes {
     }
 
     /** Replaces removed {@code ItemRenderer#getFoilBuffer} for entity cutouts (e.g. kangaroo armor). */
-    public static VertexConsumer entityFoilBuffer(MultiBufferSource buffer, RenderType base, boolean foil) {
+    public static VertexConsumer entityFoilBuffer(BufferSource buffer, RenderType base, boolean foil) {
         if (!foil) {
             return buffer.getBuffer(base);
         }
@@ -301,7 +405,7 @@ public final class AMRenderTypes {
     }
 
     /** Replaces removed {@code ItemRenderer#getArmorFoilBuffer} for armor cutouts. */
-    public static VertexConsumer armorFoilBuffer(MultiBufferSource buffer, RenderType base, boolean foil) {
+    public static VertexConsumer armorFoilBuffer(BufferSource buffer, RenderType base, boolean foil) {
         if (!foil) {
             return buffer.getBuffer(base);
         }

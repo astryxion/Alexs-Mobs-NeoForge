@@ -225,7 +225,7 @@ public class ClientEvents {
             NeoForge.EVENT_BUS.post(new RenderLivingEvent.Post(event.getRenderState(), event.getRenderer(), event.getPartialTick(), event.getPoseStack(), event.getSubmitNodeCollector()));
             return;
         }
-        if (entity != null && entity instanceof WanderingTrader && entity.getType() == EntityType.WANDERING_TRADER) {
+        if (entity != null && entity instanceof WanderingTrader && entity.getType() == EntityTypes.WANDERING_TRADER) {
             if (entity.getVehicle() instanceof EntityElephant) {
                 LivingEntityRenderer<?, ?, ?> renderer = event.getRenderer();
                 if (!(renderer.getModel() instanceof ModelWanderingVillagerRider)) {
@@ -419,7 +419,7 @@ public class ClientEvents {
     private void updateAllChunks() {
         // Force chunk rebuild - simplified approach for 1.21
         // viewArea is private, so we use the public API instead
-        Minecraft.getInstance().levelRenderer.allChanged();
+        Minecraft.getInstance().levelRenderer.resetLevelRenderData();
     }
 
     @SubscribeEvent

@@ -128,7 +128,7 @@ public class EntityMantisShrimp extends TamableAnimal implements ISemiAquatic, I
     //killEntity
     public void awardKillScore(Entity entity, DamageSource src) {
         if(entity instanceof LivingEntity living){
-            if(living.getType() == EntityType.SHULKER){
+            if(living.getType() == EntityTypes.SHULKER){
                 TagValueOutput fishOut = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, this.level().registryAccess());
                 living.saveWithoutId(fishOut);
                 CompoundTag fishNbt = fishOut.buildResult();
@@ -454,7 +454,7 @@ public class EntityMantisShrimp extends TamableAnimal implements ISemiAquatic, I
                     ValueInput fishIn = TagValueInput.create(ProblemReporter.DISCARDING, this.level().registryAccess(), fishNbt);
                     fish.load(fishIn);
                 }
-                this.getTarget().knockback(1.7F, this.getX() - this.getTarget().getX(), this.getZ() - this.getTarget().getZ());
+                this.getTarget().knockback(1.7F, this.getX() - this.getTarget().getX(), this.getZ() - this.getTarget().getZ(), this.damageSources().mobAttack(this), 1.0F);
                 float knockbackResist = (float) Mth.clamp((1.0D - this.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE)), 0, 1);
                 this.getTarget().setDeltaMovement(this.getTarget().getDeltaMovement().add(0, knockbackResist * 0.8F, 0));
                 if (!this.getTarget().isInWater()) {

@@ -253,12 +253,12 @@ public class EntitySnowLeopard extends Animal implements IAnimatedEntity, ITarge
                 if (this.getAnimation() == ANIMATION_ATTACK_L && this.getAnimationTick() == 7) {
                     doHurtTarget(serverLevel, attackTarget);
                     float rot = getYRot() + 90;
-                    attackTarget.knockback(0.5F, Mth.sin(rot * Mth.DEG_TO_RAD), -Mth.cos(rot * Mth.DEG_TO_RAD));
+                    attackTarget.knockback(0.5F, Mth.sin(rot * Mth.DEG_TO_RAD), -Mth.cos(rot * Mth.DEG_TO_RAD), this.damageSources().mobAttack(this), 1.0F);
                 }
                 if (this.getAnimation() == ANIMATION_ATTACK_R && this.getAnimationTick() == 7) {
                     doHurtTarget(serverLevel, attackTarget);
                     float rot = getYRot() - 90;
-                    attackTarget.knockback(0.5F, Mth.sin(rot * Mth.DEG_TO_RAD), -Mth.cos(rot * Mth.DEG_TO_RAD));
+                    attackTarget.knockback(0.5F, Mth.sin(rot * Mth.DEG_TO_RAD), -Mth.cos(rot * Mth.DEG_TO_RAD), this.damageSources().mobAttack(this), 1.0F);
                 }
 
             }

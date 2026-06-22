@@ -228,7 +228,7 @@ public class EntityMoose extends Animal implements IAnimatedEntity {
                 if (this.getTarget() instanceof Wolf || this.getTarget() instanceof EntityOrca) {
                     dmg = 2;
                 }
-                getTarget().knockback(1F, getTarget().getX() - this.getX(), getTarget().getZ() - this.getZ());
+                getTarget().knockback(1F, getTarget().getX() - this.getX(), getTarget().getZ() - this.getZ(), this.damageSources().mobAttack(this), 1.0F);
                 this.getTarget().hurt(this.damageSources().mobAttack(this), dmg);
             }
         }

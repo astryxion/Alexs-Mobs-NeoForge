@@ -169,23 +169,23 @@ public class EntityCachalotWhale extends Animal {
 
     private static Item planksItemForBoat(Boat boat) {
         EntityType<?> t = boat.getType();
-        if (t == EntityType.OAK_BOAT) {
+        if (t == EntityTypes.OAK_BOAT) {
             return Items.OAK_PLANKS;
-        } else if (t == EntityType.SPRUCE_BOAT) {
+        } else if (t == EntityTypes.SPRUCE_BOAT) {
             return Items.SPRUCE_PLANKS;
-        } else if (t == EntityType.BIRCH_BOAT) {
+        } else if (t == EntityTypes.BIRCH_BOAT) {
             return Items.BIRCH_PLANKS;
-        } else if (t == EntityType.JUNGLE_BOAT) {
+        } else if (t == EntityTypes.JUNGLE_BOAT) {
             return Items.JUNGLE_PLANKS;
-        } else if (t == EntityType.ACACIA_BOAT) {
+        } else if (t == EntityTypes.ACACIA_BOAT) {
             return Items.ACACIA_PLANKS;
-        } else if (t == EntityType.DARK_OAK_BOAT) {
+        } else if (t == EntityTypes.DARK_OAK_BOAT) {
             return Items.DARK_OAK_PLANKS;
-        } else if (t == EntityType.MANGROVE_BOAT) {
+        } else if (t == EntityTypes.MANGROVE_BOAT) {
             return Items.MANGROVE_PLANKS;
-        } else if (t == EntityType.CHERRY_BOAT) {
+        } else if (t == EntityTypes.CHERRY_BOAT) {
             return Items.CHERRY_PLANKS;
-        } else if (t == EntityType.PALE_OAK_BOAT) {
+        } else if (t == EntityTypes.PALE_OAK_BOAT) {
             return Items.PALE_OAK_PLANKS;
         }
         return Items.OAK_PLANKS;

@@ -5,7 +5,7 @@ issueTrackerURL="https://github.com/astryxion23/Alexs-Mobs-Fabric/issues"
 
 [[mods]]
 modId="alexsmobs"
-version="26.1-1.0.6"
+version="26.2-1.0.0"
 displayName="Alex's Mobs"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/alexs-mobs"
 logoFile="alexs_mobs.png"
@@ -25,7 +25,7 @@ config = "mixins.alexsmobs.json"
 [[dependencies.alexsmobs]]
     modId="neoforge"
     mandatory=true
-    versionRange="[26.1.0,)"
+    versionRange="[26.2,)"
     ordering="NONE"
     side="BOTH"
 

@@ -173,7 +173,7 @@ public class EntityDropBear extends Monster implements IAnimatedEntity {
                 if (this.getAnimationTick() == 6) {
                     if (this.getAnimation() == ANIMATION_BITE) {
                         final float yRotRad = this.getYRot() * Mth.DEG_TO_RAD;
-                        attackTarget.knockback(0.5F, Mth.sin(yRotRad), -Mth.cos(yRotRad));
+                        attackTarget.knockback(0.5F, Mth.sin(yRotRad), -Mth.cos(yRotRad), this.damageSources().mobAttack(this), 1.0F);
                         if (this.level() instanceof ServerLevel serverLevel) {
                             this.getTarget().hurtServer(serverLevel, this.damageSources().mobAttack(this), (float) this.getAttribute(Attributes.ATTACK_DAMAGE).getBaseValue());
                         }
@@ -182,14 +182,14 @@ public class EntityDropBear extends Monster implements IAnimatedEntity {
                     if (this.getAnimation() == ANIMATION_SWIPE_L) {
                         final float rot = getYRot() + 90;
                         final float rotRad = rot * Mth.DEG_TO_RAD;
-                        attackTarget.knockback(0.5F, Mth.sin(rotRad), -Mth.cos(rotRad));
+                        attackTarget.knockback(0.5F, Mth.sin(rotRad), -Mth.cos(rotRad), this.damageSources().mobAttack(this), 1.0F);
                         if (this.level() instanceof ServerLevel serverLevel) {
                             this.getTarget().hurtServer(serverLevel, this.damageSources().mobAttack(this), (float) this.getAttribute(Attributes.ATTACK_DAMAGE).getBaseValue());
                         }
                     } else if (this.getAnimation() == ANIMATION_SWIPE_R) {
                         final float rot = getYRot() - 90;
                         final float rotRad = rot * Mth.DEG_TO_RAD;
-                        attackTarget.knockback(0.5F, Mth.sin(rotRad), -Mth.cos(rotRad));
+                        attackTarget.knockback(0.5F, Mth.sin(rotRad), -Mth.cos(rotRad), this.damageSources().mobAttack(this), 1.0F);
                         if (this.level() instanceof ServerLevel serverLevel) {
                             this.getTarget().hurtServer(serverLevel, this.damageSources().mobAttack(this), (float) this.getAttribute(Attributes.ATTACK_DAMAGE).getBaseValue());
                         }

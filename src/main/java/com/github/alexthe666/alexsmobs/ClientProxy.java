@@ -378,11 +378,11 @@ public class ClientProxy extends CommonProxy {
     }
 
     public void openBookGUI(ItemStack itemStackIn) {
-        Minecraft.getInstance().setScreen(new GUIAnimalDictionary(itemStackIn));
+        Minecraft.getInstance().gui.setScreen(new GUIAnimalDictionary(itemStackIn));
     }
 
     public void openBookGUI(ItemStack itemStackIn, String page) {
-        Minecraft.getInstance().setScreen(new GUIAnimalDictionary(itemStackIn, page));
+        Minecraft.getInstance().gui.setScreen(new GUIAnimalDictionary(itemStackIn, page));
     }
 
     public Player getClientSidePlayer() {
@@ -461,7 +461,7 @@ public class ClientProxy extends CommonProxy {
     }
 
     public void updateBiomeVisuals(int x, int z) {
-        Minecraft.getInstance().levelRenderer.setBlocksDirty(x - 32, 0, x - 32, z + 32, 255, z + 32);
+        Minecraft.getInstance().levelRenderer.resetLevelRenderData();
     }
 
     public static void setupParticleGroups(RegisterParticleGroupsEvent event) {
@@ -511,7 +511,7 @@ public class ClientProxy extends CommonProxy {
 
     public boolean isFarFromCamera(double x, double y, double z) {
         Minecraft lvt_1_1_ = Minecraft.getInstance();
-        return lvt_1_1_.gameRenderer.getMainCamera().position().distanceToSqr(x, y, z) >= 256.0D;
+        return lvt_1_1_.gameRenderer.mainCamera().position().distanceToSqr(x, y, z) >= 256.0D;
     }
 
     public void resetVoidPortalCreation(Player player) {

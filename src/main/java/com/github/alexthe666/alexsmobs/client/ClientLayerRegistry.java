@@ -5,6 +5,7 @@ import com.github.alexthe666.alexsmobs.client.render.layer.LayerRainbow;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.DefaultAttributes;
 import net.minecraft.world.entity.player.PlayerModelType;
@@ -41,7 +42,7 @@ public class ClientLayerRegistry {
     }
 
     private static void addLayerIfApplicable(EntityType<? extends LivingEntity> entityType, EntityRenderersEvent.AddLayers event) {
-        if(entityType != EntityType.ENDER_DRAGON){
+        if(entityType != EntityTypes.ENDER_DRAGON){
             try{
                 var renderer = event.getRenderer(entityType);
                 if (renderer instanceof LivingEntityRenderer<?, ?, ?> livingRenderer) {

@@ -6,6 +6,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 public class TileEntityEndPirateShipWheel extends BlockEntity {
 
     private float wheelRot;
@@ -22,7 +23,7 @@ public class TileEntityEndPirateShipWheel extends BlockEntity {
         entity.tick();
     }
     public AABB getRenderBoundingBox() {
-        return new AABB(worldPosition.offset(-2, -2, -2).getCenter().add(-0.5, -0.5, -0.5), worldPosition.offset(2, 2, 2).getCenter().add(0.5, 0.5, 0.5));
+        return new AABB(Vec3.atCenterOf(worldPosition.offset(-2, -2, -2)).add(-0.5, -0.5, -0.5), Vec3.atCenterOf(worldPosition.offset(2, 2, 2)).add(0.5, 0.5, 0.5));
     }
 
     public void tick() {

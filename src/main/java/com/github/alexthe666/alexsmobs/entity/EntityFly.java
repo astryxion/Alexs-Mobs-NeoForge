@@ -31,7 +31,6 @@ import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.util.AirAndWaterRandomPos;
 import net.minecraft.world.entity.ai.util.HoverRandomPos;
 import net.minecraft.world.entity.animal.Animal;
-import net.minecraft.world.entity.animal.FlyingAnimal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.spider.Spider;
 import net.minecraft.world.entity.player.Player;
@@ -51,7 +50,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-public class EntityFly extends Animal implements FlyingAnimal {
+public class EntityFly extends Animal {
 
     private int conversionTime = 0;
     private static final EntityDataAccessor<Boolean> NO_DESPAWN = SynchedEntityData.defineId(EntityFly.class, EntityDataSerializers.BOOLEAN);
@@ -245,7 +244,6 @@ public class EntityFly extends Animal implements FlyingAnimal {
         return fly;
     }
 
-    @Override
     public boolean isFlying() {
         return true;
     }

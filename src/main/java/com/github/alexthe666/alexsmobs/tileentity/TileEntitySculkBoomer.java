@@ -54,7 +54,7 @@ public class TileEntitySculkBoomer extends BlockEntity implements GameEventListe
                     double distance = 0.5F + entity.position().subtract(center).horizontalDistance();
                     if(distance < 4 * screamProgress && distance > 3.5F * screamProgress && !isOccluded(level, Vec3.atCenterOf(pos), entity.position())){
                         entity.hurt(entity.damageSources().magic(), 6 + entity.getRandom().nextInt(3));
-                        entity.knockback(0.4F,  center.x - entity.getX(), center.z - entity.getZ());
+                        entity.knockback(0.4F, center.x - entity.getX(), center.z - entity.getZ(), entity.damageSources().magic(), 1.0F);
                     }
                 }
             }

@@ -358,11 +358,11 @@ public class EntityAnteater extends Animal implements NeutralMob, IAnimatedEntit
                         if (this.getAnimation() == ANIMATION_SLASH_L) {
                             doHurtTarget((ServerLevel) this.level(), attackTarget);
                             final float rot = getYRot() + 90;
-                            attackTarget.knockback(0.5F, Mth.sin(rot * Mth.DEG_TO_RAD), -Mth.cos(rot * Mth.DEG_TO_RAD));
+                            attackTarget.knockback(0.5F, Mth.sin(rot * Mth.DEG_TO_RAD), -Mth.cos(rot * Mth.DEG_TO_RAD), this.damageSources().mobAttack(this), 1.0F);
                         } else if (this.getAnimation() == ANIMATION_SLASH_R) {
                             doHurtTarget((ServerLevel) this.level(), attackTarget);
                             final float rot = getYRot() - 90;
-                            attackTarget.knockback(0.5F, Mth.sin(rot * Mth.DEG_TO_RAD), -Mth.cos(rot * Mth.DEG_TO_RAD));
+                            attackTarget.knockback(0.5F, Mth.sin(rot * Mth.DEG_TO_RAD), -Mth.cos(rot * Mth.DEG_TO_RAD), this.damageSources().mobAttack(this), 1.0F);
                         }
                     }
                 }

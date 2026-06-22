@@ -235,7 +235,7 @@ public class EntityBunfungus extends PathfinderMob implements IAnimatedEntity {
                         for (final LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(2.0D))) {
                             if ((entity == target || entity instanceof Monster) && !entity.getType().builtInRegistryHolder().is(AMTagRegistry.BUNFUNGUS_IGNORE_AOE_ATTACKS)) {
                                 flag = true;
-                                entity.knockback(0.2F, entity.getX() - this.getX(), entity.getZ() - this.getZ());
+                                entity.knockback(0.2F, entity.getX() - this.getX(), entity.getZ() - this.getZ(), this.damageSources().mobAttack(this), 1.0F);
                                 entity.hurt(this.damageSources().mobAttack(this), (float) this.getAttribute(Attributes.ATTACK_DAMAGE).getBaseValue());
                             }
                         }

@@ -31,8 +31,7 @@ import net.minecraft.world.entity.ai.goal.TemptGoal;
 import net.minecraft.world.entity.ai.goal.TryFindWaterGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.navigation.WaterBoundPathNavigation;
-import net.minecraft.world.entity.animal.Bucketable;
-import net.minecraft.world.entity.animal.FlyingAnimal;
+import net.minecraft.world.entity.Bucketable;
 import net.minecraft.world.entity.animal.fish.WaterAnimal;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
@@ -69,7 +68,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 
-public class EntityCatfish extends WaterAnimal implements FlyingAnimal, Bucketable {
+public class EntityCatfish extends WaterAnimal implements Bucketable {
 
     private static final EntityDataAccessor<Boolean> FROM_BUCKET = SynchedEntityData.defineId(EntityCatfish.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> CATFISH_SIZE = SynchedEntityData.defineId(EntityCatfish.class, EntityDataSerializers.INT);
@@ -582,7 +581,6 @@ public class EntityCatfish extends WaterAnimal implements FlyingAnimal, Bucketab
         return SoundEvents.COD_HURT;
     }
 
-    @Override
     public boolean isFlying() {
         return false;
     }

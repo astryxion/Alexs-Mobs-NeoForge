@@ -3,7 +3,7 @@ package com.github.alexthe666.alexsmobs.client.render;
 import com.github.alexthe666.alexsmobs.config.AMConfig;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.FluidModel;
 import net.minecraft.client.renderer.block.FluidRenderer;
@@ -291,8 +291,8 @@ public class LavaVisionFluidRenderer extends FluidRenderer {
     }
 
     private int getCombinedAverageLight(BlockAndTintGetter lightReaderIn, BlockPos posIn) {
-        int i = LevelRenderer.getLightCoords(lightReaderIn, posIn);
-        int j = LevelRenderer.getLightCoords(lightReaderIn, posIn.above());
+        int i = LightCoordsUtil.getLightCoords(lightReaderIn, posIn);
+        int j = LightCoordsUtil.getLightCoords(lightReaderIn, posIn.above());
         int k = i & 255;
         int l = j & 255;
         int i1 = i >> 16 & 255;

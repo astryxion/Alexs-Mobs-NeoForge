@@ -33,7 +33,7 @@ public class GUIAnimalDictionary extends GuiBasicBook {
         // prevents book text, models, and widgets from compositing on 26.1.
         this.extractTransparentBackground(guiGraphics);
         // Match Screen.extractBackground in-game tail (subtitles deferred into this pass).
-        Minecraft.getInstance().gui.extractDeferredSubtitles();
+        Minecraft.getInstance().gui.hud.extractDeferredSubtitles();
     }
 
     @Override

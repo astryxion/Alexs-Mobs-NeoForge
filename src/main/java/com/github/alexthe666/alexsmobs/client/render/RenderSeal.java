@@ -65,7 +65,7 @@ public class RenderSeal extends MobRenderer<EntitySeal, LivingEntityRenderState,
                 var scoreEvent = new RenderNameTagEvent.DoRender(state, state.scoreText, this, poseStack, submitNodeCollector, camera, state.partialTick);
                 if (!NeoForge.EVENT_BUS.post(scoreEvent).isCanceled()) {
                     submitNodeCollector.submitNameTag(
-                        poseStack, state.nameTagAttachment, 0, state.scoreText, !state.isDiscrete, state.lightCoords, state.distanceToCameraSq, camera
+                        poseStack, state.nameTagAttachment, 0, state.scoreText, !state.isDiscrete, state.lightCoords, camera
                     );
                 }
                 poseStack.translate(0.0F, 9.0F * 1.15F * 0.025F, 0.0F);
@@ -86,7 +86,7 @@ public class RenderSeal extends MobRenderer<EntitySeal, LivingEntityRenderState,
                 var event = new RenderNameTagEvent.DoRender(state, line, this, poseStack, submitNodeCollector, camera, state.partialTick);
                 if (!NeoForge.EVENT_BUS.post(event).isCanceled()) {
                     submitNodeCollector.submitNameTag(
-                        poseStack, state.nameTagAttachment, offset, line, !state.isDiscrete, state.lightCoords, state.distanceToCameraSq, camera
+                        poseStack, state.nameTagAttachment, offset, line, !state.isDiscrete, state.lightCoords, camera
                     );
                 }
                 poseStack.translate(0.0F, 9.0F * 1.15F * 0.025F, 0.0F);

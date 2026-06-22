@@ -559,21 +559,21 @@ public class EntityKangaroo extends TamableAnimal implements IAnimatedEntity, IF
         if (attackTarget != null && this.hasLineOfSight(attackTarget)) {
             if (distanceTo(attackTarget) < attackTarget.getBbWidth() + this.getBbWidth() + 1) {
                 if (this.getAnimation() == ANIMATION_KICK && this.getAnimationTick() == 8) {
-                    attackTarget.knockback(1.3F, Mth.sin(this.getYRot() * Mth.DEG_TO_RAD), -Mth.cos(this.getYRot() * Mth.DEG_TO_RAD));
+                    attackTarget.knockback(1.3F, Mth.sin(this.getYRot() * Mth.DEG_TO_RAD), -Mth.cos(this.getYRot() * Mth.DEG_TO_RAD), this.damageSources().mobAttack(this), 1.0F);
                     if (this.level() instanceof ServerLevel serverLevel) {
                         this.doHurtTarget(serverLevel, this.getTarget());
                     }
                 }
                 if ((this.getAnimation() == ANIMATION_PUNCH_L) && this.getAnimationTick() == 6) {
                     float rot = getYRot() + 90;
-                    attackTarget.knockback(0.85F, Mth.sin(rot * Mth.DEG_TO_RAD), -Mth.cos(rot * Mth.DEG_TO_RAD));
+                    attackTarget.knockback(0.85F, Mth.sin(rot * Mth.DEG_TO_RAD), -Mth.cos(rot * Mth.DEG_TO_RAD), this.damageSources().mobAttack(this), 1.0F);
                     if (this.level() instanceof ServerLevel serverLevel) {
                         this.doHurtTarget(serverLevel, this.getTarget());
                     }
                 }
                 if ((this.getAnimation() == ANIMATION_PUNCH_R) && this.getAnimationTick() == 6) {
                     float rot = getYRot() - 90;
-                    attackTarget.knockback(0.85F, Mth.sin(rot * Mth.DEG_TO_RAD), -Mth.cos(rot * Mth.DEG_TO_RAD));
+                    attackTarget.knockback(0.85F, Mth.sin(rot * Mth.DEG_TO_RAD), -Mth.cos(rot * Mth.DEG_TO_RAD), this.damageSources().mobAttack(this), 1.0F);
                     if (this.level() instanceof ServerLevel serverLevel) {
                         this.doHurtTarget(serverLevel, this.getTarget());
                     }

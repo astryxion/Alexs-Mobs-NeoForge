@@ -346,7 +346,7 @@ public class EntityTusklin extends Animal implements IAnimatedEntity {
             conversionTime++;
             if (conversionTime > 300 && !this.level().isClientSide() && this.level() instanceof ServerLevel serverLevel) {
                 Hoglin hoglin = this.convertTo(
-                    EntityType.HOGLIN,
+                    EntityTypes.HOGLIN,
                     ConversionParams.single(this, false, false),
                     hog -> hog.addEffect(new MobEffectInstance(MobEffects.NAUSEA, 200, 0))
                 );
@@ -457,7 +457,7 @@ public class EntityTusklin extends Animal implements IAnimatedEntity {
     private void knockbackTarget(LivingEntity entity, float strength, float angle) {
         float rot = getYRot() + angle;
         if(entity != null){
-            entity.knockback(strength, Mth.sin(rot * Mth.DEG_TO_RAD), -Mth.cos(rot * Mth.DEG_TO_RAD));
+            entity.knockback(strength, Mth.sin(rot * Mth.DEG_TO_RAD), -Mth.cos(rot * Mth.DEG_TO_RAD), this.damageSources().mobAttack(this), 1.0F);
         }
     }
 
