@@ -22,7 +22,6 @@ public final class CitadelShaderRenderTypes {
             .withLocation(Identifier.parse("citadel:pipeline/rainbow_aura"))
             .withFragmentShader(Identifier.parse("citadel:core/rendertype_rainbow_aura"))
             .withShaderDefine("ALPHA_CUTOUT", 0.1F)
-            .withSampler("Sampler1")
             .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
             .withCull(false)
             .build();

@@ -1,7 +1,7 @@
 package com.github.alexthe666.citadel.client.rewards;
 
+import com.github.alexthe666.citadel.client.render.pathfinding.WorldRenderMacros;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.entity.LivingEntity;
 
 import java.util.LinkedHashMap;
@@ -18,7 +18,7 @@ public abstract class CitadelPatreonRenderer {
         PATREON_RENDERER_MAP.put(identifier, renderer);
     }
 
-    public abstract void render(PoseStack matrixStackIn, MultiBufferSource buffer, int light, float partialTick, LivingEntity entity, float distanceIn, float rotateSpeed, float rotateHeight);
+    public abstract void render(PoseStack matrixStackIn, WorldRenderMacros.BufferSource buffer, int light, float partialTick, LivingEntity entity, float distanceIn, float rotateSpeed, float rotateHeight);
 
     public static String getIdOfNext(String identifier) {
         Object[] ids = PATREON_RENDERER_MAP.keySet().toArray();

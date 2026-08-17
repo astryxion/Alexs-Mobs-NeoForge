@@ -121,7 +121,6 @@ public class RenderSugarGlider extends MobRenderer<EntitySugarGlider, CitadelLiv
         if (mob == null) {
             return;
         }
-        this.sugarModel.young = mob.isBaby();
         if (mob.isPassenger() && mob.getVehicle() != null) {
             if (mob.getVehicle() instanceof Player) {
                 Player mount = (Player) mob.getVehicle();
@@ -165,9 +164,9 @@ public class RenderSugarGlider extends MobRenderer<EntitySugarGlider, CitadelLiv
             this.model.setupAnim(state);
             int finalTint = tint;
             int finalOverlay = overlay;
+            boolean young = state.isBaby;
             collector.submitCustomGeometry(poseStack, renderType, (pose, consumer) ->
-                AlexAdvancedEntityModel.withCitadelSubmitPose(pose, this.citadelPoseScratch, s ->
-                    this.sugarModel.renderToBuffer(s, consumer, state.lightCoords, finalOverlay, finalTint))
+                AlexAdvancedEntityModel.drawCitadelModel(pose, this.citadelPoseScratch, this.sugarModel, young, consumer, state.lightCoords, finalOverlay, finalTint)
             );
         }
         if (this.shouldRenderLayers(state) && !this.layers.isEmpty()) {

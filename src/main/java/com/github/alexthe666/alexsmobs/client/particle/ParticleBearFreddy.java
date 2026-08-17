@@ -72,7 +72,7 @@ public class ParticleBearFreddy extends Particle {
         @Override
         public ParticleGroupRenderState extractRenderState(Frustum frustum, Camera camera, float partialTick) {
             List<ParticleBearFreddy> list = new ArrayList<>();
-            for (ParticleBearFreddy p : this.getAll()) {
+            for (ParticleBearFreddy p : this.particles) {
                 if (frustum.pointInFrustum(p.x, p.y, p.z)) {
                     list.add(p);
                 }

@@ -309,10 +309,6 @@ public class EntityStraddler extends Monster implements IAnimatedEntity {
             return new PathFinder(this.nodeEvaluator, p_179679_1_);
         }
 
-        protected boolean hasValidPathType(PathType p_230287_1_) {
-            return p_230287_1_ == PathType.LAVA || p_230287_1_ == PathType.DAMAGE_CAUTIOUS || super.hasValidPathType(p_230287_1_);
-        }
-
         public boolean isStableDestination(BlockPos pos) {
             return this.level.getBlockState(pos).is(Blocks.LAVA) || super.isStableDestination(pos);
         }

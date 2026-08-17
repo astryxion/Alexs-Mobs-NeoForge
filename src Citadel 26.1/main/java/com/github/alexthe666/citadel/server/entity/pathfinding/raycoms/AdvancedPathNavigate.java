@@ -3,6 +3,7 @@ package com.github.alexthe666.citadel.server.entity.pathfinding.raycoms;
     All of this code is used with permission from Raycoms, one of the developers of the minecolonies project.
  */
 
+import com.mojang.datafixers.util.Pair;
 import com.github.alexthe666.citadel.Citadel;
 import com.github.alexthe666.citadel.server.entity.pathfinding.raycoms.pathjobs.AbstractPathJob;
 import com.github.alexthe666.citadel.server.entity.pathfinding.raycoms.pathjobs.PathJobMoveAwayFromLocation;
@@ -188,7 +189,7 @@ public class AdvancedPathNavigate extends AbstractAdvancedPathNavigate {
     }
 
     @Override
-    public PathResult moveToRandomPos(final int range, final double speedFactor, final net.minecraft.util.Tuple<BlockPos, BlockPos> corners, final AbstractAdvancedPathNavigate.RestrictionType restrictionType)
+    public PathResult moveToRandomPos(final int range, final double speedFactor, final Pair<BlockPos, BlockPos> corners, final AbstractAdvancedPathNavigate.RestrictionType restrictionType)
     {
         if (pathResult != null && pathResult.getJob() instanceof PathJobRandomPos)
         {
@@ -204,8 +205,8 @@ public class AdvancedPathNavigate extends AbstractAdvancedPathNavigate {
             theRange,
             (int) ourEntity.getAttribute(Attributes.FOLLOW_RANGE).getValue(),
             ourEntity,
-            corners.getA(),
-            corners.getB(),
+            corners.getFirst(),
+            corners.getSecond(),
             restrictionType), null, speedFactor, true);
     }
 
@@ -258,8 +259,8 @@ public class AdvancedPathNavigate extends AbstractAdvancedPathNavigate {
             nodeEvaluator.entityHeight = Mth.floor(ourEntity.getBbHeight() + 1.0F);
             nodeEvaluator.entityDepth = Mth.floor(ourEntity.getBbWidth() + 1.0F);
         }
-        if (desiredPosTimeout > 0) {
-            desiredPosTimeout--;
+        if (desiredPosTimeout > 0 && desiredPosTimeout-- <= 0) {
+            desiredPos = null;
         }
 
         if (pathResult != null) {
@@ -268,7 +269,11 @@ public class AdvancedPathNavigate extends AbstractAdvancedPathNavigate {
             }
             else if (pathResult.getStatus() == PathFindingStatus.CALCULATION_COMPLETE)
             {
-                processCompletedCalculationResult();
+                try {
+                    processCompletedCalculationResult();
+                } catch (Exception e) {
+                    Citadel.LOGGER.catching(e);
+                }
             }
         }
 

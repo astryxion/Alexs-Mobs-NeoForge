@@ -1,6 +1,7 @@
 package com.github.alexthe666.alexsmobs.client.render.tile;
 
 import com.github.alexthe666.alexsmobs.block.BlockEndPirateAnchorWinch;
+import com.github.alexthe666.alexsmobs.client.model.AlexAdvancedEntityModel;
 import com.github.alexthe666.alexsmobs.client.model.ModelEndPirateAnchorChain;
 import com.github.alexthe666.alexsmobs.client.render.AMRenderTypes;
 import com.github.alexthe666.alexsmobs.client.model.ModelEndPirateAnchorWinch;
@@ -68,6 +69,8 @@ public class RenderEndPirateAnchorWinch<T extends TileEntityEndPirateAnchorWinch
             matrixStackIn.mulPose(Axis.YP.rotationDegrees(90.0F));
         }
         float bottomOfChain = tileEntityIn.getChainLength(partialTicks);
+        int light = combinedLightIn;
+        int overlay = combinedOverlayIn;
         for (float i = 0; i < tileEntityIn.getChainLengthForRender(); i += 0.5F) {
             matrixStackIn.pushPose();
             float moveDown = Math.max(bottomOfChain - i, 0);
@@ -80,16 +83,24 @@ public class RenderEndPirateAnchorWinch<T extends TileEntityEndPirateAnchorWinch
                 matrixStackIn.translate(0, (1F - moveDown) * 0.5F, 0);
                 matrixStackIn.scale(modulatedScale, modulatedScale, modulatedScale);
             }
-            int light = combinedLightIn;
-            int overlay = combinedOverlayIn;
             collector.submitCustomGeometry(matrixStackIn, AMRenderTypes.entityCutoutNoCull(TEXTURE_CHAIN), (pose, consumer) ->
-                CHAIN_MODEL.renderToBuffer(matrixStackIn, consumer, light, overlay, -1));
-            collector.submitCustomGeometry(matrixStackIn, AMRenderTypes.entityCutoutNoCull(TEXTURE_CHAIN), (pose, consumer) ->
-                CHAIN_MODEL.renderToBuffer(matrixStackIn, null, 0, 0, -1));
-            collector.submitCustomGeometry(matrixStackIn, AMRenderTypes.entityCutoutNoCull(TEXTURE), (pose, consumer) ->
-                WINCH_MODEL.renderToBuffer(matrixStackIn, consumer, light, overlay, -1));
-            collector.submitCustomGeometry(matrixStackIn, AMRenderTypes.entityCutoutNoCull(TEXTURE), (pose, consumer) ->
-                WINCH_MODEL.renderToBuffer(matrixStackIn, null, 0, 0, -1));
+                AlexAdvancedEntityModel.renderSubmitted(pose, CHAIN_MODEL, consumer, light, overlay, -1));
+            collector.submitCustomGeometry(matrixStackIn, RenderTypes.eyes(TEXTURE_CHAIN), (pose, consumer) ->
+                AlexAdvancedEntityModel.renderSubmitted(pose, CHAIN_MODEL, consumer, light, overlay, -1));
+            matrixStackIn.popPose();
+            flag = !flag;
+        }
+        matrixStackIn.popPose();
+        WINCH_MODEL.renderAnchor(tileEntityIn, partialTicks, east);
+        collector.submitCustomGeometry(matrixStackIn, AMRenderTypes.entityCutoutNoCull(TEXTURE), (pose, consumer) ->
+            AlexAdvancedEntityModel.renderSubmitted(pose, WINCH_MODEL, consumer, light, overlay, -1));
+        collector.submitCustomGeometry(matrixStackIn, RenderTypes.eyes(TEXTURE), (pose, consumer) ->
+            AlexAdvancedEntityModel.renderSubmitted(pose, WINCH_MODEL, consumer, light, overlay, -1));
+        matrixStackIn.popPose();
+        matrixStackIn.popPose();
+        if (tileEntityIn.hasAnchor()) {
+            matrixStackIn.pushPose();
+            matrixStackIn.translate(0.5F, -1.5F - bottomOfChain, 0.5F);
             matrixStackIn.pushPose();
             matrixStackIn.mulPose(Axis.XP.rotationDegrees(180.0F));
             if (tileEntityIn.isAnchorEW()) {
@@ -97,10 +108,9 @@ public class RenderEndPirateAnchorWinch<T extends TileEntityEndPirateAnchorWinch
             }
             RenderEndPirateAnchor.ANCHOR_MODEL.resetToDefaultPose();
             collector.submitCustomGeometry(matrixStackIn, AMRenderTypes.entityCutoutNoCull(RenderEndPirateAnchor.TEXTURE_ANCHOR), (pose, consumer) ->
-                RenderEndPirateAnchor.ANCHOR_MODEL.renderToBuffer(matrixStackIn, consumer, light, overlay, -1));
+                AlexAdvancedEntityModel.renderSubmitted(pose, RenderEndPirateAnchor.ANCHOR_MODEL, consumer, light, overlay, -1));
             collector.submitCustomGeometry(matrixStackIn, RenderTypes.eyes(RenderEndPirateAnchor.TEXTURE_ANCHOR_GLOW), (pose, consumer) ->
-                RenderEndPirateAnchor.ANCHOR_MODEL.renderToBuffer(matrixStackIn, consumer, light, overlay, -1));
-
+                AlexAdvancedEntityModel.renderSubmitted(pose, RenderEndPirateAnchor.ANCHOR_MODEL, consumer, light, overlay, -1));
             matrixStackIn.popPose();
             matrixStackIn.popPose();
         }

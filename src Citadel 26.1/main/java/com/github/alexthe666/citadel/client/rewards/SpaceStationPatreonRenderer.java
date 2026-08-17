@@ -7,7 +7,7 @@ import com.github.alexthe666.citadel.client.shader.PostEffectRegistry;
 import com.github.alexthe666.citadel.client.texture.CitadelTextureManager;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.github.alexthe666.citadel.client.render.pathfinding.WorldRenderMacros;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
@@ -29,7 +29,7 @@ public class SpaceStationPatreonRenderer extends CitadelPatreonRenderer {
 
 
     @Override
-    public void render(PoseStack matrixStackIn, MultiBufferSource buffer, int light, float partialTick, LivingEntity entity, float distanceIn, float rotateSpeed, float rotateHeight) {
+    public void render(PoseStack matrixStackIn, WorldRenderMacros.BufferSource buffer, int light, float partialTick, LivingEntity entity, float distanceIn, float rotateSpeed, float rotateHeight) {
         float tick = entity.tickCount + partialTick;
         float bob = (float) (Math.sin(tick * 0.1F) * 1 * 0.05F - 1 * 0.05F);
         float scale = 0.4F;

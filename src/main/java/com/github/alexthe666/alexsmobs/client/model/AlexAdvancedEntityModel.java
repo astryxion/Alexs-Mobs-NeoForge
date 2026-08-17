@@ -2,6 +2,7 @@ package com.github.alexthe666.alexsmobs.client.model;
 
 import com.github.alexthe666.citadel.client.model.AdvancedEntityModel;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -44,6 +45,21 @@ public abstract class AlexAdvancedEntityModel<T extends Entity> extends Advanced
         while (!scratch.isEmpty()) {
             scratch.popPose();
         }
+    }
+
+    /**
+     * Deferred {@code submitCustomGeometry} replays after other entities have already mutated the shared
+     * model, so {@link #young} must be captured per submit and restored at draw time.
+     */
+    public static void drawCitadelModel(PoseStack.Pose submitPose, PoseStack scratch, AlexAdvancedEntityModel<?> model, boolean young, VertexConsumer consumer, int light, int overlay, int tint) {
+        withCitadelSubmitPose(submitPose, scratch, s -> {
+            model.young = young;
+            model.renderToBuffer(s, consumer, light, overlay, tint);
+        });
+    }
+
+    public static void renderSubmitted(PoseStack.Pose submitPose, AdvancedEntityModel<?> model, VertexConsumer consumer, int light, int overlay, int tint) {
+        withCitadelSubmitPose(submitPose, new PoseStack(), scratch -> model.renderToBuffer(scratch, consumer, light, overlay, tint));
     }
 
     /**

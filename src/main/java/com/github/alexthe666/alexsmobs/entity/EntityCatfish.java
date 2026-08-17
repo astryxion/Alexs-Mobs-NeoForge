@@ -4,6 +4,7 @@ import com.github.alexthe666.alexsmobs.config.AMConfig;
 import com.github.alexthe666.alexsmobs.entity.ai.AnimalAISwimBottom;
 import com.github.alexthe666.alexsmobs.entity.ai.AquaticMoveController;
 import com.github.alexthe666.alexsmobs.item.AMItemRegistry;
+import com.github.alexthe666.alexsmobs.misc.AMLoot;
 import com.github.alexthe666.alexsmobs.misc.AMTagRegistry;
 import net.minecraft.core.BlockPos;
 import com.mojang.serialization.DataResult;
@@ -32,7 +33,6 @@ import net.minecraft.world.entity.ai.goal.TryFindWaterGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.navigation.WaterBoundPathNavigation;
 import net.minecraft.world.entity.animal.Bucketable;
-import net.minecraft.world.entity.animal.FlyingAnimal;
 import net.minecraft.world.entity.animal.fish.WaterAnimal;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
@@ -69,7 +69,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 
-public class EntityCatfish extends WaterAnimal implements FlyingAnimal, Bucketable {
+public class EntityCatfish extends WaterAnimal implements Bucketable {
 
     private static final EntityDataAccessor<Boolean> FROM_BUCKET = SynchedEntityData.defineId(EntityCatfish.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> CATFISH_SIZE = SynchedEntityData.defineId(EntityCatfish.class, EntityDataSerializers.INT);
@@ -231,14 +231,16 @@ public class EntityCatfish extends WaterAnimal implements FlyingAnimal, Bucketab
         }
     }
 
-    // TODO 1.21: getDefaultLootTable now returns ResourceKey<LootTable>
-    // @Nullable
-    // protected Identifier getDefaultLootTable() {
-    //     if (this.getCatfishSize() == 2) {
-    //         return LARGE_LOOT;
-    //     }
-    //     return this.getCatfishSize() == 1 ? MEDIUM_LOOT : super.getDefaultLootTable();
-    // }
+    @Override
+    protected void dropFromLootTable(ServerLevel level, DamageSource source, boolean playerKilled) {
+        if (this.getCatfishSize() == 2) {
+            this.dropFromLootTable(level, source, playerKilled, AMLoot.of(LARGE_LOOT));
+        } else if (this.getCatfishSize() == 1) {
+            this.dropFromLootTable(level, source, playerKilled, AMLoot.of(MEDIUM_LOOT));
+        } else {
+            super.dropFromLootTable(level, source, playerKilled);
+        }
+    }
 
     public void onSyncedDataUpdated(EntityDataAccessor<?> accessor) {
         if (CATFISH_SIZE.equals(accessor)) {
@@ -582,7 +584,6 @@ public class EntityCatfish extends WaterAnimal implements FlyingAnimal, Bucketab
         return SoundEvents.COD_HURT;
     }
 
-    @Override
     public boolean isFlying() {
         return false;
     }

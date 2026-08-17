@@ -161,7 +161,6 @@ public class AlexsMobs {
         event.enqueueWork(AMItemRegistry::init);
         event.enqueueWork(AMItemRegistry::initDispenser);
         // TODO 1.21: AMAdvancementTriggerRegistry.init();
-        AMEffectRegistry.init();
         AMRecipeRegistry.init();
         PROXY.initPathfinding();
     }

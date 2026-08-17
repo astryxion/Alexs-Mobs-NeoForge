@@ -2,6 +2,7 @@ package com.github.alexthe666.alexsmobs.entity;
 
 import com.github.alexthe666.alexsmobs.AlexsMobs;
 import com.github.alexthe666.alexsmobs.network.MessageInteractMultipart;
+import com.github.alexthe666.alexsmobs.misc.AMEntityHooks;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -26,12 +27,14 @@ public class EntityCachalotPart extends PartEntity<EntityCachalotWhale> {
 
     public EntityCachalotPart(EntityCachalotWhale parent, float sizeX, float sizeY) {
         super(parent);
+        AMEntityHooks.assignClientPartId(this);
         this.size = EntityDimensions.scalable(sizeX, sizeY);
         this.refreshDimensions();
     }
 
     public EntityCachalotPart(EntityCachalotWhale entityCachalotWhale, float sizeX, float sizeY, EntityDimensions size) {
         super(entityCachalotWhale);
+        AMEntityHooks.assignClientPartId(this);
         this.size = size;
     }
 

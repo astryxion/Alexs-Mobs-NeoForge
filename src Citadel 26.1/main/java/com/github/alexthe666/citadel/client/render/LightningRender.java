@@ -1,11 +1,11 @@
 package com.github.alexthe666.citadel.client.render;
 
+import com.github.alexthe666.citadel.client.render.pathfinding.WorldRenderMacros;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import org.apache.commons.lang3.tuple.Pair;
 import org.joml.Matrix4f;
@@ -27,7 +27,7 @@ public class LightningRender {
 
     private final Map<Object, BoltOwnerData> boltOwners = new Object2ObjectOpenHashMap<>();
 
-    public void render(float partialTicks, PoseStack PoseStackIn, MultiBufferSource bufferIn) {
+    public void render(float partialTicks, PoseStack PoseStackIn, WorldRenderMacros.BufferSource bufferIn) {
         VertexConsumer buffer = bufferIn.getBuffer(RenderTypes.lightning());
         Matrix4f matrix = PoseStackIn.last().pose();
         Timestamp timestamp = new Timestamp(minecraft.level.getGameTime(), partialTicks);

@@ -1,6 +1,7 @@
 package com.github.alexthe666.alexsmobs.client.render;
 
 import com.github.alexthe666.alexsmobs.client.AlexsMobsClientKeys;
+import com.github.alexthe666.alexsmobs.client.model.AlexAdvancedEntityModel;
 import com.github.alexthe666.alexsmobs.client.model.ModelKomodoDragon;
 import com.github.alexthe666.alexsmobs.entity.EntityKomodoDragon;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -64,7 +65,7 @@ public class RenderKomodoDragon extends MobRenderer<EntityKomodoDragon, LivingEn
                     parentModel.copyPropertiesTo(MAID_MODEL);
                     MAID_MODEL.prepareMobModel(entitylivingbaseIn, limbSwing, limbSwingAmount, partialTicks);
                     MAID_MODEL.setupAnim(entitylivingbaseIn, limbSwing, limbSwingAmount, ageInTicks, wrappedHead, headPitch);
-                    MAID_MODEL.renderToBuffer(matrixStackIn, maid, packedLightIn, overlay, -1);
+                    AlexAdvancedEntityModel.renderSubmitted(pose, MAID_MODEL, maid, packedLightIn, overlay, -1);
                 });
             }
             if (entitylivingbaseIn.isSaddled()) {
@@ -72,7 +73,7 @@ public class RenderKomodoDragon extends MobRenderer<EntityKomodoDragon, LivingEn
                     parentModel.copyPropertiesTo(SADDLE_MODEL);
                     SADDLE_MODEL.prepareMobModel(entitylivingbaseIn, limbSwing, limbSwingAmount, partialTicks);
                     SADDLE_MODEL.setupAnim(entitylivingbaseIn, limbSwing, limbSwingAmount, ageInTicks, wrappedHead, headPitch);
-                    SADDLE_MODEL.renderToBuffer(matrixStackIn, saddle, packedLightIn, overlay, -1);
+                    AlexAdvancedEntityModel.renderSubmitted(pose, SADDLE_MODEL, saddle, packedLightIn, overlay, -1);
                 });
             }
         }

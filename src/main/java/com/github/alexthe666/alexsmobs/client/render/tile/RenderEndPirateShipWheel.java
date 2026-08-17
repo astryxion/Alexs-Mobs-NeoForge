@@ -1,6 +1,7 @@
 package com.github.alexthe666.alexsmobs.client.render.tile;
 
 import com.github.alexthe666.alexsmobs.block.BlockEndPirateShipWheel;
+import com.github.alexthe666.alexsmobs.client.model.AlexAdvancedEntityModel;
 import com.github.alexthe666.alexsmobs.client.model.ModelEndPirateShipWheel;
 import com.github.alexthe666.alexsmobs.client.render.AMRenderTypes;
 import com.github.alexthe666.alexsmobs.tileentity.TileEntityEndPirateShipWheel;
@@ -68,9 +69,9 @@ public class RenderEndPirateShipWheel<T extends TileEntityEndPirateShipWheel> im
         int finalLight = light;
         int finalOverlay = overlay;
         collector.submitCustomGeometry(poseStack, AMRenderTypes.entityCutoutNoCull(TEXTURE), (pose, consumer) ->
-            WHEEL_MODEL.renderToBuffer(poseStack, consumer, finalLight, finalOverlay, -1));
+            AlexAdvancedEntityModel.renderSubmitted(pose, WHEEL_MODEL, consumer, finalLight, finalOverlay, -1));
         collector.submitCustomGeometry(poseStack, AMRenderTypes.entityCutoutNoCull(TEXTURE_GLOW), (pose, consumer) ->
-            WHEEL_MODEL.renderToBuffer(poseStack, consumer, 240, finalOverlay, -1));
+            AlexAdvancedEntityModel.renderSubmitted(pose, WHEEL_MODEL, consumer, 240, finalOverlay, -1));
         poseStack.popPose();
         poseStack.popPose();
     }

@@ -1,5 +1,6 @@
 package com.github.alexthe666.alexsmobs.entity;
 
+import com.github.alexthe666.alexsmobs.misc.AMEntityHooks;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
@@ -491,7 +492,7 @@ public class EntityGiantSquid extends WaterAnimal {
     }
 
     public boolean canBeCollidedWith() {
-        return this.isAlive();
+        return AMEntityHooks.isFullyConstructed(this) && this.isAlive();
     }
 
     public Vec3 collide(Vec3 movement) {
@@ -536,6 +537,12 @@ public class EntityGiantSquid extends WaterAnimal {
     @Override
     public net.neoforged.neoforge.entity.PartEntity<?>[] getParts() {
         return this.allParts;
+    }
+
+    @Override
+    public void setId(int id) {
+        super.setId(id);
+        AMEntityHooks.bindPartIds(id, this.allParts);
     }
 
     public boolean attackEntityPartFrom(EntityGiantSquidPart part, DamageSource source, float amount) {

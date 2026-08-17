@@ -30,6 +30,7 @@ public class LayerGrizzlyItem extends RenderLayer<LivingEntityRenderState, Citad
         }
         ItemStack itemstack = entitylivingbaseIn.getItemBySlot(EquipmentSlot.MAINHAND);
         ItemInHandRenderer renderer = Minecraft.getInstance().getEntityRenderDispatcher().getItemInHandRenderer();
+        this.getParentModel().setupAnim(state);
         matrixStackIn.pushPose();
         if (entitylivingbaseIn.isBaby()) {
             matrixStackIn.scale(0.35F, 0.35F, 0.35F);
@@ -51,7 +52,6 @@ public class LayerGrizzlyItem extends RenderLayer<LivingEntityRenderState, Citad
     protected void translateToHand(boolean left, PoseStack matrixStack) {
         ModelGrizzlyBear model = (ModelGrizzlyBear) this.getParentModel().citadel();
         model.root.translateAndRotate(matrixStack);
-        model.midbody.translateAndRotate(matrixStack);
         model.body.translateAndRotate(matrixStack);
         model.right_arm.translateAndRotate(matrixStack);
     }

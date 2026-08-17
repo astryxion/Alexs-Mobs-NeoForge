@@ -5,7 +5,6 @@ import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -31,7 +30,24 @@ public class WorldRenderMacros {
     /**
      * Always use {@link #getBufferSource} when actually using the buffer source
      */
-    private static MultiBufferSource.BufferSource bufferSource;
+    private static BufferSource bufferSource;
+
+    public static class BufferSource implements MultiBufferSource {
+        private final MultiBufferSource.BufferSource inner;
+
+        public BufferSource(MultiBufferSource.BufferSource inner) {
+            this.inner = inner;
+        }
+
+        @Override
+        public VertexConsumer getBuffer(RenderType renderType) {
+            return inner.getBuffer(renderType);
+        }
+
+        public void endBatch() {
+            inner.endBatch();
+        }
+    }
 
     /**
      * Put type at the first position.
@@ -89,11 +105,15 @@ public class WorldRenderMacros {
         putBufferTail(WorldRenderMacros.COLORED_TRIANGLES_NC_ND);
     }
 
-    public static MultiBufferSource.BufferSource getBufferSource() {
+    public static BufferSource getBufferSource() {
         if (bufferSource == null) {
-            bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
+            bufferSource = new BufferSource(Minecraft.getInstance().renderBuffers().bufferSource());
         }
         return bufferSource;
+    }
+
+    static void drawInBatch(Font font, net.minecraft.util.FormattedCharSequence text, float x, float y, int color, boolean dropShadow, Matrix4f pose, BufferSource buffer, Font.DisplayMode displayMode, int backgroundColor, int lightCoords) {
+        font.drawInBatch(text, x, y, color, dropShadow, pose, buffer, displayMode, backgroundColor, lightCoords);
     }
 
     /**
@@ -890,7 +910,7 @@ public class WorldRenderMacros {
                                        final PoseStack matrixStack,
                                        final boolean forceWhite,
                                        final int mergeEveryXListElements,
-                                       final MultiBufferSource buffer) {
+                                       final BufferSource buffer) {
         if (mergeEveryXListElements < 1) {
             throw new IllegalArgumentException("mergeEveryXListElements is less than 1");
         }
@@ -916,18 +936,9 @@ public class WorldRenderMacros {
                         mergeEveryXListElements == 1 ? text.get(i) : text.subList(i, Math.min(i + mergeEveryXListElements, cap)).toString());
                 final float textCenterShift = (float) (-fontrenderer.width(renderText) / 2);
 
-                fontrenderer.drawInBatch(renderText,
-                        textCenterShift,
-                        0,
-                        forceWhite ? 0xffffffff : 0x20ffffff,
-                        false,
-                        rawPosMatrix,
-                        buffer,
-                        Font.DisplayMode.SEE_THROUGH,
-                        alphaMask,
-                        0x00f000f0);
+                drawInBatch(fontrenderer, renderText.getVisualOrderText(), textCenterShift, 0, forceWhite ? 0xffffffff : 0x20ffffff, false, rawPosMatrix, buffer, Font.DisplayMode.SEE_THROUGH, alphaMask, 0x00f000f0);
                 if (!forceWhite) {
-                    fontrenderer.drawInBatch(renderText, textCenterShift, 0, 0xffffffff, false, rawPosMatrix, buffer, Font.DisplayMode.NORMAL, 0, 0x00f000f0);
+                    drawInBatch(fontrenderer, renderText.getVisualOrderText(), textCenterShift, 0, 0xffffffff, false, rawPosMatrix, buffer, Font.DisplayMode.NORMAL, 0, 0x00f000f0);
                 }
                 matrixStack.translate(0.0d, fontrenderer.lineHeight + 1, 0.0d);
             }

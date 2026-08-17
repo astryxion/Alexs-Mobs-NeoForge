@@ -157,7 +157,7 @@ dependencies {
         }
         if (citadelJars.isEmpty()) {
             throw new GradleException(
-                    "No Citadel jar in libs/. Set use_citadel_subproject=true in gradle.properties to use the :citadel subproject, or add a NeoForge 26.1 Citadel jar (e.g. citadelneoforge-26.1-1.0.1.jar)."
+                    "No Citadel jar in libs/. Set use_citadel_subproject=true in gradle.properties to use the :citadel subproject, or add a NeoForge 26.1 Citadel jar (e.g. citadelneoforge-26.1-1.0.0.jar)."
             )
         }
         if (citadelJars.size() > 1) {

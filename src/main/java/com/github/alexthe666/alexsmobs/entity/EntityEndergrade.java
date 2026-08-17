@@ -34,7 +34,6 @@ import net.minecraft.world.entity.ai.control.MoveControl;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.animal.Animal;
-import net.minecraft.world.entity.animal.FlyingAnimal;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
@@ -54,7 +53,7 @@ import net.minecraft.world.phys.Vec3;
 import javax.annotation.Nullable;
 import java.util.EnumSet;
 
-public class EntityEndergrade extends Animal implements FlyingAnimal {
+public class EntityEndergrade extends Animal {
 
     private static final EntityDataAccessor<Integer> BITE_TICK = SynchedEntityData.defineId(EntityEndergrade.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> SADDLED = SynchedEntityData.defineId(EntityEndergrade.class, EntityDataSerializers.BOOLEAN);
@@ -314,7 +313,6 @@ public class EntityEndergrade extends Animal implements FlyingAnimal {
         return (float)(this.getAttributeValue(Attributes.MOVEMENT_SPEED) * (this.onGround() ? 0.2F : 0.8F));
     }
 
-    @Override
     public boolean isFlying() {
         return true;
     }

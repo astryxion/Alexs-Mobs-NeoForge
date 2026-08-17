@@ -1,6 +1,7 @@
 package com.github.alexthe666.alexsmobs.client.render;
 
 import com.github.alexthe666.alexsmobs.client.AlexsMobsClientKeys;
+import com.github.alexthe666.alexsmobs.client.model.AlexAdvancedEntityModel;
 import com.github.alexthe666.alexsmobs.client.model.ModelVoidWormShot;
 import com.github.alexthe666.alexsmobs.entity.EntityVoidWormShot;
 import com.github.alexthe666.alexsmobs.entity.util.Maths;
@@ -55,7 +56,7 @@ public class RenderVoidWormShot extends EntityRenderer<EntityVoidWormShot, Entit
         float colorize = home;
         matrixStackIn.translate(0, -1.5F, 0);
         collector.submitCustomGeometry(matrixStackIn, AMRenderTypes.getFullBright(TEXTURE), (pose, ivertexbuilder) ->
-            MODEL.renderToBuffer(matrixStackIn, ivertexbuilder, 210, NO_OVERLAY, -1)
+            AlexAdvancedEntityModel.renderSubmitted(pose, MODEL, ivertexbuilder, 210, NO_OVERLAY, -1)
         );
         matrixStackIn.popPose();
         matrixStackIn.popPose();

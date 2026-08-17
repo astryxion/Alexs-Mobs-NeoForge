@@ -5,7 +5,9 @@ import com.github.alexthe666.citadel.server.entity.pathfinding.raycoms.MNode;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.github.alexthe666.citadel.client.render.pathfinding.WorldRenderMacros;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.RenderBuffers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
@@ -18,7 +20,7 @@ import java.util.Set;
 
 public class PathfindingDebugRenderer {
     public static final RenderBuffers renderBuffers = new RenderBuffers(Runtime.getRuntime().availableProcessors());
-    private static final MultiBufferSource.BufferSource renderBuffer = renderBuffers.bufferSource();
+    private static final WorldRenderMacros.BufferSource renderBuffer = new WorldRenderMacros.BufferSource(renderBuffers.bufferSource());
     /**
      * Set of visited nodes.
      */
@@ -108,9 +110,9 @@ public class PathfindingDebugRenderer {
         WorldRenderMacros.renderFillRectangle(ctx.bufferSource, ctx.poseStack, -i - 1, -5, 0, 2 * i + 2, 17, 0x7f000000);
 
         ctx.poseStack.translate(0.0F, -5F, -0.1F);
-        fontrenderer.drawInBatch(s1, -fontrenderer.width(s1) / 2.0f, 1, 0xFFFFFFFF, false, mat, ctx.bufferSource, Font.DisplayMode.NORMAL, 0, 15728880);
+        WorldRenderMacros.drawInBatch(fontrenderer, net.minecraft.network.chat.Component.literal(s1).getVisualOrderText(), -fontrenderer.width(s1) / 2.0f, 1, 0xFFFFFFFF, false, mat, ctx.bufferSource, Font.DisplayMode.NORMAL, 0, 15728880);
         ctx.poseStack.translate(0.0F, 8F, -0.1F);
-        fontrenderer.drawInBatch(s2, -fontrenderer.width(s2) / 2.0f, 1, 0xFFFFFFFF, false, mat, ctx.bufferSource, Font.DisplayMode.NORMAL, 0, 15728880);
+        WorldRenderMacros.drawInBatch(fontrenderer, net.minecraft.network.chat.Component.literal(s2).getVisualOrderText(), -fontrenderer.width(s2) / 2.0f, 1, 0xFFFFFFFF, false, mat, ctx.bufferSource, Font.DisplayMode.NORMAL, 0, 15728880);
 
         ctx.poseStack.popPose();
     }

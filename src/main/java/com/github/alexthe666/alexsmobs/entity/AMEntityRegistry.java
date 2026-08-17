@@ -179,7 +179,7 @@ public class AMEntityRegistry {
 
 
     public static void registerSpawnPlacements(net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent event) {
-        SpawnPlacementType spawnsOnLeaves = SpawnPlacementTypes.ON_GROUND; // TODO: Custom spawn placement removed in 1.21
+        SpawnPlacementType placeOnLeaves = AMEntityRegistry::createLeavesSpawnPlacement;
         event.register(GRIZZLY_BEAR.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Animal::checkAnimalSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
         event.register(ROADRUNNER.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, EntityRoadrunner::canRoadrunnerSpawn, RegisterSpawnPlacementsEvent.Operation.REPLACE);
         event.register(BONE_SERPENT.get(), SpawnPlacementTypes.IN_LAVA, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, EntityBoneSerpent::canBoneSerpentSpawn, RegisterSpawnPlacementsEvent.Operation.REPLACE);
@@ -236,8 +236,8 @@ public class AMEntityRegistry {
         event.register(TUSKLIN.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, EntityTusklin::canTusklinSpawn, RegisterSpawnPlacementsEvent.Operation.REPLACE);
         event.register(LAVIATHAN.get(), SpawnPlacementTypes.IN_LAVA, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, EntityLaviathan::canLaviathanSpawn, RegisterSpawnPlacementsEvent.Operation.REPLACE);
         event.register(COSMAW.get(), SpawnPlacementTypes.NO_RESTRICTIONS, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, EntityCosmaw::canCosmawSpawn, RegisterSpawnPlacementsEvent.Operation.REPLACE);
-        event.register(TOUCAN.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Animal::checkAnimalSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
-        event.register(MANED_WOLF.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, EntityManedWolf::checkAnimalSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
+        event.register(TOUCAN.get(), placeOnLeaves, Heightmap.Types.MOTION_BLOCKING, EntityToucan::canToucanSpawn, RegisterSpawnPlacementsEvent.Operation.REPLACE);
+        event.register(MANED_WOLF.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Animal::checkAnimalSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
         event.register(ANACONDA.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, EntityAnaconda::canAnacondaSpawn, RegisterSpawnPlacementsEvent.Operation.REPLACE);
         event.register(ANTEATER.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, EntityAnteater::canAnteaterSpawn, RegisterSpawnPlacementsEvent.Operation.REPLACE);
         event.register(ROCKY_ROLLER.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, EntityRockyRoller::checkRockyRollerSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
@@ -254,7 +254,7 @@ public class AMEntityRegistry {
         event.register(FLYING_FISH.get(), SpawnPlacementTypes.IN_WATER, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, WaterAnimal::checkSurfaceWaterAnimalSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
         event.register(SKELEWAG.get(), SpawnPlacementTypes.IN_WATER, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, EntitySkelewag::canSkelewagSpawn, RegisterSpawnPlacementsEvent.Operation.REPLACE);
         event.register(RAIN_FROG.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, EntityRainFrog::canRainFrogSpawn, RegisterSpawnPlacementsEvent.Operation.REPLACE);
-        event.register(POTOO.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Animal::checkAnimalSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
+        event.register(POTOO.get(), placeOnLeaves, Heightmap.Types.MOTION_BLOCKING, EntityPotoo::canPotooSpawn, RegisterSpawnPlacementsEvent.Operation.REPLACE);
         event.register(MUDSKIPPER.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, EntityMudskipper::canMudskipperSpawn, RegisterSpawnPlacementsEvent.Operation.REPLACE);
         event.register(RHINOCEROS.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, EntityRhinoceros::checkAnimalSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
         event.register(FARSEER.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, EntityFarseer::checkFarseerSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
@@ -262,12 +262,13 @@ public class AMEntityRegistry {
         event.register(UNDERMINER.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, EntityUnderminer::checkUnderminerSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
         event.register(MURMUR.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, EntityMurmur::checkMurmurSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
         event.register(SKUNK.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, EntitySkunk::checkAnimalSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
-        event.register(SUGAR_GLIDER.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Animal::checkAnimalSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
+        event.register(SUGAR_GLIDER.get(), placeOnLeaves, Heightmap.Types.MOTION_BLOCKING, EntitySugarGlider::canSugarGliderSpawn, RegisterSpawnPlacementsEvent.Operation.REPLACE);
         event.register(BANANA_SLUG.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, EntityBananaSlug::checkBananaSlugSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
-        event.register(BLUE_JAY.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Animal::checkAnimalSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
+        event.register(BLUE_JAY.get(), placeOnLeaves, Heightmap.Types.MOTION_BLOCKING, EntityBlueJay::checkBlueJaySpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
         event.register(CAIMAN.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, EntityCaiman::canCaimanSpawn, RegisterSpawnPlacementsEvent.Operation.REPLACE);
         event.register(TRIOPS.get(), SpawnPlacementTypes.IN_WATER, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, WaterAnimal::checkSurfaceWaterAnimalSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
-        event.register(CAPUCHIN_MONKEY.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Animal::checkAnimalSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
+        event.register(CAPUCHIN_MONKEY.get(), placeOnLeaves, Heightmap.Types.MOTION_BLOCKING, EntityCapuchinMonkey::canCapuchinSpawn, RegisterSpawnPlacementsEvent.Operation.REPLACE);
+        event.register(COSMIC_COD.get(), SpawnPlacementTypes.NO_RESTRICTIONS, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, (type, level, reason, pos, random) -> true, RegisterSpawnPlacementsEvent.Operation.REPLACE);
     }
 
     public static void initializeAttributes(EntityAttributeCreationEvent event) {

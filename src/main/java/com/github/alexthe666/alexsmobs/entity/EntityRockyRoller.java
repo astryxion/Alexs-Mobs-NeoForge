@@ -1,5 +1,6 @@
 package com.github.alexthe666.alexsmobs.entity;
 
+import com.github.alexthe666.alexsmobs.misc.AMEntityHooks;
 import com.github.alexthe666.alexsmobs.config.AMConfig;
 import com.github.alexthe666.alexsmobs.effect.AMEffectRegistry;
 import com.github.alexthe666.alexsmobs.entity.ai.AdvancedPathNavigateNoTeleport;
@@ -301,7 +302,7 @@ public class EntityRockyRoller extends Monster implements ICustomCollisions {
     }
 
     public boolean canBeCollidedWith() {
-        return this.isAlive();
+        return AMEntityHooks.isFullyConstructed(this) && this.isAlive();
     }
 
     public void push(Entity entity) {

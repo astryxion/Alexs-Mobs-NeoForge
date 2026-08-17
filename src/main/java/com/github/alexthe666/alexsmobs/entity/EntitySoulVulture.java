@@ -33,7 +33,6 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
-import net.minecraft.world.entity.animal.FlyingAnimal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
 import net.minecraft.world.entity.npc.villager.AbstractVillager;
@@ -55,7 +54,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 
-public class EntitySoulVulture extends Monster implements FlyingAnimal {
+public class EntitySoulVulture extends Monster {
 
     public static final ResourceKey<LootTable> SOUL_LOOT =
         ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE,

@@ -19,7 +19,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
@@ -34,9 +34,9 @@ import net.minecraft.world.entity.ai.goal.target.OwnerHurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.OwnerHurtTargetGoal;
 import net.minecraft.world.entity.ai.util.LandRandomPos;
 import net.minecraft.world.entity.animal.Animal;
-import net.minecraft.world.entity.animal.FlyingAnimal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -61,7 +61,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
-public class EntityFlutter extends TamableAnimal implements IFollower, FlyingAnimal {
+public class EntityFlutter extends TamableAnimal implements IFollower {
 
     private static final EntityDataAccessor<Float> FLUTTER_PITCH = SynchedEntityData.defineId(EntityFlutter.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Boolean> FLYING = SynchedEntityData.defineId(EntityFlutter.class, EntityDataSerializers.BOOLEAN);
@@ -411,13 +411,13 @@ public class EntityFlutter extends TamableAnimal implements IFollower, FlyingAni
                 }
             }
             return this.level().isClientSide() ? InteractionResult.SUCCESS : InteractionResult.CONSUME;
-        } else if (!isTame() && itemstack.is(ItemTags.FLOWERS)) {
+        } else if (!isTame() && isFlowerItem(itemstack)) {
             this.gameEvent(GameEvent.ENTITY_INTERACT);
             this.playSound(AMSoundRegistry.FLUTTER_NO.get(), this.getSoundVolume(), this.getVoicePitch());
             this.entityData.set(SHAKING_HEAD_TICKS, 20);
         }
         InteractionResult type = super.mobInteract(player, hand);
-        if (isTame() && itemstack.is(ItemTags.FLOWERS) && this.getHealth() < this.getMaxHealth()) {
+        if (isTame() && isFlowerItem(itemstack) && this.getHealth() < this.getMaxHealth()) {
             if (!this.level().isClientSide()) {
                 this.usePlayerItem(player, hand, itemstack);
                 this.gameEvent(GameEvent.EAT);
@@ -427,7 +427,7 @@ public class EntityFlutter extends TamableAnimal implements IFollower, FlyingAni
             return this.level().isClientSide() ? InteractionResult.SUCCESS : InteractionResult.CONSUME;
         }
         InteractionResult interactionresult = itemstack.interactLivingEntity(player, this, hand);
-        if (interactionresult != InteractionResult.SUCCESS && type != InteractionResult.SUCCESS && isTame() && isOwnedBy(player) && !isFood(itemstack) && !itemstack.is(ItemTags.FLOWERS)) {
+        if (interactionresult != InteractionResult.SUCCESS && type != InteractionResult.SUCCESS && isTame() && isOwnedBy(player) && !isFood(itemstack) && !isFlowerItem(itemstack)) {
             if (item == Items.FLOWER_POT && !this.isPotted()) {
                 this.setPotted(true);
                 return InteractionResult.SUCCESS;
@@ -640,7 +640,11 @@ public class EntityFlutter extends TamableAnimal implements IFollower, FlyingAni
     }
 
     public boolean canEatFlower(ItemStack stack) {
-        return !hasEatenFlower(stack) && stack.is(ItemTags.FLOWERS);
+        return !hasEatenFlower(stack) && isFlowerItem(stack);
+    }
+
+    private static boolean isFlowerItem(ItemStack stack) {
+        return stack.getItem() instanceof BlockItem blockItem && blockItem.getBlock().defaultBlockState().is(BlockTags.FLOWERS);
     }
 
     private void setupShooting() {

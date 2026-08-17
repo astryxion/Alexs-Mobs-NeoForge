@@ -3,6 +3,7 @@ package com.github.alexthe666.citadel.server.entity.pathfinding.raycoms;
     All of this code is used with permission from Raycoms, one of the developers of the minecolonies project.
  */
 
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
@@ -119,7 +120,7 @@ public abstract class AbstractAdvancedPathNavigate extends GroundPathNavigation 
      * @param corners the corners they can't leave.
      * @return the result of the pathing.
      */
-    public abstract PathResult moveToRandomPos(final int range, final double speed, final net.minecraft.util.Tuple<BlockPos, BlockPos> corners, final RestrictionType restrictionType);
+    public abstract PathResult moveToRandomPos(final int range, final double speed, final Pair<BlockPos, BlockPos> corners, final RestrictionType restrictionType);
 
     /**
      * Used to move a living ourEntity with a speed.

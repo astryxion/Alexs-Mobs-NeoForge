@@ -4,6 +4,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
 import com.github.alexthe666.alexsmobs.entity.ai.*;
+import com.github.alexthe666.alexsmobs.misc.AMLoot;
 import com.github.alexthe666.alexsmobs.misc.AMPointOfInterestRegistry;
 import com.github.alexthe666.alexsmobs.misc.AMSoundRegistry;
 import com.github.alexthe666.alexsmobs.misc.AMTagRegistry;
@@ -112,11 +113,14 @@ public class EntityLeafcutterAnt extends Animal implements NeutralMob, IAnimated
         super.setTarget(entitylivingbaseIn);
     }
 
-    // TODO 1.21: getDefaultLootTable now returns ResourceKey<LootTable>
-    // @Nullable
-    //     protected Identifier getDefaultLootTable() {
-    //         return this.isQueen() ? QUEEN_LOOT : super.getDefaultLootTable();
-    //     }
+    @Override
+    protected void dropFromLootTable(ServerLevel level, DamageSource source, boolean playerKilled) {
+        if (this.isQueen()) {
+            this.dropFromLootTable(level, source, playerKilled, AMLoot.of(QUEEN_LOOT));
+        } else {
+            super.dropFromLootTable(level, source, playerKilled);
+        }
+    }
 
     private void switchNavigator(boolean rightsideUp) {
         if (rightsideUp) {

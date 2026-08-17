@@ -1,11 +1,15 @@
 package com.github.alexthe666.citadel.mixin.client;
 
-import com.github.alexthe666.citadel.CitadelConstants;
 import com.github.alexthe666.citadel.client.event.EventLivingRenderer;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.client.renderer.entity.state.AvatarRenderState;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.neoforge.common.NeoForge;
 import org.spongepowered.asm.mixin.Mixin;
@@ -15,58 +19,80 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LivingEntityRenderer.class)
-public class LivingEntityRendererMixin<T extends LivingEntity> {
+public class LivingEntityRendererMixin<T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> {
 
     @Shadow
-    protected EntityModel model;
+    protected M model;
 
-    @Inject(
-            method = "setupRotations",
-            remap = CitadelConstants.REMAPREFS,
-            at = @At(value = "RETURN")
-    )
-    protected void citadel_setupRotations(T entity, PoseStack poseStack, float bob, float yBodyRot, float partialTick, float scale, CallbackInfo ci) {
-        EventLivingRenderer.SetupRotations event = new EventLivingRenderer.SetupRotations(entity, model, poseStack, yBodyRot, partialTick);
-        NeoForge.EVENT_BUS.post(event);
-
+    @Inject(method = "setupRotations", at = @At("RETURN"))
+    protected void citadel_setupRotations(S state, PoseStack poseStack, float bodyRot, float entityScale, CallbackInfo ci) {
+        LivingEntity entity = getLivingEntity(state);
+        if (entity != null) {
+            EventLivingRenderer.SetupRotations event = new EventLivingRenderer.SetupRotations(entity, model, poseStack, bodyRot, state.partialTick);
+            NeoForge.EVENT_BUS.post(event);
+        }
     }
 
     @Inject(
-            method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
-            remap = CitadelConstants.REMAPREFS,
+            method = "submit",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/model/EntityModel;setupAnim(Lnet/minecraft/world/entity/Entity;FFFFF)V",
+                    target = "Lnet/minecraft/client/model/EntityModel;setupAnim(Ljava/lang/Object;)V",
                     shift = At.Shift.BEFORE
             )
     )
-    protected void citadel_render_setupAnim_before(LivingEntity livingEntity, float yaw, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, CallbackInfo ci) {
-        EventLivingRenderer.PreSetupAnimations event = new EventLivingRenderer.PreSetupAnimations(livingEntity, model, poseStack, yaw, partialTicks, bufferSource, packedLight);
-        NeoForge.EVENT_BUS.post(event);
+    protected void citadel_render_setupAnim_before(S state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera, CallbackInfo ci) {
+        LivingEntity entity = getLivingEntity(state);
+        if (entity != null) {
+            EventLivingRenderer.PreSetupAnimations event = new EventLivingRenderer.PreSetupAnimations(entity, model, poseStack, state.yRot, state.partialTick, submitNodeCollector, state.lightCoords);
+            NeoForge.EVENT_BUS.post(event);
+        }
     }
 
     @Inject(
-            method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
-            remap = true,
-
+            method = "submit",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/model/EntityModel;setupAnim(Lnet/minecraft/world/entity/Entity;FFFFF)V",
+                    target = "Lnet/minecraft/client/model/EntityModel;setupAnim(Ljava/lang/Object;)V",
                     shift = At.Shift.AFTER
             )
     )
-    protected void citadel_render_setupAnim_after(LivingEntity livingEntity, float yaw, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, CallbackInfo ci) {
-        EventLivingRenderer.PostSetupAnimations event = new EventLivingRenderer.PostSetupAnimations(livingEntity, model, poseStack, yaw, partialTicks, bufferSource, packedLight);
-        NeoForge.EVENT_BUS.post(event);
+    protected void citadel_render_setupAnim_after(S state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera, CallbackInfo ci) {
+        LivingEntity entity = getLivingEntity(state);
+        if (entity != null) {
+            EventLivingRenderer.PostSetupAnimations event = new EventLivingRenderer.PostSetupAnimations(entity, model, poseStack, state.yRot, state.partialTick, submitNodeCollector, state.lightCoords);
+            NeoForge.EVENT_BUS.post(event);
+        }
     }
 
-    @Inject(
-            method = {"Lnet/minecraft/client/renderer/entity/LivingEntityRenderer;render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V"},
-            remap = CitadelConstants.REMAPREFS,
-            at = @At(value = "RETURN")
-    )
-    protected void citadel_render_renderToBuffer(LivingEntity livingEntity, float yaw, float partialTicks, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, CallbackInfo ci) {
-        EventLivingRenderer.PostRenderModel event = new EventLivingRenderer.PostRenderModel(livingEntity, model, poseStack, yaw, partialTicks, bufferSource, packedLight);
-        NeoForge.EVENT_BUS.post(event);
+    @Inject(method = "submit", at = @At(value = "RETURN"))
+    protected void citadel_render_renderToBuffer(S state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera, CallbackInfo ci) {
+        LivingEntity entity = getLivingEntity(state);
+        if (entity != null) {
+            EventLivingRenderer.PostRenderModel event = new EventLivingRenderer.PostRenderModel(entity, model, poseStack, state.yRot, state.partialTick, submitNodeCollector, state.lightCoords);
+            NeoForge.EVENT_BUS.post(event);
+        }
+    }
+
+    private static LivingEntity getLivingEntity(LivingEntityRenderState state) {
+        if (Minecraft.getInstance().level == null) {
+            return null;
+        }
+        if (state instanceof AvatarRenderState avatarRenderState) {
+            Entity entity = Minecraft.getInstance().level.getEntity(avatarRenderState.id);
+            if (entity instanceof LivingEntity livingEntity) {
+                return livingEntity;
+            }
+        }
+        for (Entity entity : Minecraft.getInstance().level.entitiesForRendering()) {
+            if (entity instanceof LivingEntity livingEntity
+                    && entity.getType() == state.entityType
+                    && Math.abs(entity.getX() - state.x) < 0.01D
+                    && Math.abs(entity.getY() - state.y) < 0.01D
+                    && Math.abs(entity.getZ() - state.z) < 0.01D) {
+                return livingEntity;
+            }
+        }
+        return null;
     }
 }

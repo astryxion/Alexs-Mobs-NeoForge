@@ -1,5 +1,6 @@
 package com.github.alexthe666.alexsmobs.entity;
 
+import com.github.alexthe666.alexsmobs.misc.AMEntityHooks;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
@@ -9,6 +10,7 @@ import com.github.alexthe666.alexsmobs.entity.util.Maths;
 import com.github.alexthe666.alexsmobs.item.AMItemRegistry;
 import com.github.alexthe666.alexsmobs.misc.AMAdvancementTriggerRegistry;
 import com.github.alexthe666.alexsmobs.misc.AMBlockPos;
+import com.github.alexthe666.alexsmobs.misc.AMLoot;
 import com.github.alexthe666.alexsmobs.misc.AMSoundRegistry;
 import com.github.alexthe666.alexsmobs.misc.AMTagRegistry;
 import com.google.common.collect.Sets;
@@ -162,18 +164,21 @@ public class EntityLaviathan extends Animal implements ISemiAquatic, IHerdPanic 
         return AMSoundRegistry.LAVIATHAN_HURT.get();
     }
 
-    // TODO 1.21: getDefaultLootTable now returns ResourceKey<LootTable>
-    // @Nullable
-    //     protected Identifier getDefaultLootTable() {
-    //         return this.isObsidian() ? OBSIDIAN_LOOT : super.getDefaultLootTable();
-    //     }
+    @Override
+    protected void dropFromLootTable(ServerLevel level, DamageSource source, boolean playerKilled) {
+        if (this.isObsidian()) {
+            this.dropFromLootTable(level, source, playerKilled, AMLoot.of(OBSIDIAN_LOOT));
+        } else {
+            super.dropFromLootTable(level, source, playerKilled);
+        }
+    }
 
     public static AttributeSupplier.Builder bakeAttributes() {
         return Monster.createMonsterAttributes().add(Attributes.TEMPT_RANGE, 10.0D).add(Attributes.MAX_HEALTH, 60D).add(Attributes.ATTACK_DAMAGE, 1.0D).add(Attributes.ARMOR, 10D).add(Attributes.MOVEMENT_SPEED, 0.3F).add(Attributes.KNOCKBACK_RESISTANCE, 1.0D);
     }
 
     public boolean canBeCollidedWith() {
-        return this.isAlive();
+        return AMEntityHooks.isFullyConstructed(this) && this.isAlive();
     }
 
     protected boolean canAddPassenger(Entity p_38390_) {
@@ -980,6 +985,12 @@ public class EntityLaviathan extends Animal implements ISemiAquatic, IHerdPanic 
     @Override
     public net.neoforged.neoforge.entity.PartEntity<?>[] getParts() {
         return this.allParts;
+    }
+
+    @Override
+    public void setId(int id) {
+        super.setId(id);
+        AMEntityHooks.bindPartIds(id, this.allParts);
     }
 
     public boolean attackEntityPartFrom(EntityLaviathanPart part, DamageSource source, float amount) {

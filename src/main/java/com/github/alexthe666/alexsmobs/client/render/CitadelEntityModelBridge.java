@@ -9,8 +9,10 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.world.entity.LivingEntity;
 
 import java.util.Collections;
@@ -38,7 +40,6 @@ public final class CitadelEntityModelBridge<E extends LivingEntity> extends Enti
         this.citadel.renderToBuffer(poseStack, buffer, packedLight, packedOverlay, color);
     }
 
-    @Override
     public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay) {
         this.citadel.renderToBuffer(poseStack, buffer, packedLight, packedOverlay, -1);
     }
@@ -50,13 +51,23 @@ public final class CitadelEntityModelBridge<E extends LivingEntity> extends Enti
 
     /**
      * Convenience overload for deferred submit callbacks that provide a baked pose instead of a mutable stack.
+     * Must copy onto the scratch root (no extra identity frame) so Citadel tentacles/limbs match vanilla {@code submitModel}.
      */
     public void renderCitadelToBuffer(PoseStack.Pose pose, VertexConsumer buffer, int packedLight, int packedOverlay, int color) {
-        PoseStack stack = new PoseStack();
-        stack.pushPose();
-        stack.last().set(pose);
-        this.citadel.renderToBuffer(stack, buffer, packedLight, packedOverlay, color);
-        stack.popPose();
+        AlexAdvancedEntityModel.renderSubmitted(pose, this.citadel, buffer, packedLight, packedOverlay, color);
+    }
+
+    /**
+     * Queues the Citadel mesh and restores {@link #setupAnim(LivingEntityRenderState)} at replay so a shared model
+     * is not left in another entity's pose (or {@code resetToDefaultPose}) when translucent overlays draw.
+     */
+    public void submitAnimatedCitadel(PoseStack poseStack, SubmitNodeCollector collector, RenderType renderType,
+            LivingEntityRenderState state, int light, int overlay, int tint, PoseStack scratch) {
+        collector.submitCustomGeometry(poseStack, renderType, (pose, consumer) -> {
+            this.setupAnim(state);
+            AlexAdvancedEntityModel.withCitadelSubmitPose(pose, scratch, s ->
+                    this.citadel.renderToBuffer(s, consumer, light, overlay, tint));
+        });
     }
 
     /**
@@ -80,6 +91,9 @@ public final class CitadelEntityModelBridge<E extends LivingEntity> extends Enti
         // Vanilla LivingEntityRenderer.extractRenderState: state.yRot is already head yaw relative to body (wrapped).
         float netHeadYaw = state.yRot;
         float headPitch = state.xRot;
+        if (citadel instanceof AlexAdvancedEntityModel<?> alexModel) {
+            alexModel.young = state.isBaby;
+        }
         citadel.prepareMobModel(entity, limbSwing, limbSwingAmount, ageInTicks);
         citadel.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
     }

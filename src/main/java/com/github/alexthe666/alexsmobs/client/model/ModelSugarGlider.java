@@ -170,8 +170,10 @@ public class ModelSugarGlider extends AlexAdvancedEntityModel<EntitySugarGlider>
             });
             matrixStackIn.popPose();
             this.head.setScale(1F, 1F, 1F);
+            this.head.setShouldScaleChildren(false);
         } else {
             this.head.setScale(1F, 1F, 1F);
+            this.head.setShouldScaleChildren(false);
             matrixStackIn.pushPose();
             parts().forEach((p_228290_8_) -> {
                 p_228290_8_.render(matrixStackIn, buffer, packedLight, packedOverlay, color);

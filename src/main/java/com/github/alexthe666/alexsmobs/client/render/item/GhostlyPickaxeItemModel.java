@@ -5,7 +5,6 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -38,7 +37,7 @@ public final class GhostlyPickaxeItemModel implements ItemModel {
         var newMi = new BakedQuad.MaterialInfo(
                 mi.sprite(),
                 mi.layer(),
-                AMRenderTypes.getGhostPickaxe(TextureAtlas.LOCATION_ITEMS),
+                AMRenderTypes.getGhostPickaxe(mi.sprite().atlasLocation()),
                 mi.tintIndex(),
                 mi.shade(),
                 15);

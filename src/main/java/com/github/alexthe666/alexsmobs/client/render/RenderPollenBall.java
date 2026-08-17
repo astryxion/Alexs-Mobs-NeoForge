@@ -1,6 +1,7 @@
 package com.github.alexthe666.alexsmobs.client.render;
 
 import com.github.alexthe666.alexsmobs.client.AlexsMobsClientKeys;
+import com.github.alexthe666.alexsmobs.client.model.AlexAdvancedEntityModel;
 import com.github.alexthe666.alexsmobs.client.model.ModelPollenBall;
 import com.github.alexthe666.alexsmobs.entity.EntityPollenBall;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -46,7 +47,7 @@ public class RenderPollenBall extends EntityRenderer<EntityPollenBall, EntityRen
         matrixStackIn.scale(1F, 1F, 1F);
         int packedLightIn = state.lightCoords;
         collector.submitCustomGeometry(matrixStackIn, AMRenderTypes.getFullBright(getTextureLocation(state)), (pose, ivertexbuilder) ->
-            MODEL_POLLEN_BALL.renderToBuffer(matrixStackIn, ivertexbuilder, packedLightIn, OverlayTexture.NO_OVERLAY, -1)
+            AlexAdvancedEntityModel.renderSubmitted(pose, MODEL_POLLEN_BALL, ivertexbuilder, packedLightIn, OverlayTexture.NO_OVERLAY, -1)
         );
         matrixStackIn.popPose();
         matrixStackIn.popPose();

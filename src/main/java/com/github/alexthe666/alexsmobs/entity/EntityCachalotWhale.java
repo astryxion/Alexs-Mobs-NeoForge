@@ -6,6 +6,7 @@ import com.github.alexthe666.alexsmobs.entity.ai.*;
 import com.github.alexthe666.alexsmobs.entity.util.Maths;
 import com.github.alexthe666.alexsmobs.item.AMItemRegistry;
 import com.github.alexthe666.alexsmobs.misc.AMBlockPos;
+import com.github.alexthe666.alexsmobs.misc.AMEntityHooks;
 import com.github.alexthe666.alexsmobs.misc.AMSoundRegistry;
 import com.github.alexthe666.alexsmobs.misc.AMTagRegistry;
 import net.minecraft.core.BlockPos;
@@ -867,6 +868,12 @@ public class EntityCachalotWhale extends Animal {
     @Override
     public net.neoforged.neoforge.entity.PartEntity<?>[] getParts() {
         return this.whaleParts;
+    }
+
+    @Override
+    public void setId(int id) {
+        super.setId(id);
+        AMEntityHooks.bindPartIds(id, this.whaleParts);
     }
 
     @Nullable

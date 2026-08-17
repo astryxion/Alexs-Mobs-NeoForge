@@ -1,5 +1,6 @@
 package com.github.alexthe666.alexsmobs.entity;
 
+import com.github.alexthe666.alexsmobs.misc.AMEntityHooks;
 import com.github.alexthe666.alexsmobs.enchantment.AMEnchantments;
 import com.github.alexthe666.alexsmobs.item.AMItemRegistry;
 import net.minecraft.util.BlockUtil;
@@ -146,7 +147,7 @@ public class EntityStraddleboard extends Entity implements PlayerRideableJumping
     }
 
     public boolean canBeCollidedWith() {
-        return !this.isRemoveLogic();
+        return AMEntityHooks.isFullyConstructed(this) && !this.isRemoveLogic();
     }
 
     public boolean isPushable() {

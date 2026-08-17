@@ -1,10 +1,10 @@
 package com.github.alexthe666.citadel.client.render.pathfinding;
 
+import com.github.alexthe666.citadel.client.render.pathfinding.WorldRenderMacros;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
@@ -15,7 +15,7 @@ public class WorldEventContext {
     private WorldEventContext() {
     }
 
-    public MultiBufferSource.BufferSource bufferSource;
+    public WorldRenderMacros.BufferSource bufferSource;
     public PoseStack poseStack;
     public float partialTicks;
     public ClientLevel clientLevel;

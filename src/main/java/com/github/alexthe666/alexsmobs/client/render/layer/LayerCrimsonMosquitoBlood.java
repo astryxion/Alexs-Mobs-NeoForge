@@ -7,7 +7,6 @@ import com.github.alexthe666.alexsmobs.entity.EntityCrimsonMosquito;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
-import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
@@ -27,16 +26,9 @@ public class LayerCrimsonMosquitoBlood extends RenderLayer<LivingEntityRenderSta
         if (entitylivingbaseIn == null || entitylivingbaseIn.getBloodLevel() <= 0) {
             return;
         }
-        matrixStackIn.pushPose();
-        bufferIn.submitModel(
-                this.getParentModel(),
-                renderState,
-                matrixStackIn,
-                RenderTypes.eyes(entitylivingbaseIn.isSick() ? TEXTURE_SICK : TEXTURE),
-                packedLightIn,
-                LivingEntityRenderer.getOverlayCoords(renderState, 0.0F),
-                -1,
-                null);
-        matrixStackIn.popPose();
+        int overlay = LivingEntityRenderer.getOverlayCoords(renderState, 0.0F);
+        this.getParentModel().setupAnim(renderState);
+        bufferIn.submitCustomGeometry(matrixStackIn, RenderTypes.eyes(entitylivingbaseIn.isSick() ? TEXTURE_SICK : TEXTURE), (pose, consumer) ->
+                this.getParentModel().renderCitadelToBuffer(pose, consumer, packedLightIn, overlay, -1));
     }
 }

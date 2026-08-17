@@ -1,5 +1,6 @@
 package com.github.alexthe666.citadel;
 
+import com.github.alexthe666.citadel.animation.Animation;
 import com.github.alexthe666.citadel.animation.IAnimatedEntity;
 import com.github.alexthe666.citadel.client.event.EventRenderSplashText;
 import com.github.alexthe666.citadel.client.game.Tetris;
@@ -9,6 +10,7 @@ import com.github.alexthe666.citadel.client.gui.GuiCitadelPatreonConfig;
 import com.github.alexthe666.citadel.client.model.TabulaModel;
 import com.github.alexthe666.citadel.client.model.TabulaModelHandler;
 import com.github.alexthe666.citadel.client.render.pathfinding.WorldEventContext;
+import com.github.alexthe666.citadel.client.render.pathfinding.WorldRenderMacros;
 import com.github.alexthe666.citadel.client.rewards.CitadelCapes;
 import com.github.alexthe666.citadel.client.rewards.CitadelPatreonRenderer;
 import com.github.alexthe666.citadel.client.rewards.SpaceStationPatreonRenderer;
@@ -139,7 +141,9 @@ public class ClientProxy extends ServerProxy {
                     float speed = tag.getFloatOr("CitadelRotateSpeed", 1F);
                     float height = tag.getFloatOr("CitadelRotateHeight", 1F);
                     int packedLight = renderState.lightCoords;
-                    renderer.render(matrixStackIn, Minecraft.getInstance().renderBuffers().bufferSource(), packedLight, event.getPartialTick(), player, distance, speed, height);
+                    WorldRenderMacros.BufferSource buffer = WorldRenderMacros.getBufferSource();
+                    renderer.render(matrixStackIn, buffer, packedLight, event.getPartialTick(), player, distance, speed, height);
+                    buffer.endBatch();
                 }
             }
         }
@@ -288,12 +292,15 @@ public class ClientProxy extends ServerProxy {
     @Override
     public void handleAnimationPacket(int entityId, int index) {
         if (Minecraft.getInstance().level != null) {
-            IAnimatedEntity entity = (IAnimatedEntity) Minecraft.getInstance().level.getEntity(entityId);
-            if (entity != null) {
+            Entity found = Minecraft.getInstance().level.getEntity(entityId);
+            if (found instanceof IAnimatedEntity entity) {
                 if (index == -1) {
                     entity.setAnimation(IAnimatedEntity.NO_ANIMATION);
                 } else {
-                    entity.setAnimation(entity.getAnimations()[index]);
+                    Animation[] animations = entity.getAnimations();
+                    if (animations != null && index >= 0 && index < animations.length) {
+                        entity.setAnimation(animations[index]);
+                    }
                 }
                 entity.setAnimationTick(0);
             }
