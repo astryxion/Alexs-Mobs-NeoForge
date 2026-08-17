@@ -1,6 +1,7 @@
 package com.github.alexthe666.alexsmobs.client.render;
 
 import com.github.alexthe666.alexsmobs.client.AlexsMobsClientKeys;
+import com.github.alexthe666.alexsmobs.client.model.AlexAdvancedEntityModel;
 import com.github.alexthe666.alexsmobs.client.model.ModelCombJelly;
 import com.github.alexthe666.alexsmobs.entity.EntityCombJelly;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -84,13 +85,14 @@ public class RenderCombJelly extends MobRenderer<EntityCombJelly, LivingEntityRe
             float limbSwingAmount = Math.min(1.0F, state.walkAnimationSpeed);
             float ageInTicks = state.ageInTicks;
             float wrappedHead = state.yRot;
-            STRIPES_MODEL.setupAnim(entitylivingbaseIn, limbSwing, limbSwingAmount, ageInTicks, wrappedHead, state.xRot);
-            collector.submitCustomGeometry(matrixStackIn, AMRenderTypes.COMBJELLY_RAINBOW_GLINT, (pose, rainbow) ->
-                STRIPES_MODEL.renderToBuffer(matrixStackIn, rainbow, packedLightIn, OverlayTexture.NO_OVERLAY, -1)
-            );
-            collector.submitCustomGeometry(matrixStackIn, AMRenderTypes.entityCutoutNoCull(TEXTURE_OVERLAY), (pose, overlay) ->
-                STRIPES_MODEL.renderToBuffer(matrixStackIn, overlay, packedLightIn, OverlayTexture.NO_OVERLAY, -1)
-            );
+            collector.submitCustomGeometry(matrixStackIn, AMRenderTypes.COMBJELLY_RAINBOW_GLINT, (pose, rainbow) -> {
+                STRIPES_MODEL.setupAnim(entitylivingbaseIn, limbSwing, limbSwingAmount, ageInTicks, wrappedHead, state.xRot);
+                AlexAdvancedEntityModel.renderSubmitted(pose, STRIPES_MODEL, rainbow, packedLightIn, OverlayTexture.NO_OVERLAY, -1);
+            });
+            collector.submitCustomGeometry(matrixStackIn, AMRenderTypes.entityCutoutNoCull(TEXTURE_OVERLAY), (pose, overlay) -> {
+                STRIPES_MODEL.setupAnim(entitylivingbaseIn, limbSwing, limbSwingAmount, ageInTicks, wrappedHead, state.xRot);
+                AlexAdvancedEntityModel.renderSubmitted(pose, STRIPES_MODEL, overlay, packedLightIn, OverlayTexture.NO_OVERLAY, -1);
+            });
         }
     }
 }

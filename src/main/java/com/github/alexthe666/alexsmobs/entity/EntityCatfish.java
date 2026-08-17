@@ -4,6 +4,7 @@ import com.github.alexthe666.alexsmobs.config.AMConfig;
 import com.github.alexthe666.alexsmobs.entity.ai.AnimalAISwimBottom;
 import com.github.alexthe666.alexsmobs.entity.ai.AquaticMoveController;
 import com.github.alexthe666.alexsmobs.item.AMItemRegistry;
+import com.github.alexthe666.alexsmobs.misc.AMLoot;
 import com.github.alexthe666.alexsmobs.misc.AMTagRegistry;
 import net.minecraft.core.BlockPos;
 import com.mojang.serialization.DataResult;
@@ -230,14 +231,16 @@ public class EntityCatfish extends WaterAnimal implements Bucketable {
         }
     }
 
-    // TODO 1.21: getDefaultLootTable now returns ResourceKey<LootTable>
-    // @Nullable
-    // protected Identifier getDefaultLootTable() {
-    //     if (this.getCatfishSize() == 2) {
-    //         return LARGE_LOOT;
-    //     }
-    //     return this.getCatfishSize() == 1 ? MEDIUM_LOOT : super.getDefaultLootTable();
-    // }
+    @Override
+    protected void dropFromLootTable(ServerLevel level, DamageSource source, boolean playerKilled) {
+        if (this.getCatfishSize() == 2) {
+            this.dropFromLootTable(level, source, playerKilled, AMLoot.of(LARGE_LOOT));
+        } else if (this.getCatfishSize() == 1) {
+            this.dropFromLootTable(level, source, playerKilled, AMLoot.of(MEDIUM_LOOT));
+        } else {
+            super.dropFromLootTable(level, source, playerKilled);
+        }
+    }
 
     public void onSyncedDataUpdated(EntityDataAccessor<?> accessor) {
         if (CATFISH_SIZE.equals(accessor)) {

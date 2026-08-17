@@ -1,6 +1,7 @@
 package com.github.alexthe666.alexsmobs.client.render.tile;
 
 import com.github.alexthe666.alexsmobs.block.BlockEndPirateFlag;
+import com.github.alexthe666.alexsmobs.client.model.AlexAdvancedEntityModel;
 import com.github.alexthe666.alexsmobs.client.model.ModelEndPirateFlag;
 import com.github.alexthe666.alexsmobs.client.render.AMRenderTypes;
 import com.github.alexthe666.alexsmobs.tileentity.TileEntityEndPirateFlag;
@@ -68,7 +69,7 @@ public class RenderEndPirateFlag<T extends TileEntityEndPirateFlag> implements B
         int finalLight = light;
         int finalOverlay = overlay;
         collector.submitCustomGeometry(poseStack, AMRenderTypes.entityCutoutNoCull(TEXTURE), (pose, consumer) ->
-            FLAG_MODEL.renderToBuffer(poseStack, consumer, finalLight, finalOverlay, -1));
+            AlexAdvancedEntityModel.renderSubmitted(pose, FLAG_MODEL, consumer, finalLight, finalOverlay, -1));
         poseStack.popPose();
         poseStack.popPose();
     }

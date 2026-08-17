@@ -156,6 +156,7 @@ public class ClientProxy extends CommonProxy {
     public static void onRegisterRenderPipelines(RegisterRenderPipelinesEvent event) {
         event.registerPipeline(AMRenderTypes.GHOST_PICKAXE_PIPELINE);
         event.registerPipeline(AMRenderTypes.UNDERMINER_PIPELINE);
+        event.registerPipeline(AMRenderTypes.SKULK_BOOM_PIPELINE);
     }
     public static void onRegisterRenderStateModifiers(RegisterRenderStateModifiersEvent event) {
         event.registerEntityModifier(
@@ -466,6 +467,7 @@ public class ClientProxy extends CommonProxy {
 
     public static void setupParticleGroups(RegisterParticleGroupsEvent event) {
         event.register(ParticleBearFreddy.BEAR_FREDDY, ParticleBearFreddy.BearFreddyParticleGroup::new);
+        event.register(ParticleSkulkBoom.SKULK_BOOM, ParticleSkulkBoom.SkulkBoomParticleGroup::new);
     }
 
     public static void setupParticles(RegisterParticleProvidersEvent registry) {

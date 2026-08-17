@@ -17,7 +17,6 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -40,7 +39,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Pose;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -134,6 +132,22 @@ public abstract class GuiBasicBook extends Screen {
         bufferSource.endBatch();
     }
 
+    /**
+     * Guide-book entity PiP: full-bright, origin at the JSON (x, y), bounds sized from the
+     * entity bounding box so large models are not clipped by a fixed pixel clamp.
+     */
+    public static void submitBookEntity(GuiGraphicsExtractor guiGraphics, Entity entity, int centerX, int centerY, float scale, float partialTick, Quaternionf rotation, @Nullable Quaternionf cameraAngle) {
+        EntityRenderDispatcher dispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
+        EntityRenderState state = dispatcher.extractEntity(entity, partialTick);
+        state.outlineColor = 0;
+        state.shadowPieces.clear();
+        float bbH = entity.getBbHeight();
+        float bbW = entity.getBbWidth();
+        float blocks = Math.max(2.5F, Math.max(bbH, 0.71F * bbW + 0.5F * bbH) * 1.5F + 0.5F);
+        int half = Math.min(512, Math.max(1, Math.round(Math.abs(scale) * blocks)));
+        guiGraphics.entity(state, Math.abs(scale), new Vector3f(), rotation, cameraAngle, centerX - half, centerY - half, centerX + half, centerY + half);
+    }
+
     public void drawEntityOnScreen(GuiGraphicsExtractor guiGraphics, int posX, int posY, float zOff, float scale, boolean follow, double xRot, double yRot, double zRot, float mouseX, float mouseY, Entity entity, float partialTick) {
         float customYaw = posX - mouseX;
         float customPitch = posY - mouseY;
@@ -156,44 +170,13 @@ public abstract class GuiBasicBook extends Screen {
             f1 = 0;
         }
 
-        EntityRenderDispatcher dispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
-        EntityRenderState state = dispatcher.extractEntity(entity, partialTick);
-        if (state instanceof LivingEntityRenderState livingState) {
-            if (follow) {
-                livingState.bodyRot = 180.0F + f * 20.0F;
-                livingState.yRot = f * 20.0F;
-                if (livingState.pose != Pose.FALL_FLYING) {
-                    livingState.xRot = -f1 * 20.0F;
-                } else {
-                    livingState.xRot = 0.0F;
-                }
-            }
-            livingState.boundingBoxWidth /= livingState.scale;
-            livingState.boundingBoxHeight /= livingState.scale;
-            livingState.scale = 1.0F;
-        }
-
-        Quaternionf qBody = new Quaternionf().rotateZ((float) Math.PI);
-        Quaternionf qPitch = new Quaternionf().rotateX(f1 * 20.0F * (float) (Math.PI / 180.0D));
-        qBody.mul(qPitch);
-        qBody.rotateAxis((float) Math.toRadians(xRot), -1.0F, 0.0F, 0.0F);
-        qBody.rotateY((float) Math.toRadians(yRot));
-        qBody.rotateZ((float) Math.toRadians(zRot));
-
-        // PiP translation matches InventoryScreen / vanilla PiP: small Y lift for feet, not the portrait scale (~30).
-        Vector3f translate = new Vector3f(0.0F, state.boundingBoxHeight / 2.0F + 0.0625F, 0.0F);
-        // `scale` here is the PiP model scale (~30 * JSON scale), not pixel radius. Old `40 * scale` produced ~1200px half-bounds and broke/clipped book portraits.
-        int half = Math.max(40, Math.min(100, Math.round(scale * 2.15F)));
-        // JSON (x, y) matched 1.21.1 translate(posX, posY) at the entity origin. A symmetric PiP rect centered on y
-        // sat too low (over body text); a bottom-anchored rect sat too high (over title). Blend between those
-        // vertical centers: t=0 → same center as bottom-anchored portrait; t=1 → centered on posY (raise t to move down).
-        final float bookEntityPipVerticalBlend = 0.58F;
-        int centerY = posY - Math.round((1.0F - bookEntityPipVerticalBlend) * half);
-        int x0 = posX - half;
-        int x1 = posX + half;
-        int y0 = centerY - half;
-        int y1 = centerY + half;
-        guiGraphics.entity(state, scale, translate, qBody, qPitch, x0, y0, x1, y1);
+        Quaternionf quaternion = new Quaternionf().rotateZ((float) Math.PI);
+        Quaternionf quaternion1 = new Quaternionf().rotateX(f1 * 20.0F * (float) (Math.PI / 180.0D));
+        quaternion.mul(quaternion1);
+        quaternion.rotateAxis((float) Math.toRadians(xRot), -1.0F, 0.0F, 0.0F);
+        quaternion.rotateY((float) Math.toRadians(yRot));
+        quaternion.rotateZ((float) Math.toRadians(zRot));
+        submitBookEntity(guiGraphics, entity, posX, posY, scale, partialTick, quaternion, quaternion1);
 
         entity.setYRot(0);
         entity.setXRot(0);
@@ -377,6 +360,17 @@ public abstract class GuiBasicBook extends Screen {
         return null;
     }
 
+    private boolean hasDisplayableRecipe(String registryName) {
+        Recipe<?> live = getRecipeByName(registryName);
+        if (live instanceof SpecialRecipeInGuideBook) {
+            return true;
+        }
+        if (BookRecipe.get(registryName) != null) {
+            return true;
+        }
+        return live != null;
+    }
+
     private void addWidgetSpacing() {
         yIndexesToSkip.clear();
         for (ItemRenderData itemRenderData : itemRenders) {
@@ -385,8 +379,7 @@ public abstract class GuiBasicBook extends Screen {
 
         }
         for (RecipeData recipeData : recipes) {
-            Recipe recipe = getRecipeByName(recipeData.getRecipe());
-            if (recipe != null) {
+            if (hasDisplayableRecipe(recipeData.getRecipe())) {
                 yIndexesToSkip.add(new Whitespace(recipeData.getPage(), recipeData.getX(), recipeData.getY() - (int) (recipeData.getScale() * 15), (int) (recipeData.getScale() * 35), (int) (recipeData.getScale() * 60), true));
             }
         }
@@ -487,9 +480,16 @@ public abstract class GuiBasicBook extends Screen {
         }
         for (RecipeData recipeData : recipes) {
             if (recipeData.getPage() == this.currentPageCounter) {
-                Recipe<?> recipe = getRecipeByName(recipeData.getRecipe());
-                if (recipe != null) {
-                    renderRecipe(guiGraphics, recipe, recipeData, k, l, partialTicks);
+                Recipe<?> live = getRecipeByName(recipeData.getRecipe());
+                if (live instanceof SpecialRecipeInGuideBook) {
+                    renderRecipe(guiGraphics, live, recipeData, k, l, partialTicks);
+                } else {
+                    BookRecipe parsed = BookRecipe.get(recipeData.getRecipe());
+                    if (parsed != null) {
+                        renderRecipe(guiGraphics, parsed, recipeData, k, l);
+                    } else if (live != null) {
+                        renderRecipe(guiGraphics, live, recipeData, k, l, partialTicks);
+                    }
                 }
             }
         }
@@ -569,6 +569,39 @@ public abstract class GuiBasicBook extends Screen {
         }
         guiGraphics.item(result, 0, 0, 100);
         guiGraphics.pose().popMatrix();
+    }
+
+    protected void renderRecipe(GuiGraphicsExtractor guiGraphics, BookRecipe recipe, RecipeData recipeData, int k, int l) {
+        int playerTicks = Minecraft.getInstance().player.tickCount;
+        float scale = (float) recipeData.getScale();
+        List<ItemStack[]> ingredients = recipe.getIngredients();
+
+        for (int i = 0; i < ingredients.size(); i++) {
+            ItemStack[] options = ingredients.get(i);
+            if (options.length == 0) {
+                continue;
+            }
+            ItemStack stack = options.length > 1 ? options[(int) ((playerTicks / 20F) % options.length)] : options[0];
+            if (!stack.isEmpty()) {
+                guiGraphics.pose().pushMatrix();
+                guiGraphics.pose().translate(k, l);
+                guiGraphics.pose().translate((int) (recipeData.getX() + (i % 3) * 20 * scale), (int) (recipeData.getY() + (i / 3) * 20 * scale));
+                guiGraphics.pose().scale(scale, scale);
+                guiGraphics.item(stack, 0, 0, 32);
+                guiGraphics.pose().popMatrix();
+            }
+        }
+
+        ItemStack result = recipe.getResult();
+        if (!result.isEmpty()) {
+            guiGraphics.pose().pushMatrix();
+            guiGraphics.pose().translate(k, l);
+            float finScale = scale * 1.5F;
+            guiGraphics.pose().translate(recipeData.getX() + 70 * finScale, recipeData.getY() + 10 * finScale);
+            guiGraphics.pose().scale(finScale, finScale);
+            guiGraphics.item(result, 0, 0, 100);
+            guiGraphics.pose().popMatrix();
+        }
     }
 
     protected void writePageText(GuiGraphicsExtractor guiGraphics, int x, int y) {

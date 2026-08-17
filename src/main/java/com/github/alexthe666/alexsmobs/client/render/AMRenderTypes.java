@@ -196,8 +196,41 @@ public final class AMRenderTypes {
         return glintType("sunbird_shine", Identifier.parse("alexsmobs:textures/entity/sunbird_shine.png"), TextureTransform.GLINT_TEXTURING);
     }
 
+    public static final Identifier SKULK_BOOM_TEXTURE = Identifier.parse("alexsmobs:textures/particle/skulk_boom.png");
+
+    /**
+     * Energy-swirl entity shader with translucent blend (original shockwave), not vanilla additive {@code energySwirl}.
+     */
+    public static final RenderPipeline SKULK_BOOM_PIPELINE = RenderPipeline.builder(RenderPipelines.MATRICES_FOG_SNIPPET)
+            .withLocation(Identifier.parse("alexsmobs:pipeline/skulk_boom"))
+            .withVertexShader("core/entity")
+            .withFragmentShader("core/entity")
+            .withShaderDefine("ALPHA_CUTOUT", 0.1F)
+            .withShaderDefine("EMISSIVE")
+            .withShaderDefine("NO_OVERLAY")
+            .withShaderDefine("NO_CARDINAL_LIGHTING")
+            .withShaderDefine("APPLY_TEXTURE_MATRIX")
+            .withBindGroupLayout(BindGroupLayouts.SAMPLER0)
+            .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
+            .withCull(false)
+            .withVertexBinding(0, DefaultVertexFormat.ENTITY)
+            .withPrimitiveTopology(PrimitiveTopology.QUADS)
+            .withDepthStencilState(DepthStencilState.DEFAULT)
+            .build();
+
+    private static final RenderType SKULK_BOOM_TYPE = RenderType.create(
+            "skulk_boom",
+            RenderSetup.builder(SKULK_BOOM_PIPELINE)
+                    .withTexture("Sampler0", SKULK_BOOM_TEXTURE)
+                    .setTextureTransform(new TextureTransform.OffsetTextureTransform(0.0F, 0.0F))
+                    .useLightmap()
+                    .useOverlay()
+                    .sortOnUpload()
+                    .createRenderSetup()
+    );
+
     public static RenderType getSkulkBoom() {
-        return RenderTypes.energySwirl(Identifier.parse("alexsmobs:textures/particle/skulk_boom.png"), 0.0F, 0.0F);
+        return SKULK_BOOM_TYPE;
     }
 
     /**

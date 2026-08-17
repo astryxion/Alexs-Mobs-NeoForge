@@ -7,6 +7,7 @@ import com.github.alexthe666.alexsmobs.client.particle.AMParticleRegistry;
 import com.github.alexthe666.alexsmobs.config.AMConfig;
 import com.github.alexthe666.alexsmobs.entity.ai.AnimalAIWanderRanged;
 import com.github.alexthe666.alexsmobs.entity.ai.GroundPathNavigatorWide;
+import com.github.alexthe666.alexsmobs.misc.AMLoot;
 import com.github.alexthe666.alexsmobs.misc.AMSoundRegistry;
 import com.github.alexthe666.alexsmobs.misc.AMTagRegistry;
 import net.minecraft.ChatFormatting;
@@ -87,11 +88,16 @@ public class EntityGuster extends Monster {
         return true;
     }
 
-    // TODO 1.21: getDefaultLootTable now returns ResourceKey<LootTable>
-    // @Nullable
-    //     protected Identifier getDefaultLootTable() {
-    //         return this.getVariant() == 2 ? SOUL_LOOT : this.getVariant() == 1 ? RED_LOOT : super.getDefaultLootTable();
-    //     }
+    @Override
+    protected void dropFromLootTable(ServerLevel level, DamageSource source, boolean playerKilled) {
+        if (this.getVariant() == 2) {
+            this.dropFromLootTable(level, source, playerKilled, AMLoot.of(SOUL_LOOT));
+        } else if (this.getVariant() == 1) {
+            this.dropFromLootTable(level, source, playerKilled, AMLoot.of(RED_LOOT));
+        } else {
+            super.dropFromLootTable(level, source, playerKilled);
+        }
+    }
 
     public static AttributeSupplier.Builder bakeAttributes() {
         return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH, 16.0D).add(Attributes.FOLLOW_RANGE, 32.0D).add(Attributes.ATTACK_DAMAGE, 1.0D).add(Attributes.MOVEMENT_SPEED, 0.2D);

@@ -1,5 +1,6 @@
 package com.github.alexthe666.alexsmobs.entity;
 
+import com.github.alexthe666.alexsmobs.misc.AMEntityHooks;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
@@ -433,7 +434,7 @@ public class EntityTerrapin extends Animal implements ISemiAquatic, Bucketable {
 
     @Override
     public boolean canBeCollidedWith(@Nullable Entity entity) {
-        return AMEntityRegistry.isInWaterOrBubble(this) ? super.canBeCollidedWith(entity) : this.isAlive();
+        return AMEntityHooks.isFullyConstructed(this) && (AMEntityRegistry.isInWaterOrBubble(this) ? super.canBeCollidedWith(entity) : this.isAlive());
     }
 
     private void spinFor(int time) {

@@ -13,6 +13,7 @@ import com.github.alexthe666.alexsmobs.network.MessageMosquitoDismount;
 import com.github.alexthe666.alexsmobs.network.MessageMosquitoMountPlayer;
 import com.github.alexthe666.alexsmobs.misc.AMAdvancementTriggerRegistry;
 import com.github.alexthe666.alexsmobs.misc.AMBlockPos;
+import com.github.alexthe666.alexsmobs.misc.AMLoot;
 import com.github.alexthe666.alexsmobs.misc.AMSoundRegistry;
 import com.github.alexthe666.alexsmobs.misc.AMTagRegistry;
 import net.minecraft.core.BlockPos;
@@ -146,14 +147,16 @@ public class EntityCrimsonMosquito extends Monster {
         return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH, 10.0D).add(Attributes.FOLLOW_RANGE, 32.0D).add(Attributes.ARMOR, 0.0D).add(Attributes.ATTACK_DAMAGE, 5.0D).add(Attributes.MOVEMENT_SPEED, 0.25F);
     }
 
-    // TODO 1.21: getDefaultLootTable now returns ResourceKey<LootTable>
-    // @Nullable
-    // protected Identifier getDefaultLootTable() {
-    //     if (this.getBloodLevel() > 0) {
-    //         return this.isFromFly() ? FROM_FLY_FULL_LOOT : FULL_LOOT;
-    //     }
-    //     return this.isFromFly() ? FROM_FLY_LOOT : super.getDefaultLootTable();
-    // }
+    @Override
+    protected void dropFromLootTable(ServerLevel level, DamageSource source, boolean playerKilled) {
+        if (this.getBloodLevel() > 0) {
+            this.dropFromLootTable(level, source, playerKilled, AMLoot.of(this.isFromFly() ? FROM_FLY_FULL_LOOT : FULL_LOOT));
+        } else if (this.isFromFly()) {
+            this.dropFromLootTable(level, source, playerKilled, AMLoot.of(FROM_FLY_LOOT));
+        } else {
+            super.dropFromLootTable(level, source, playerKilled);
+        }
+    }
 
     @Override
     public boolean canRiderInteract() {

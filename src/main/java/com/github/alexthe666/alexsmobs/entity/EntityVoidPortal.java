@@ -10,6 +10,7 @@ import com.github.alexthe666.alexsmobs.item.AMItemRegistry;
 import com.github.alexthe666.alexsmobs.item.ItemDimensionalCarver;
 import com.github.alexthe666.alexsmobs.misc.AMSoundRegistry;
 import com.github.alexthe666.alexsmobs.misc.AMTagRegistry;
+import com.github.alexthe666.alexsmobs.misc.AMTeleportQueue;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.UUIDUtil;
@@ -40,6 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.apache.commons.lang3.tuple.Triple;
 
 public class EntityVoidPortal extends Entity {
 
@@ -181,10 +183,9 @@ public class EntityVoidPortal extends Entity {
     }
 
     private void teleportEntityFromDimension(Entity entity, ServerLevel endpointWorld, BlockPos endpoint, boolean b) {
-        if (entity instanceof ServerPlayer) {
-            // teleportPlayers removed - teleport directly
-            entity.teleportTo(endpointWorld, endpoint.getX() + 0.5, endpoint.getY(), endpoint.getZ() + 0.5, java.util.Set.<Relative>of(), entity.getYRot(), entity.getXRot(), false);
-            if(this.getSisterId() == null){
+        if (entity instanceof ServerPlayer player) {
+            AMTeleportQueue.PLAYERS.add(Triple.of(player, endpointWorld, endpoint));
+            if (this.getSisterId() == null) {
                 createAndSetSister(endpointWorld, Direction.DOWN);
             }
         } else {

@@ -1,6 +1,7 @@
 package com.github.alexthe666.alexsmobs.client.render.layer;
 
 import com.github.alexthe666.alexsmobs.client.AlexsMobsClientKeys;
+import com.github.alexthe666.alexsmobs.client.model.AlexAdvancedEntityModel;
 import com.github.alexthe666.alexsmobs.client.model.ModelAncientDart;
 import com.github.alexthe666.alexsmobs.client.model.ModelCapuchinMonkey;
 import com.github.alexthe666.alexsmobs.client.render.CitadelEntityModelBridge;
@@ -63,7 +64,7 @@ public class LayerCapuchinItem extends RenderLayer<LivingEntityRenderState, Cita
             matrixStackIn.pushPose();
             matrixStackIn.mulPose(Axis.XP.rotationDegrees(f));
             bufferIn.submitCustomGeometry(matrixStackIn, RenderTypes.entityCutout(DART_TEXTURE), (pose, consumer) ->
-                    DART_MODEL.renderToBuffer(matrixStackIn, consumer, packedLightIn, overlay, -1));
+                    AlexAdvancedEntityModel.renderSubmitted(pose, DART_MODEL, consumer, packedLightIn, overlay, -1));
             matrixStackIn.popPose();
             matrixStackIn.popPose();
 

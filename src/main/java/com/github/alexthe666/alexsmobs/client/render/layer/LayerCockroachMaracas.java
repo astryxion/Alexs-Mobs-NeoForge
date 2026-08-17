@@ -85,12 +85,16 @@ public class LayerCockroachMaracas extends RenderLayer<LivingEntityRenderState, 
         if (!entitylivingbaseIn.isHeadless()) {
             matrixStackIn.pushPose();
             translateToHand(4, matrixStackIn);
-            matrixStackIn.translate(0F, -0.4F, -0.01F);
-            matrixStackIn.translate(0F, entitylivingbaseIn.danceProgress * 0.045F, entitylivingbaseIn.danceProgress * -0.09F);
-            matrixStackIn.scale(0.8F, 0.8F, 0.8F);
             matrixStackIn.mulPose(Axis.XP.rotationDegrees(60F * entitylivingbaseIn.danceProgress * 0.2F));
-            bufferIn.submitCustomGeometry(matrixStackIn, AMRenderTypes.entityCutoutNoCull(SOMBRERO_TEX), (pose, consumer) ->
-                    sombrero.renderToBuffer(matrixStackIn, consumer, packedLightIn, overlay, -1));
+            matrixStackIn.translate(0.0F, 0.15F - entitylivingbaseIn.danceProgress * 0.008F, 0.02F);
+            matrixStackIn.scale(0.8F, 0.8F, 0.8F);
+            bufferIn.submitCustomGeometry(matrixStackIn, AMRenderTypes.entityCutoutNoCull(SOMBRERO_TEX), (pose, consumer) -> {
+                PoseStack renderPose = new PoseStack();
+                renderPose.pushPose();
+                renderPose.last().set(pose);
+                sombrero.renderToBuffer(renderPose, consumer, packedLightIn, overlay, -1);
+                renderPose.popPose();
+            });
             matrixStackIn.popPose();
         }
         matrixStackIn.popPose();

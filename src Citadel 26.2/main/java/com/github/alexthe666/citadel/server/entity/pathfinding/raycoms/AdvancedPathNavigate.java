@@ -259,8 +259,8 @@ public class AdvancedPathNavigate extends AbstractAdvancedPathNavigate {
             nodeEvaluator.entityHeight = Mth.floor(ourEntity.getBbHeight() + 1.0F);
             nodeEvaluator.entityDepth = Mth.floor(ourEntity.getBbWidth() + 1.0F);
         }
-        if (desiredPosTimeout > 0) {
-            desiredPosTimeout--;
+        if (desiredPosTimeout > 0 && desiredPosTimeout-- <= 0) {
+            desiredPos = null;
         }
 
         if (pathResult != null) {
@@ -269,7 +269,11 @@ public class AdvancedPathNavigate extends AbstractAdvancedPathNavigate {
             }
             else if (pathResult.getStatus() == PathFindingStatus.CALCULATION_COMPLETE)
             {
-                processCompletedCalculationResult();
+                try {
+                    processCompletedCalculationResult();
+                } catch (Exception e) {
+                    Citadel.LOGGER.catching(e);
+                }
             }
         }
 

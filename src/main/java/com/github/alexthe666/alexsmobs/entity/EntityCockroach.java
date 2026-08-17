@@ -5,6 +5,7 @@ import com.github.alexthe666.alexsmobs.config.AMConfig;
 import com.github.alexthe666.alexsmobs.entity.ai.AnimalAIFleeLight;
 import com.github.alexthe666.alexsmobs.entity.ai.CreatureAITargetItems;
 import com.github.alexthe666.alexsmobs.item.AMItemRegistry;
+import com.github.alexthe666.alexsmobs.misc.AMLoot;
 import com.github.alexthe666.alexsmobs.misc.AMSoundRegistry;
 import com.github.alexthe666.alexsmobs.misc.AMTagRegistry;
 import net.minecraft.core.BlockPos;
@@ -171,11 +172,14 @@ public class EntityCockroach extends Animal implements Shearable, net.neoforged.
         compound.getInt("EggTime").ifPresent(v -> this.timeUntilNextEgg = v);
     }
 
-    // TODO 1.21: getDefaultLootTable now returns ResourceKey<LootTable>
-    // @Nullable
-    //     protected Identifier getDefaultLootTable() {
-    //         return this.hasMaracas() ? this.isHeadless() ? MARACA_HEADLESS_LOOT : MARACA_LOOT : super.getDefaultLootTable();
-    //     }
+    @Override
+    protected void dropFromLootTable(ServerLevel level, DamageSource source, boolean playerKilled) {
+        if (this.hasMaracas()) {
+            this.dropFromLootTable(level, source, playerKilled, AMLoot.of(this.isHeadless() ? MARACA_HEADLESS_LOOT : MARACA_LOOT));
+        } else {
+            super.dropFromLootTable(level, source, playerKilled);
+        }
+    }
 
     public float getWalkTargetValue(BlockPos pos, LevelReader worldIn) {
         return 0.5F - Math.max(worldIn.getBrightness(LightLayer.BLOCK, pos), worldIn.getBrightness(LightLayer.SKY, pos));

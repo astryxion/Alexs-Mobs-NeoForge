@@ -1,6 +1,7 @@
 package com.github.alexthe666.alexsmobs.client.render.tile;
 
 import com.github.alexthe666.alexsmobs.block.BlockEndPirateAnchor;
+import com.github.alexthe666.alexsmobs.client.model.AlexAdvancedEntityModel;
 import com.github.alexthe666.alexsmobs.client.model.ModelEndPirateAnchor;
 import com.github.alexthe666.alexsmobs.client.render.AMRenderTypes;
 import com.github.alexthe666.alexsmobs.tileentity.TileEntityEndPirateAnchor;
@@ -63,9 +64,9 @@ public class RenderEndPirateAnchor<T extends TileEntityEndPirateAnchor> implemen
         ANCHOR_MODEL.renderAnchor(tileEntityIn, partialTicks, east);
         int finalLight = light;
         collector.submitCustomGeometry(poseStack, AMRenderTypes.entityCutoutNoCull(TEXTURE_ANCHOR), (pose, consumer) ->
-            ANCHOR_MODEL.renderToBuffer(poseStack, consumer, finalLight, overlay, -1));
+            AlexAdvancedEntityModel.renderSubmitted(pose, ANCHOR_MODEL, consumer, finalLight, overlay, -1));
         collector.submitCustomGeometry(poseStack, RenderTypes.eyes(TEXTURE_ANCHOR_GLOW), (pose, consumer) ->
-            ANCHOR_MODEL.renderToBuffer(poseStack, consumer, finalLight, overlay, -1));
+            AlexAdvancedEntityModel.renderSubmitted(pose, ANCHOR_MODEL, consumer, finalLight, overlay, -1));
 
         poseStack.popPose();
         poseStack.popPose();

@@ -1,15 +1,17 @@
 modLoader="javafml"
 loaderVersion="[4,)"
-license="GPL-3.0"
-issueTrackerURL="https://github.com/astryxion23/Alexs-Mobs-Fabric/issues"
+license="LGPL-3.0"
+issueTrackerURL="https://github.com/astryxion/Alexs-Mobs-NeoForge/issues"
 
 [[mods]]
 modId="alexsmobs"
-version="26.2-1.0.0"
-displayName="Alex's Mobs"
-displayURL="https://www.curseforge.com/minecraft/mc-mods/alexs-mobs"
-logoFile="alexs_mobs.png"
-authors="Alexthe668, Carro1001, Paint_Ninja, Raguto, Astryxion"
+version="26.2-1.1.0"
+displayName="Alex's Mobs (NeoForge)"
+displayURL="https://github.com/astryxion/Alexs-Mobs-NeoForge"
+bannerFile="alexs_mobs.png"
+iconFile="alexs_mobs.png"
+authors="Astryxion"
+credits="Alexthe666, Carro1001, Paint_Ninja, Raguto"
 description='''New, original, engaging, and aesthetic mobs for Minecraft.'''
 
 [[mixins]]
@@ -24,6 +26,13 @@ config = "mixins.alexsmobs.json"
 
 [[dependencies.alexsmobs]]
     modId="neoforge"
+    mandatory=true
+    versionRange="[26.2,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.alexsmobs]]
+    modId="minecraft"
     mandatory=true
     versionRange="[26.2,)"
     ordering="NONE"

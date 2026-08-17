@@ -110,6 +110,13 @@ public class ClientEvents {
     }
 
     @SubscribeEvent
+    public void onFOVUpdate(ComputeFovModifierEvent event) {
+        if (event.getPlayer().hasEffect(AMEffectRegistry.FEAR) || event.getPlayer().hasEffect(AMEffectRegistry.POWER_DOWN)) {
+            event.setNewFovModifier(1.0F);
+        }
+    }
+
+    @SubscribeEvent
     public void onGetStarBrightness(EventGetStarBrightness event) {
         if (Minecraft.getInstance().player.hasEffect(AMEffectRegistry.POWER_DOWN)) {
             if (Minecraft.getInstance().player.getEffect(AMEffectRegistry.POWER_DOWN) != null) {
