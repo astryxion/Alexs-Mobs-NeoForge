@@ -6,6 +6,7 @@ import com.mojang.blaze3d.pipeline.BlendFunction;
 import com.mojang.blaze3d.pipeline.ColorTargetState;
 import com.mojang.blaze3d.pipeline.DepthStencilState;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.platform.CompareOp;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -73,28 +74,59 @@ public final class AMRenderTypes {
     private static final TextureTransform STATIC_PARTICLE_TEXTURING = new TextureTransform("entity_glint_texturing", () -> staticMatrix(0.1F, 12L));
     private static final TextureTransform STATIC_ENTITY_TEXTURING = new TextureTransform("entity_glint_texturing", () -> staticMatrix(3F, 12L));
 
+    /**
+     * Entity overlay with a scrolling texture matrix. Vanilla {@link RenderPipelines#GLINT} is item-enchantment
+     * geometry ({@code POSITION_TEX}, additive glint blend) and turns living models into a solid white silhouette.
+     * Vanilla {@link RenderPipelines#ENERGY_SWIRL} is the same shader path but additive, which also blows out skin quads.
+     */
+    public static final RenderPipeline UNDERMINER_PIPELINE = RenderPipeline.builder(RenderPipelines.MATRICES_FOG_SNIPPET)
+            .withLocation(Identifier.parse("alexsmobs:pipeline/underminer"))
+            .withVertexShader("core/entity")
+            .withFragmentShader("core/entity")
+            .withShaderDefine("ALPHA_CUTOUT", 0.1F)
+            .withShaderDefine("EMISSIVE")
+            .withShaderDefine("NO_OVERLAY")
+            .withShaderDefine("NO_CARDINAL_LIGHTING")
+            .withShaderDefine("APPLY_TEXTURE_MATRIX")
+            .withBindGroupLayout(BindGroupLayouts.SAMPLER0)
+            .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
+            .withCull(false)
+            .withVertexBinding(0, DefaultVertexFormat.ENTITY)
+            .withPrimitiveTopology(PrimitiveTopology.QUADS)
+            .withDepthStencilState(DepthStencilState.DEFAULT)
+            .build();
+
+    /**
+     * Scrolling rainbow overlay on living models. Vanilla {@link RenderPipelines#GLINT} is item geometry
+     * ({@code POSITION_TEX}) and cannot draw entity meshes. {@link RenderPipelines#BREEZE_WIND} is translucent
+     * and replaces the skin with an opaque rainbow. This matches original Alex's Mobs: entity shader +
+     * {@link BlendFunction#GLINT} + equal depth so the skin stays and the rainbow tints it.
+     */
+    public static final RenderPipeline RAINBOW_OVERLAY_PIPELINE = RenderPipeline.builder(RenderPipelines.ENTITY_SNIPPET)
+            .withLocation(Identifier.parse("alexsmobs:pipeline/rainbow_overlay"))
+            .withShaderDefine("ALPHA_CUTOUT", 0.1F)
+            .withShaderDefine("APPLY_TEXTURE_MATRIX")
+            .withShaderDefine("NO_OVERLAY")
+            .withShaderDefine("NO_CARDINAL_LIGHTING")
+            .withColorTargetState(new ColorTargetState(BlendFunction.GLINT))
+            .withCull(false)
+            .withDepthStencilState(new DepthStencilState(CompareOp.EQUAL, false))
+            .build();
+
     private static RenderType glintType(String name, Identifier texture, TextureTransform transform) {
-        RenderSetup setup = RenderSetup.builder(RenderPipelines.GLINT)
+        RenderSetup setup = RenderSetup.builder(RAINBOW_OVERLAY_PIPELINE)
                 .withTexture("Sampler0", texture)
                 .useLightmap()
-                .useOverlay()
                 .setTextureTransform(transform)
-                .setOutline(RenderSetup.OutlineProperty.AFFECTS_OUTLINE)
+                .sortOnUpload()
                 .createRenderSetup();
         return RenderType.create(name, setup);
     }
 
-    public static final RenderType COMBJELLY_RAINBOW_GLINT = Util.make(() -> {
-        RenderSetup setup = RenderSetup.builder(RenderPipelines.ENTITY_TRANSLUCENT_CULL)
-                .withTexture("Sampler0", Identifier.parse("alexsmobs:textures/entity/rainbow_jelly_overlays/glint_rainbow.png"))
-                .useLightmap()
-                .useOverlay()
-                .setTextureTransform(COMB_JELLY_TEXTURING)
-                .sortOnUpload()
-                .setOutline(RenderSetup.OutlineProperty.AFFECTS_OUTLINE)
-                .createRenderSetup();
-        return RenderType.create("cj_rainbow_glint", setup);
-    });
+    public static final RenderType COMBJELLY_RAINBOW_GLINT = glintType(
+            "cj_rainbow_glint",
+            Identifier.parse("alexsmobs:textures/entity/rainbow_jelly_overlays/glint_rainbow.png"),
+            COMB_JELLY_TEXTURING);
 
     public static final RenderType RAINBOW_GLINT = glintType("rainbow_glint", Identifier.parse("alexsmobs:textures/entity/rainbow_jelly_overlays/glint_rainbow.png"), RAINBOW_TEXTURING);
     public static final RenderType TRANS_GLINT = glintType("trans_glint", Identifier.parse("alexsmobs:textures/entity/rainbow_jelly_overlays/glint_trans.png"), RAINBOW_TEXTURING);
@@ -232,28 +264,6 @@ public final class AMRenderTypes {
     public static RenderType getSkulkBoom() {
         return SKULK_BOOM_TYPE;
     }
-
-    /**
-     * Same shader path as {@link RenderPipelines#ENERGY_SWIRL} / {@link RenderTypes#energySwirl}, but with
-     * {@link BlendFunction#TRANSLUCENT} like 1.21.1 {@code getUnderminer} ({@code TRANSLUCENT_TRANSPARENCY} + energy swirl
-     * shader). Vanilla {@code energySwirl} uses {@link BlendFunction#ADDITIVE}, which blows out entity skin quads to white.
-     */
-    public static final RenderPipeline UNDERMINER_PIPELINE = RenderPipeline.builder(RenderPipelines.MATRICES_FOG_SNIPPET)
-            .withLocation(Identifier.parse("alexsmobs:pipeline/underminer"))
-            .withVertexShader("core/entity")
-            .withFragmentShader("core/entity")
-            .withShaderDefine("ALPHA_CUTOUT", 0.1F)
-            .withShaderDefine("EMISSIVE")
-            .withShaderDefine("NO_OVERLAY")
-            .withShaderDefine("NO_CARDINAL_LIGHTING")
-            .withShaderDefine("APPLY_TEXTURE_MATRIX")
-            .withBindGroupLayout(BindGroupLayouts.SAMPLER0)
-            .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
-            .withCull(false)
-            .withVertexBinding(0, DefaultVertexFormat.ENTITY)
-            .withPrimitiveTopology(PrimitiveTopology.QUADS)
-            .withDepthStencilState(DepthStencilState.DEFAULT)
-            .build();
 
     private static final Function<Identifier, RenderType> UNDERMINER_TYPE = Util.memoize(
             texture -> {
