@@ -8,10 +8,10 @@ import com.github.alexthe666.alexsmobs.item.ItemRainbowJelly;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 
@@ -30,23 +30,24 @@ public class LayerRainbow<S extends LivingEntityRenderState, M extends EntityMod
         int i = RainbowUtil.getRainbowType(entity);
         if (i > 0) {
             ItemRainbowJelly.RainbowType rainbowType = ItemRainbowJelly.RainbowType.values()[Mth.clamp(i - 1, 0, ItemRainbowJelly.RainbowType.values().length - 1)];
-            int overlay = LivingEntityRenderer.getOverlayCoords(renderState, 0.0F);
             if (this.getParentModel() instanceof CitadelEntityModelBridge<?> citadel) {
                 citadel.setupAnim(renderState);
                 bufferIn.submitCustomGeometry(matrixStackIn, getRenderType(rainbowType), (pose, consumer) ->
-                        citadel.renderCitadelToBuffer(pose, consumer, packedLightIn, overlay, -1));
+                        citadel.renderCitadelToBuffer(pose, consumer, packedLightIn, OverlayTexture.NO_OVERLAY, -1));
             } else {
-                matrixStackIn.pushPose();
-                bufferIn.submitModel(
+                // 8-arg submitModel treats the 7th int as outlineColor. Passing -1 there draws a solid
+                // white silhouette. Match EnergySwirlLayer: tint, sprite, outline, crumbling.
+                bufferIn.order(1).submitModel(
                         this.getParentModel(),
                         renderState,
                         matrixStackIn,
                         getRenderType(rainbowType),
                         packedLightIn,
-                        overlay,
+                        OverlayTexture.NO_OVERLAY,
                         -1,
+                        null,
+                        0,
                         null);
-                matrixStackIn.popPose();
             }
         }
     }

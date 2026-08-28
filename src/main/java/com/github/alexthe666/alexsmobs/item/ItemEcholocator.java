@@ -81,7 +81,7 @@ public class ItemEcholocator extends Item {
     public InteractionResult use(Level worldIn, Player livingEntityIn, InteractionHand handIn) {
         ItemStack stack = livingEntityIn.getItemInHand(handIn);
         boolean left = false;
-        if (livingEntityIn.getUsedItemHand() == InteractionHand.OFF_HAND && livingEntityIn.getMainArm() == HumanoidArm.RIGHT || livingEntityIn.getUsedItemHand() == InteractionHand.MAIN_HAND && livingEntityIn.getMainArm() == HumanoidArm.LEFT) {
+        if (handIn == InteractionHand.OFF_HAND && livingEntityIn.getMainArm() == HumanoidArm.RIGHT || handIn == InteractionHand.MAIN_HAND && livingEntityIn.getMainArm() == HumanoidArm.LEFT) {
             left = true;
         }
         EntityCachalotEcho whaleEcho = new EntityCachalotEcho(worldIn, livingEntityIn, !left, type == EchoType.PUPFISH);
@@ -105,7 +105,7 @@ public class ItemEcholocator extends Item {
                 CompoundTag nbt = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
                 if(nbt.contains("CavePos") && nbt.getBooleanOr("ValidCavePos", false)){
                     pos = BlockPos.of(nbt.getLongOr("CavePos", 0L));
-                    if(isCaveAir(worldIn, pos) || 1000000 < pos.distSqr(playerPos)){
+                    if(!isCaveAir(worldIn, pos) || 1000000 < pos.distSqr(playerPos)){
                         nbt.putBoolean("ValidCavePos", false);
                         CustomData.set(DataComponents.CUSTOM_DATA, stack, nbt);
                     }
@@ -132,7 +132,8 @@ public class ItemEcholocator extends Item {
                 worldIn.addFreshEntity(whaleEcho);
                 livingEntityIn.gameEvent(GameEvent.ITEM_INTERACT_START);
                 worldIn.playSound((Player)null, whaleEcho.getX(), whaleEcho.getY(), whaleEcho.getZ(), AMSoundRegistry.CACHALOT_WHALE_CLICK.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
-                stack.hurtAndBreak(1, livingEntityIn, EquipmentSlot.MAINHAND);
+                EquipmentSlot breakSlot = handIn == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
+                stack.hurtAndBreak(1, livingEntityIn, breakSlot);
             }
         }
         livingEntityIn.getCooldowns().addCooldown(stack, 5);

@@ -98,6 +98,9 @@ public class EntityCachalotEcho extends Entity {
             this.leftOwner = this.checkLeftOwner();
         }
         super.tick();
+        if (this.isFasterAnimation()) {
+            this.playerLaunched = true;
+        }
         final Vec3 vector3d = this.getDeltaMovement();
         final HitResult raytraceresult = ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity);
         if (raytraceresult.getType() != HitResult.Type.MISS) {
@@ -266,8 +269,12 @@ public class EntityCachalotEcho extends Entity {
         }
 
     }
-    public void lerpMotion(double x, double y, double z) {
-        this.setDeltaMovement(x, y, z);
+    @Override
+    public void lerpMotion(Vec3 movement) {
+        double x = movement.x;
+        double y = movement.y;
+        double z = movement.z;
+        this.setDeltaMovement(movement);
         if (this.xRotO == 0.0F && this.yRotO == 0.0F) {
             final float f = Mth.sqrt((float)(x * x + z * z));
             this.setXRot((float) (Mth.atan2(y, f) * Mth.RAD_TO_DEG));

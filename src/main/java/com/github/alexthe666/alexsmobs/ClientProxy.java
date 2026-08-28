@@ -157,6 +157,7 @@ public class ClientProxy extends CommonProxy {
         event.registerPipeline(AMRenderTypes.GHOST_PICKAXE_PIPELINE);
         event.registerPipeline(AMRenderTypes.UNDERMINER_PIPELINE);
         event.registerPipeline(AMRenderTypes.SKULK_BOOM_PIPELINE);
+        event.registerPipeline(AMRenderTypes.RAINBOW_OVERLAY_PIPELINE);
     }
     public static void onRegisterRenderStateModifiers(RegisterRenderStateModifiersEvent event) {
         event.registerEntityModifier(
