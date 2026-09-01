@@ -99,6 +99,11 @@ public class AMNetworking {
             MessageSwingArm::handleServer
         );
         registrar.playToServer(
+            MessageSpongeRainbow.ID,
+            MessageSpongeRainbow.CODEC,
+            MessageSpongeRainbow::handleServer
+        );
+        registrar.playToServer(
             MessageUpdateEagleControls.ID,
             MessageUpdateEagleControls.CODEC,
             MessageUpdateEagleControls::handleServer

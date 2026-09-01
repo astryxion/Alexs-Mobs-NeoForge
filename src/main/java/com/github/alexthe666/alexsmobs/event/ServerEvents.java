@@ -20,6 +20,7 @@ import com.github.alexthe666.alexsmobs.entity.util.VineLassoUtil;
 import com.github.alexthe666.alexsmobs.item.AMItemRegistry;
 import com.github.alexthe666.alexsmobs.item.ILeftClick;
 import com.github.alexthe666.alexsmobs.item.ItemGhostlyPickaxe;
+import com.github.alexthe666.alexsmobs.network.MessageSpongeRainbow;
 import com.github.alexthe666.alexsmobs.network.MessageSwingArm;
 import com.github.alexthe666.alexsmobs.misc.AMAdvancementTriggerRegistry;
 import com.github.alexthe666.alexsmobs.misc.AMTagRegistry;
@@ -748,6 +749,11 @@ public class ServerEvents {
                 }
             }
         }
+        if (RainbowUtil.tryWashOffRainbow(player, event.getItemStack())) {
+            player.swing(event.getHand());
+            event.setCanceled(true);
+            event.setCancellationResult(InteractionResult.SUCCESS);
+        }
     }
 
 
@@ -783,16 +789,8 @@ public class ServerEvents {
                     consume.run();
                 }
             }
-            if (RainbowUtil.getRainbowType(living) > 0 && held.getItem() == Items.SPONGE) {
+            if (RainbowUtil.tryWashOffRainbow(living, player, held)) {
                 consume.run();
-                RainbowUtil.setRainbowType(living, 0);
-                if (!player.isCreative()) {
-                    held.shrink(1);
-                }
-                ItemStack wetSponge = new ItemStack(Items.WET_SPONGE);
-                if (!player.addItem(wetSponge)) {
-                    player.drop(wetSponge, true);
-                }
             }
             if (living instanceof Rabbit rabbit && held.getItem() == AMItemRegistry.MUNGAL_SPORES.get()
                     && AMConfig.bunfungusTransformation) {
@@ -832,15 +830,13 @@ public class ServerEvents {
         if (stack.isEmpty()) {
             stack = event.getEntity().getItemBySlot(EquipmentSlot.MAINHAND);
         }
-        if (RainbowUtil.getRainbowType(event.getEntity()) > 0 && stack.is(Items.SPONGE)) {
-            event.getEntity().swing(InteractionHand.MAIN_HAND);
-            RainbowUtil.setRainbowType(event.getEntity(), 0);
-            if (!event.getEntity().isCreative()) {
-                stack.shrink(1);
+        if (stack.is(Items.SPONGE)) {
+            if (RainbowUtil.tryWashOffRainbow(event.getEntity(), stack)) {
+                event.getEntity().swing(InteractionHand.MAIN_HAND);
             }
-            ItemStack wetSponge = new ItemStack(Items.WET_SPONGE);
-            if (!event.getEntity().addItem(wetSponge)) {
-                event.getEntity().drop(wetSponge, true);
+            // RightClickEmpty is client-only; the server must persist the clear or the effect returns on rejoin.
+            if (event.getLevel().isClientSide()) {
+                AlexsMobs.sendMSGToServer(new MessageSpongeRainbow());
             }
         }
     }
