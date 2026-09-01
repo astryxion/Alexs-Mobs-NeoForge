@@ -409,18 +409,19 @@ public class EntityTusklin extends Animal implements IAnimatedEntity {
             }else{
                 // setMaxUpStep removed in 1.21
             }
-            if (this.getTarget() != null && this.hasLineOfSight(this.getTarget()) && distanceTo(this.getTarget()) < this.getTarget().getBbWidth() + this.getBbWidth() + 1.8F) {
+            LivingEntity target = this.getTarget();
+            if (target != null && this.hasLineOfSight(target) && distanceTo(target) < target.getBbWidth() + this.getBbWidth() + 1.8F) {
                 if (this.getAnimation() == ANIMATION_FLING && this.getAnimationTick() == 6) {
-                    this.getTarget().hurt(this.damageSources().mobAttack(this), (float) this.getAttributeValue(Attributes.ATTACK_DAMAGE));
-                    knockbackTarget(this.getTarget(), 0.9F, 0F);
+                    target.hurt(this.damageSources().mobAttack(this), (float) this.getAttributeValue(Attributes.ATTACK_DAMAGE));
+                    knockbackTarget(target, 0.9F, 0F);
                 }
                 if ((this.getAnimation() == ANIMATION_GORE_L) && this.getAnimationTick() == 6) {
-                    this.getTarget().hurt(this.damageSources().mobAttack(this), (float) this.getAttributeValue(Attributes.ATTACK_DAMAGE));
-                    knockbackTarget(this.getTarget(), 0.5F, -90F);
+                    target.hurt(this.damageSources().mobAttack(this), (float) this.getAttributeValue(Attributes.ATTACK_DAMAGE));
+                    knockbackTarget(target, 0.5F, -90F);
                 }
                 if ((this.getAnimation() == ANIMATION_GORE_R) && this.getAnimationTick() == 6) {
-                    this.getTarget().hurt(this.damageSources().mobAttack(this), (float) this.getAttributeValue(Attributes.ATTACK_DAMAGE));
-                    knockbackTarget(this.getTarget(), 0.5F, 90F);
+                    target.hurt(this.damageSources().mobAttack(this), (float) this.getAttributeValue(Attributes.ATTACK_DAMAGE));
+                    knockbackTarget(target, 0.5F, 90F);
                 }
             }
         }

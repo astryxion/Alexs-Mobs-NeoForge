@@ -9,7 +9,9 @@ import com.github.alexthe666.citadel.server.entity.CitadelEntityData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 import java.awt.*;
 import java.util.Locale;
@@ -20,11 +22,39 @@ public class RainbowUtil {
 
     public static void setRainbowType(LivingEntity fabulous, int type) {
         CompoundTag tag = CitadelEntityData.getOrCreateCitadelTag(fabulous);
-        tag.putInt(RAINBOW_TYPE, type);
+        if (type <= 0) {
+            tag.remove(RAINBOW_TYPE);
+        } else {
+            tag.putInt(RAINBOW_TYPE, type);
+        }
         CitadelEntityData.setCitadelTag(fabulous, tag);
         if (!fabulous.level().isClientSide()) {
             AlexsMobs.sendMSGToAll(new MessageSyncEntityData(fabulous.getId(), tag));
         }
+    }
+
+    /**
+     * Clears rainbow data on {@code target} and converts one dry sponge in {@code stack} to a wet sponge.
+     * No-ops when the target is not rainbowed or the stack is not a dry sponge, so client prediction
+     * plus a later server packet cannot consume two sponges.
+     */
+    public static boolean tryWashOffRainbow(LivingEntity target, Player player, ItemStack stack) {
+        if (player == null || stack.isEmpty() || !stack.is(Items.SPONGE) || getRainbowType(target) <= 0) {
+            return false;
+        }
+        setRainbowType(target, 0);
+        if (!player.isCreative()) {
+            stack.shrink(1);
+        }
+        ItemStack wetSponge = new ItemStack(Items.WET_SPONGE);
+        if (!player.addItem(wetSponge)) {
+            player.drop(wetSponge, true);
+        }
+        return true;
+    }
+
+    public static boolean tryWashOffRainbow(Player player, ItemStack stack) {
+        return tryWashOffRainbow(player, player, stack);
     }
 
     public static int getRainbowType(LivingEntity entity) {
