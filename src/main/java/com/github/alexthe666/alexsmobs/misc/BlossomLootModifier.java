@@ -2,64 +2,56 @@ package com.github.alexthe666.alexsmobs.misc;
 
 import com.github.alexthe666.alexsmobs.config.AMConfig;
 import com.github.alexthe666.alexsmobs.item.AMItemRegistry;
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.resources.Identifier;
+import java.util.Optional;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemInstance;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.ShearsItem;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
-import net.minecraft.world.level.storage.loot.predicates.LootItemConditions;
 import net.neoforged.neoforge.common.loot.IGlobalLootModifier;
+import net.neoforged.neoforge.common.loot.LootModifier;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+public class BlossomLootModifier extends LootModifier {
 
-public class BlossomLootModifier implements IGlobalLootModifier {
+    public static final MapCodec<BlossomLootModifier> CODEC = RecordCodecBuilder.mapCodec(inst ->
+            codecStart(inst).apply(inst, BlossomLootModifier::new));
 
-    public static final Supplier<MapCodec<BlossomLootModifier>> CODEC =
-            () -> MapCodec.unit(() -> new BlossomLootModifier(new net.minecraft.world.level.storage.loot.predicates.LootItemCondition[0]));
-
-    // Hardcoded loot table ID since codec doesn't load conditions from JSON
-    private static final Identifier ACACIA_LEAVES = Identifier.withDefaultNamespace("blocks/acacia_leaves");
-
-    private final LootItemCondition[] conditions;
-
-    public BlossomLootModifier(LootItemCondition[] conditionsIn) {
-        this.conditions = conditionsIn;
+    public BlossomLootModifier(Optional<Holder<LootItemCondition>> condition, int priority) {
+        super(condition, priority);
     }
 
     @NotNull
     @Override
-    public ObjectArrayList<ItemStack> apply(ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
-        // Hardcoded check for acacia leaves
-        Identifier lootTableId = context.getQueriedLootTableId();
-        if (lootTableId.equals(ACACIA_LEAVES)) {
-            return this.doApply(generatedLoot, context);
-        }
-        return generatedLoot;
-    }
-
     protected ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
         if (AMConfig.acaciaBlossomsDropFromLeaves) {
-            ItemInstance toolInstance = context.getOptionalParameter(LootContextParams.TOOL);
-            ItemStack ctxTool = toolInstance instanceof ItemStack is ? is : ItemStack.EMPTY;
+            ItemInstance toolInstance = context.getOptional(LootContextParams.TOOL);
+            ItemStack ctxTool;
+            if (toolInstance instanceof ItemStack stack) {
+                ctxTool = stack;
+            } else if (toolInstance instanceof ItemStackTemplate template) {
+                ctxTool = template.create();
+            } else {
+                ctxTool = ItemStack.EMPTY;
+            }
             RandomSource random = context.getRandom();
+            var enchantments = context.getLevel().registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
             if (!ctxTool.isEmpty()) {
-                int silkTouch = ctxTool.getEnchantmentLevel(context.getLevel().registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.ENCHANTMENT).getOrThrow(net.minecraft.world.item.enchantment.Enchantments.SILK_TOUCH));
+                int silkTouch = ctxTool.getEnchantmentLevel(enchantments.getOrThrow(Enchantments.SILK_TOUCH));
                 if (silkTouch > 0 || ctxTool.getItem() instanceof ShearsItem) {
                     return generatedLoot;
                 }
             }
-            int bonusLevel = !ctxTool.isEmpty() ? 0 /* TODO 1.21: Enchantments are data-driven */ : 0;
+            int bonusLevel = !ctxTool.isEmpty() ? ctxTool.getEnchantmentLevel(enchantments.getOrThrow(Enchantments.FORTUNE)) : 0;
             int blossomStep = (int) Math.floor(AMConfig.acaciaBlossomChance * 0.1F);
             int blossomRarity = AMConfig.acaciaBlossomChance - (bonusLevel * blossomStep);
             if (blossomRarity < 1 || random.nextInt(blossomRarity) == 0) {
@@ -71,11 +63,6 @@ public class BlossomLootModifier implements IGlobalLootModifier {
 
     @Override
     public MapCodec<? extends IGlobalLootModifier> codec() {
-        return CODEC.get();
-    }
-
-    @Override
-    public int priority() {
-        return 0;
+        return CODEC;
     }
 }

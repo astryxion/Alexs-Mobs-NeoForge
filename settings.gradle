@@ -11,4 +11,4 @@ plugins {
 rootProject.name = 'alexsmobs-neoforge'
 
 include ':citadel'
-project(':citadel').projectDir = file('src Citadel 26.2')
+project(':citadel').projectDir = file('src Citadel 26.3')

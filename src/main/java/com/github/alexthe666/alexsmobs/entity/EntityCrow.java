@@ -60,8 +60,8 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
+
+import net.neoforged.neoforge.transfer.item.ItemUtil;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 
@@ -1041,7 +1041,7 @@ public class EntityCrow extends TamableAnimal implements ITargetsDroppedItems {
                     BlockEntity entity = e.level().getBlockEntity(hangingPosition);
                     if(entity != null){
                         ResourceHandler<ItemResource> resourceHandler = e.level().getCapability(Capabilities.Item.BLOCK, hangingPosition, e.getDirection());
-                        IItemHandler handler = resourceHandler != null ? IItemHandler.of(resourceHandler) : null;
+                        ResourceHandler<ItemResource> handler = resourceHandler;
                         if(handler != null){
                             return ItemStack.isSameItem(e.getItem(), EntityCrow.this.getMainHandItem());
                         }
@@ -1115,12 +1115,12 @@ public class EntityCrow extends TamableAnimal implements ITargetsDroppedItems {
                         final BlockEntity entity = targetEntity.level().getBlockEntity(hangingPosition);
                         final Direction deposit = targetEntity.getDirection();
                         ResourceHandler<ItemResource> resourceHandler = targetEntity.level().getCapability(Capabilities.Item.BLOCK, hangingPosition, deposit);
-                        IItemHandler handler = resourceHandler != null ? IItemHandler.of(resourceHandler) : null;
+                        ResourceHandler<ItemResource> handler = resourceHandler;
                         if(handler != null && cooldown == 0) {
                             ItemStack duplicate = EntityCrow.this.getItemInHand(InteractionHand.MAIN_HAND).copy();
-                            ItemStack insertSimulate = ItemHandlerHelper.insertItem(handler, duplicate, true);
+                            ItemStack insertSimulate = ItemUtil.insertItemReturnRemaining(handler, duplicate, true, null);
                             if (!insertSimulate.equals(duplicate)) {
-                                ItemStack shrunkenStack = ItemHandlerHelper.insertItem(handler, duplicate, false);
+                                ItemStack shrunkenStack = ItemUtil.insertItemReturnRemaining(handler, duplicate, false, null);
                                 if(shrunkenStack.isEmpty()){
                                     EntityCrow.this.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
                                 }else{

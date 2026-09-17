@@ -1,5 +1,9 @@
 package com.github.alexthe666.alexsmobs.event;
 
+import net.minecraft.util.Prediction;
+
+import net.minecraft.world.item.component.SwingAnimation;
+
 import com.github.alexthe666.alexsmobs.AlexsMobs;
 import com.github.alexthe666.alexsmobs.block.AMBlockRegistry;
 import com.github.alexthe666.alexsmobs.client.particle.AMParticleRegistry;
@@ -90,7 +94,6 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
-import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.EntityStruckByLightningEvent;
 import net.neoforged.neoforge.event.entity.ProjectileImpactEvent;
@@ -102,7 +105,7 @@ import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.ExplosionEvent;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
+
 import org.apache.commons.lang3.tuple.Triple;
 
 import java.util.*;
@@ -117,11 +120,6 @@ public class ServerEvents {
     private static final Identifier SNEAK_SPEED_ID = Identifier.fromNamespaceAndPath(AlexsMobs.MODID, "frontier_cap_sneak_speed");
     private static final Random RAND = new Random();
     private static final Map<ServerLevel, BeachedCachalotWhaleSpawner> BEACHED_CACHALOT_WHALE_SPAWNER_MAP = new HashMap<>();
-
-    @SubscribeEvent
-    public static void onRegisterBrewingRecipes(RegisterBrewingRecipesEvent event) {
-        AMEffectRegistry.registerBrewingRecipes(event.getBuilder());
-    }
 
     @SubscribeEvent
     public static void onLevelTick(LevelTickEvent.Post tick) {
@@ -318,13 +316,13 @@ public class ServerEvents {
             CompoundTag playerData = event.getEntity().getPersistentData();
             CompoundTag data = playerData.getCompoundOrEmpty(Player.PERSISTED_NBT_TAG);
             if (!data.getBooleanOr("alexsmobs_has_book", false)) {
-                ItemHandlerHelper.giveItemToPlayer(event.getEntity(), new ItemStack(AMItemRegistry.ANIMAL_DICTIONARY.get()));
+                event.getEntity().getInventory().placeItemBackInInventory(new ItemStack(AMItemRegistry.ANIMAL_DICTIONARY.get()), Prediction.SERVER_ONLY);
                 boolean isAlex = Objects.equals(event.getEntity().getUUID(), ALEX_UUID);
                 if (isAlex || Objects.equals(event.getEntity().getUUID(), CARRO_UUID)) {
-                    ItemHandlerHelper.giveItemToPlayer(event.getEntity(), new ItemStack(AMItemRegistry.BEAR_DUST.get()));
+                    event.getEntity().getInventory().placeItemBackInInventory(new ItemStack(AMItemRegistry.BEAR_DUST.get()), Prediction.SERVER_ONLY);
                 }
                 if (isAlex) {
-                    ItemHandlerHelper.giveItemToPlayer(event.getEntity(), new ItemStack(AMItemRegistry.NOVELTY_HAT.get()));
+                    event.getEntity().getInventory().placeItemBackInInventory(new ItemStack(AMItemRegistry.NOVELTY_HAT.get()), Prediction.SERVER_ONLY);
                 }
                 data.putBoolean("alexsmobs_has_book", true);
                 playerData.put(Player.PERSISTED_NBT_TAG, data);
@@ -721,7 +719,7 @@ public class ServerEvents {
         Player player = event.getEntity();
         if (event.getItemStack().getItem() == Items.WHEAT && player.getVehicle() instanceof EntityElephant elephant) {
             if (elephant.triggerCharge(event.getItemStack())) {
-                player.swing(event.getHand());
+                player.swing(event.getHand(), SwingAnimation.DEFAULT, false);
                 if (!player.isCreative()) {
                     event.getItemStack().shrink(1);
                 }
@@ -741,7 +739,7 @@ public class ServerEvents {
                         if (!player.addItem(new ItemStack(AMItemRegistry.LAVA_BOTTLE.get()))) {
                             player.spawnAtLocation((ServerLevel) event.getLevel(), new ItemStack(AMItemRegistry.LAVA_BOTTLE.get()));
                         }
-                        player.swing(event.getHand());
+                        player.swing(event.getHand(), SwingAnimation.DEFAULT, false);
                         if (!player.isCreative()) {
                             event.getItemStack().shrink(1);
                         }
@@ -750,7 +748,7 @@ public class ServerEvents {
             }
         }
         if (RainbowUtil.tryWashOffRainbow(player, event.getItemStack())) {
-            player.swing(event.getHand());
+            player.swing(event.getHand(), SwingAnimation.DEFAULT, false);
             event.setCanceled(true);
             event.setCancellationResult(InteractionResult.SUCCESS);
         }
@@ -832,7 +830,7 @@ public class ServerEvents {
         }
         if (stack.is(Items.SPONGE)) {
             if (RainbowUtil.tryWashOffRainbow(event.getEntity(), stack)) {
-                event.getEntity().swing(InteractionHand.MAIN_HAND);
+                event.getEntity().swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, false);
             }
             // RightClickEmpty is client-only; the server must persist the clear or the effect returns on rejoin.
             if (event.getLevel().isClientSide()) {

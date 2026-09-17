@@ -1,5 +1,7 @@
 package com.github.alexthe666.alexsmobs.client.model;
 
+import net.minecraft.world.item.component.SwingAnimation;
+
 import com.github.alexthe666.alexsmobs.entity.EntityCatfish;
 import com.github.alexthe666.citadel.client.model.AdvancedEntityModel;
 import com.github.alexthe666.citadel.client.model.AdvancedModelBox;
@@ -102,7 +104,7 @@ public class ModelCatfishMedium extends AlexAdvancedEntityModel<EntityCatfish> {
         float swimDegree = 0.75F;
         AdvancedModelBox[] tailBoxes = new AdvancedModelBox[]{body, tail, tail_fin};
         this.chainSwing(tailBoxes, swimSpeed, swimDegree * 0.9F, -2.5F, limbSwing, limbSwingAmount);
-        // TODO 1.21: Citadel API changed - this.swing(head);
+        // TODO 1.21: Citadel API changed - this.swing(head, SwingAnimation.DEFAULT, false);
         this.flap(left_fin, swimSpeed, swimDegree, false, 4, -0.6F, limbSwing, limbSwingAmount);
         this.flap(right_fin, swimSpeed, swimDegree, true, 4, -0.6F, limbSwing, limbSwingAmount);
         this.bob(body, idleSpeed, idleDegree, false, ageInTicks, 1);

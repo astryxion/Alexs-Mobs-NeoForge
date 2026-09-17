@@ -83,16 +83,16 @@ public class RenderFarseer extends MobRenderer<EntityFarseer, LivingEntityRender
     }
 
     @Override
-    public boolean shouldRender(EntityFarseer livingEntityIn, Frustum camera, double camX, double camY, double camZ) {
-        if (super.shouldRender(livingEntityIn, camera, camX, camY, camZ)) {
+    public boolean shouldRender(EntityFarseer entity, Frustum frustum, double camX, double camY, double camZ, float partialTicks) {
+        if (super.shouldRender(entity, frustum, camX, camY, camZ, partialTicks)) {
             return true;
         } else {
-            if (livingEntityIn.hasLaser()) {
-                LivingEntity livingentity = livingEntityIn.getLaserTarget();
+            if (entity.hasLaser()) {
+                LivingEntity livingentity = entity.getLaserTarget();
                 if (livingentity != null) {
                     Vec3 vector3d = this.getPosition(livingentity, (double) livingentity.getBbHeight() * 0.5D, 1.0F);
-                    Vec3 vector3d1 = this.getPosition(livingEntityIn, livingEntityIn.getEyeHeight(), 1.0F);
-                    return camera.isVisible(new AABB(vector3d1.x, vector3d1.y, vector3d1.z, vector3d.x, vector3d.y, vector3d.z));
+                    Vec3 vector3d1 = this.getPosition(entity, entity.getEyeHeight(), 1.0F);
+                    return frustum.isVisible(new AABB(vector3d1.x, vector3d1.y, vector3d1.z, vector3d.x, vector3d.y, vector3d.z));
                 }
             }
 
@@ -160,8 +160,8 @@ public class RenderFarseer extends MobRenderer<EntityFarseer, LivingEntityRender
 
         float f7 = state.ageInTicks;
         if (faceCameraAmount != 0) {
-            matrixStackIn.mulPose(camera);
-            matrixStackIn.mulPose(Axis.YP.rotationDegrees(180.0F));
+            matrixStackIn.rotate(camera);
+            matrixStackIn.rotate(Axis.YP.rotationDegrees(180.0F));
         }
         this.farseerSetupRotations(entityIn, state, matrixStackIn, f7, f, partialTicks);
         matrixStackIn.scale(-1.0F, -1.0F, 1.0F);
@@ -207,8 +207,8 @@ public class RenderFarseer extends MobRenderer<EntityFarseer, LivingEntityRender
         if (entityIn.getAnimation() == EntityFarseer.ANIMATION_EMERGE) {
             matrixStackIn.pushPose();
             matrixStackIn.scale(3.0F, 3.0F, 3.0F);
-            matrixStackIn.mulPose(camera);
-            matrixStackIn.mulPose(Axis.YP.rotationDegrees(180.0F));
+            matrixStackIn.rotate(camera);
+            matrixStackIn.rotate(Axis.YP.rotationDegrees(180.0F));
             PoseStack.Pose posestack$pose = matrixStackIn.last();
             Matrix4f matrix4f = posestack$pose.pose();
             Matrix3f matrix3f = posestack$pose.normal();
@@ -236,9 +236,9 @@ public class RenderFarseer extends MobRenderer<EntityFarseer, LivingEntityRender
             float laserX = (float) (-(Mth.atan2(d1, d4) * (double) Mth.RAD_TO_DEG));
             matrixStackIn.pushPose();
             matrixStackIn.translate(0, laserHeight, 0);
-            matrixStackIn.mulPose(Axis.YN.rotationDegrees(laserY));
-            matrixStackIn.mulPose(Axis.XP.rotationDegrees(laserX));
-            matrixStackIn.mulPose(Axis.XP.rotationDegrees(90));
+            matrixStackIn.rotate(Axis.YN.rotationDegrees(laserY));
+            matrixStackIn.rotate(Axis.XP.rotationDegrees(laserX));
+            matrixStackIn.rotate(Axis.XP.rotationDegrees(90));
             float length = entityIn.getLaserDistance() * laserProgress;
             float width = (1.5F - laserProgress) * 2F;
             float speed = 1F + laserProgress * laserProgress * 5F;
@@ -340,7 +340,7 @@ public class RenderFarseer extends MobRenderer<EntityFarseer, LivingEntityRender
         }
 
         if (!farseer.hasPose(Pose.SLEEPING)) {
-            matrixStackIn.mulPose(Axis.YP.rotationDegrees((180.0F - f2 * invCameraAmount)));
+            matrixStackIn.rotate(Axis.YP.rotationDegrees((180.0F - f2 * invCameraAmount)));
         }
 
         if (farseer.deathTime > 0) {
@@ -350,10 +350,10 @@ public class RenderFarseer extends MobRenderer<EntityFarseer, LivingEntityRender
                 f = 1.0F;
             }
 
-            matrixStackIn.mulPose(Axis.YP.rotationDegrees(f * 90.0F * invCameraAmount));
+            matrixStackIn.rotate(Axis.YP.rotationDegrees(f * 90.0F * invCameraAmount));
         } else if (isEntityUpsideDown(farseer)) {
             matrixStackIn.translate(0.0D, (double) (farseer.getBbHeight() + 0.1F), 0.0D);
-            matrixStackIn.mulPose(Axis.ZP.rotationDegrees(180.0F));
+            matrixStackIn.rotate(Axis.ZP.rotationDegrees(180.0F));
         }
     }
 
@@ -366,7 +366,7 @@ public class RenderFarseer extends MobRenderer<EntityFarseer, LivingEntityRender
         }
         Identifier id = this.getTextureLocation(state);
         if (invis || farseer.getAnimation() == EntityFarseer.ANIMATION_EMERGE) {
-            return RenderTypes.entityTranslucentCullItemTarget(id);
+            return RenderTypes.entityTranslucentCull(id);
         } else if (normal) {
             return RenderTypes.entityCutout(id);
         } else {

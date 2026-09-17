@@ -1,5 +1,7 @@
 package com.github.alexthe666.alexsmobs.client.model;
 
+import net.minecraft.world.item.component.SwingAnimation;
+
 import com.github.alexthe666.alexsmobs.entity.EntitySkelewag;
 import com.github.alexthe666.alexsmobs.entity.util.Maths;
 import com.github.alexthe666.citadel.animation.IAnimatedEntity;
@@ -152,7 +154,7 @@ public class ModelSkelewag extends AlexAdvancedEntityModel<EntitySkelewag> {
         this.bob(right_fin, idleSpeed, idleDegree, false, ageInTicks, 1);
         this.swing(flag, idleSpeed, idleDegree * 0.2F, false, 3, 0.05F, ageInTicks, 1);
         this.chainSwing(tailBoxes, swimSpeed, swimDegree, -2, limbSwing, limbSwingAmount);
-        // TODO 1.21: Citadel API changed - this.swing(head);
+        // TODO 1.21: Citadel API changed - this.swing(head, SwingAnimation.DEFAULT, false);
         this.flap(left_fin, swimSpeed, swimDegree, true, -1, -0, limbSwing, limbSwingAmount);
         this.flap(right_fin, swimSpeed, swimDegree, false, -1, -0, limbSwing, limbSwingAmount);
         this.bob(left_fin, swimSpeed, -1.5F * swimDegree, false, limbSwing, limbSwingAmount);

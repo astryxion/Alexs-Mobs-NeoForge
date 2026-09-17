@@ -42,10 +42,7 @@ public class LayerRainbow<S extends LivingEntityRenderState, M extends EntityMod
                         getRenderType(rainbowType),
                         packedLightIn,
                         OverlayTexture.NO_OVERLAY,
-                        -1,
-                        null,
-                        0,
-                        null);
+                        0);
             }
         }
     }

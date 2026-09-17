@@ -1,5 +1,7 @@
 package com.github.alexthe666.alexsmobs.entity.util;
 
+import net.minecraft.util.Prediction;
+
 import com.github.alexthe666.alexsmobs.AlexsMobs;
 import com.github.alexthe666.alexsmobs.config.AMConfig;
 import com.github.alexthe666.alexsmobs.item.ItemRainbowJelly;
@@ -48,7 +50,7 @@ public class RainbowUtil {
         }
         ItemStack wetSponge = new ItemStack(Items.WET_SPONGE);
         if (!player.addItem(wetSponge)) {
-            player.drop(wetSponge, true);
+            player.drop(wetSponge, true, Prediction.SERVER_ONLY);
         }
         return true;
     }

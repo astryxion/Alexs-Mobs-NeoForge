@@ -199,11 +199,11 @@ public class EntityTiger extends Animal implements ICustomCollisions, IAnimatedE
         return !isSitting() && !isSleeping() && !this.isHolding();
     }
 
-    public double getVisibilityPercent(@Nullable Entity lookingEntity) {
+    public double getVisibilityPercent(ServerLevel serverLevel, @Nullable Entity lookingEntity) {
         if (this.isStealth()) {
             return 0.2D;
         }
-        return super.getVisibilityPercent(lookingEntity);
+        return super.getVisibilityPercent(serverLevel, lookingEntity);
     }
 
     public boolean isFood(ItemStack stack) {

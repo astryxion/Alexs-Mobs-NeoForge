@@ -1,6 +1,5 @@
 package com.github.alexthe666.alexsmobs.block;
 
-import com.mojang.serialization.MapCodec;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -15,19 +14,11 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 
-import static net.minecraft.world.level.block.state.BlockBehaviour.simpleCodec;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.MapColor;
 
 public class BlockRainbowGlass extends TransparentBlock {
-
-    @Override
-    public MapCodec<? extends TransparentBlock> codec() {
-        return CODEC;
-    }
-
-    public static final MapCodec<BlockRainbowGlass> CODEC = simpleCodec(BlockRainbowGlass::new);
 
     public static final BooleanProperty UP = BooleanProperty.create("up");
     public static final BooleanProperty DOWN = BooleanProperty.create("down");
@@ -37,7 +28,7 @@ public class BlockRainbowGlass extends TransparentBlock {
     public static final BooleanProperty SOUTH = BooleanProperty.create("south");
 
     public static BlockBehaviour.Properties defaultProperties() {
-        return BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_PURPLE).friction(0.97F).strength(0.2F).lightLevel((i) -> 11).sound(SoundType.GLASS).noOcclusion().isValidSpawn(BlockRainbowGlass::noOption).isRedstoneConductor(BlockRainbowGlass::noOption).isSuffocating(BlockRainbowGlass::noOption).isViewBlocking(BlockRainbowGlass::noOption).emissiveRendering(state -> true);
+        return BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_PURPLE).friction(0.97F).strength(0.2F).lightLevel((i) -> 11).sound(SoundType.GLASS).noOcclusion().isValidSpawn(BlockRainbowGlass::noOption).isRedstoneConductor(BlockRainbowGlass::noOption).isSuffocating(BlockRainbowGlass::noOption).isViewBlocking((s, level, pos, aabb) -> BlockRainbowGlass.noOption(s, level, pos)).emissiveRendering(state -> true);
     }
 
     protected BlockRainbowGlass(BlockBehaviour.Properties props) {

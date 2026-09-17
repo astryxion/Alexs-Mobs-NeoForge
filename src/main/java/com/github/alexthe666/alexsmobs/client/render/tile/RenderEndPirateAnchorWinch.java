@@ -59,14 +59,14 @@ public class RenderEndPirateAnchorWinch<T extends TileEntityEndPirateAnchorWinch
         matrixStackIn.pushPose();
         matrixStackIn.translate(0.5F, 1.5F, 0.5F);
         matrixStackIn.pushPose();
-        matrixStackIn.mulPose(Axis.XP.rotationDegrees(180.0F));
+        matrixStackIn.rotate(Axis.XP.rotationDegrees(180.0F));
         if (east) {
-            matrixStackIn.mulPose(Axis.YP.rotationDegrees(90.0F));
+            matrixStackIn.rotate(Axis.YP.rotationDegrees(90.0F));
         }
         boolean flag = false;
         matrixStackIn.pushPose();
         if (!tileEntityIn.isAnchorEW()) {
-            matrixStackIn.mulPose(Axis.YP.rotationDegrees(90.0F));
+            matrixStackIn.rotate(Axis.YP.rotationDegrees(90.0F));
         }
         float bottomOfChain = tileEntityIn.getChainLength(partialTicks);
         int light = combinedLightIn;
@@ -76,7 +76,7 @@ public class RenderEndPirateAnchorWinch<T extends TileEntityEndPirateAnchorWinch
             float moveDown = Math.max(bottomOfChain - i, 0);
             matrixStackIn.translate(0, 0.1F + moveDown, 0);
             if (flag) {
-                matrixStackIn.mulPose(Axis.YP.rotationDegrees(90.0F));
+                matrixStackIn.rotate(Axis.YP.rotationDegrees(90.0F));
             }
             if (moveDown <= 1F) {
                 float modulatedScale = 0.5F + moveDown * 0.5F;
@@ -102,9 +102,9 @@ public class RenderEndPirateAnchorWinch<T extends TileEntityEndPirateAnchorWinch
             matrixStackIn.pushPose();
             matrixStackIn.translate(0.5F, -1.5F - bottomOfChain, 0.5F);
             matrixStackIn.pushPose();
-            matrixStackIn.mulPose(Axis.XP.rotationDegrees(180.0F));
+            matrixStackIn.rotate(Axis.XP.rotationDegrees(180.0F));
             if (tileEntityIn.isAnchorEW()) {
-                matrixStackIn.mulPose(Axis.YP.rotationDegrees(90.0F));
+                matrixStackIn.rotate(Axis.YP.rotationDegrees(90.0F));
             }
             RenderEndPirateAnchor.ANCHOR_MODEL.resetToDefaultPose();
             collector.submitCustomGeometry(matrixStackIn, AMRenderTypes.entityCutoutNoCull(RenderEndPirateAnchor.TEXTURE_ANCHOR), (pose, consumer) ->

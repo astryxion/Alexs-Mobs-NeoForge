@@ -54,13 +54,13 @@ public class RenderMurmurHead extends MobRenderer<EntityMurmurHead, LivingEntity
     }
 
     @Override
-    public boolean shouldRender(EntityMurmurHead livingEntityIn, Frustum camera, double camX, double camY, double camZ) {
-        if (super.shouldRender(livingEntityIn, camera, camX, camY, camZ)) {
+    public boolean shouldRender(EntityMurmurHead head, Frustum frustum, double camX, double camY, double camZ, float partialTicks) {
+        if (super.shouldRender(head, frustum, camX, camY, camZ, partialTicks)) {
             return true;
-        } else if (livingEntityIn.hasNeckBottom()) {
-            Vec3 vector3d = livingEntityIn.getNeckBottom(1.0F);
-            Vec3 vector3d1 = livingEntityIn.getNeckTop(1.0F);
-            return camera.isVisible(new AABB(vector3d1.x, vector3d1.y, vector3d1.z, vector3d.x, vector3d.y, vector3d.z));
+        } else if (head.hasNeckBottom()) {
+            Vec3 vector3d = head.getNeckBottom(1.0F);
+            Vec3 vector3d1 = head.getNeckTop(1.0F);
+            return frustum.isVisible(new AABB(vector3d1.x, vector3d1.y, vector3d1.z, vector3d.x, vector3d.y, vector3d.z));
         } else {
             return false;
         }

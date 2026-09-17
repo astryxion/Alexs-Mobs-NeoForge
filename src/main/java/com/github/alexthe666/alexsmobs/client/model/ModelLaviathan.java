@@ -1,5 +1,7 @@
 package com.github.alexthe666.alexsmobs.client.model;
 
+import net.minecraft.world.item.component.SwingAnimation;
+
 import com.github.alexthe666.alexsmobs.entity.EntityLaviathan;
 import com.github.alexthe666.alexsmobs.entity.util.Maths;
 import com.github.alexthe666.citadel.client.model.AdvancedEntityModel;
@@ -201,7 +203,7 @@ public class ModelLaviathan extends AlexAdvancedEntityModel<EntityLaviathan> {
         this.swing(rightArm, walkSpeed, walkDegree, true, 2, -0.25F, limbSwing, limbSwingAmount * onLandProgress * 0.2F);
         this.bob(body, -walkSpeed * 0.5F, walkDegree * 3, true, limbSwing, limbSwingAmount);
         this.chainSwing(neckBoxes, walkSpeed, walkDegree * 0.3F, -21, limbSwing, limbSwingAmount * swimProgress * 0.2F * headStillProgress);
-        // TODO 1.21: Citadel API changed - this.swing(tail);
+        // TODO 1.21: Citadel API changed - this.swing(tail, SwingAnimation.DEFAULT, false);
         this.flap(leftLeg, walkSpeed, walkDegree, true, 2, 0.2F, limbSwing, limbSwingAmount * swimProgress * 0.2F);
         this.flap(rightLeg, walkSpeed, walkDegree, false, 2, 0.2F, limbSwing, limbSwingAmount * swimProgress * 0.2F);
         this.flap(leftArm, walkSpeed, walkDegree, false, 2, -0.25F, limbSwing, limbSwingAmount * swimProgress * 0.2F);

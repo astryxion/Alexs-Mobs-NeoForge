@@ -39,11 +39,11 @@ public class RenderGrizzlyBear extends MobRenderer<EntityGrizzlyBear, LivingEnti
     }
 
     @Override
-    public boolean shouldRender(EntityGrizzlyBear livingEntityIn, Frustum camera, double camX, double camY, double camZ) {
-        if (livingEntityIn.getAprilFoolsFlag() == 5) {
+    public boolean shouldRender(EntityGrizzlyBear bear, Frustum frustum, double camX, double camY, double camZ, float partialTicks) {
+        if (bear.getAprilFoolsFlag() == 5) {
             return false;
         }
-        return super.shouldRender(livingEntityIn, camera, camX, camY, camZ);
+        return super.shouldRender(bear, frustum, camX, camY, camZ, partialTicks);
     }
 
     @Override

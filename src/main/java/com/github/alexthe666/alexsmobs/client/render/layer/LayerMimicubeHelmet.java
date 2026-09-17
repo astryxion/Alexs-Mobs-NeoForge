@@ -87,7 +87,7 @@ public class LayerMimicubeHelmet extends RenderLayer<LivingEntityRenderState, Ci
             matrixStackIn.scale(1F + 0.3F * (1 - helmetSwap), 1F + 0.3F * (1 - helmetSwap), 1F + 0.3F * (1 - helmetSwap));
             boolean flag1 = itemstack.hasFoil();
             int clampedLight = helmetSwap > 0 ? (int) (-100 * helmetSwap) : packedLightIn;
-            matrixStackIn.mulPose(Axis.YP.rotationDegrees(360 * helmetSwap));
+            matrixStackIn.rotate(Axis.YP.rotationDegrees(360 * helmetSwap));
             if (itemstack.has(DataComponents.DYED_COLOR)) {
                 int i = itemstack.get(DataComponents.DYED_COLOR).rgb();
                 float f = (float) (i >> 16 & 255) / 255.0F;
@@ -141,7 +141,7 @@ public class LayerMimicubeHelmet extends RenderLayer<LivingEntityRenderState, Ci
             stack.popPose();
         });
         if (glintIn) {
-            collector.submitCustomGeometry(matrixStackIn, RenderTypes.armorEntityGlint(), (pose, vc) -> {
+            collector.submitCustomGeometry(matrixStackIn, RenderTypes.trimmedArmorGlint(), (pose, vc) -> {
                 PoseStack stack = new PoseStack();
                 stack.pushPose();
                 stack.last().set(pose);

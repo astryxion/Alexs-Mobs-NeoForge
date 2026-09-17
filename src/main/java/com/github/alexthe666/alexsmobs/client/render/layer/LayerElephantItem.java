@@ -8,8 +8,8 @@ import com.github.alexthe666.alexsmobs.entity.EntityElephant;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
@@ -42,7 +42,7 @@ public class LayerElephantItem extends RenderLayer<LivingEntityRenderState, Cita
             matrixStackIn.translate(0.0D, 0.2F, -0.22D);
         }
         matrixStackIn.translate(-0.0, 1.0F, 0.15F);
-        matrixStackIn.mulPose(Axis.XP.rotationDegrees(180F));
+        matrixStackIn.rotate(Axis.XP.rotationDegrees(180F));
         matrixStackIn.scale(1.3F, 1.3F, 1.3F);
         ItemModelResolver itemModelResolver = Minecraft.getInstance().getItemModelResolver();
         ItemStackRenderState itemStackRenderState = new ItemStackRenderState();
@@ -52,8 +52,11 @@ public class LayerElephantItem extends RenderLayer<LivingEntityRenderState, Cita
             matrixStackIn.translate(-0.05F, -0.1F, -0.15F);
             matrixStackIn.scale(2, 2, 2);
         }
-        ItemInHandRenderer renderer = Minecraft.getInstance().getEntityRenderDispatcher().getItemInHandRenderer();
-        renderer.renderItem(entitylivingbaseIn, itemstack, ItemDisplayContext.GROUND, matrixStackIn, collector, packedLightIn);
+        ItemStackRenderState itemRenderState = new ItemStackRenderState();
+
+        Minecraft.getInstance().getItemModelResolver().updateForLiving(itemRenderState, itemstack, ItemDisplayContext.GROUND, entitylivingbaseIn);
+
+        itemRenderState.submit(matrixStackIn, collector, packedLightIn, OverlayTexture.NO_OVERLAY, 0);
         matrixStackIn.popPose();
         matrixStackIn.popPose();
     }

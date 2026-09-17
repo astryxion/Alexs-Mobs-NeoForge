@@ -1,9 +1,7 @@
 {
   "type": "alexsmobs:pigshoes",
-  "conditions": [
-    {
-      "condition": "neoforge:loot_table_id",
-      "loot_table_id": "minecraft:gameplay/piglin_bartering"
-    }
-  ]
+  "condition": {
+    "condition": "neoforge:loot_table_id",
+    "loot_table_id": "minecraft:gameplay/piglin_bartering"
+  }
 }

@@ -88,8 +88,8 @@ public class RenderUnderminer extends MobRenderer<EntityUnderminer, HumanoidRend
 
     private static HumanoidModel.ArmPose getUnderminerArmPose(EntityUnderminer mob, HumanoidArm arm) {
         ItemStack itemHeldByArm = mob.getItemHeldByArm(arm);
-        SwingAnimation anim = itemHeldByArm.get(DataComponents.SWING_ANIMATION);
-        if (anim != null && anim.type() == SwingAnimationType.STAB && mob.swinging) {
+        SwingAnimation anim = itemHeldByArm.getAttackAnimation();
+        if (anim != null && anim.type() == SwingAnimationType.STAB && mob.getCurrentSwing() != null) {
             return HumanoidModel.ArmPose.SPEAR;
         } else {
             return itemHeldByArm.is(ItemTags.SPEARS) ? HumanoidModel.ArmPose.SPEAR : HumanoidModel.ArmPose.EMPTY;
@@ -113,15 +113,15 @@ public class RenderUnderminer extends MobRenderer<EntityUnderminer, HumanoidRend
     }
 
     @Override
-    public boolean shouldRender(EntityUnderminer livingEntityIn, Frustum camera, double camX, double camY, double camZ) {
-        if (super.shouldRender(livingEntityIn, camera, camX, camY, camZ)) {
+    public boolean shouldRender(EntityUnderminer entityIn, Frustum frustum, double camX, double camY, double camZ, float partialTicks) {
+        if (super.shouldRender(entityIn, frustum, camX, camY, camZ, partialTicks)) {
             return true;
         } else {
-            if (livingEntityIn.getMiningPos() != null) {
-                BlockPos pos = livingEntityIn.getMiningPos();
+            if (entityIn.getMiningPos() != null) {
+                BlockPos pos = entityIn.getMiningPos();
                 Vec3 vector3d = Vec3.atLowerCornerOf(pos);
                 Vec3 vector3dCorner = Vec3.atLowerCornerOf(pos).add(1, 1, 1);
-                return camera.isVisible(new AABB(vector3d.x, vector3d.y, vector3d.z, vector3dCorner.x, vector3dCorner.y, vector3dCorner.z));
+                return frustum.isVisible(new AABB(vector3d.x, vector3d.y, vector3d.z, vector3dCorner.x, vector3dCorner.y, vector3dCorner.z));
             }
             return false;
         }
@@ -256,7 +256,7 @@ public class RenderUnderminer extends MobRenderer<EntityUnderminer, HumanoidRend
         boolean shouldSit = entityIn.isPassenger() && (entityIn.getVehicle() != null && entityIn.getVehicle().shouldRiderSit());
         this.dwarfModel.riding = shouldSit;
         this.dwarfModel.young = entityIn.isBaby();
-        this.dwarfModel.attackTime = entityIn.getAttackAnim(partialTicks);
+        this.dwarfModel.attackTime = entityIn.getSwingAnimation(partialTicks);
         this.dwarfModel.crouching = entityIn.isCrouching();
         this.dwarfModel.swimAmount = entityIn.getSwimAmount(partialTicks);
         this.dwarfModel.leftArmPose = state.leftArmPose;

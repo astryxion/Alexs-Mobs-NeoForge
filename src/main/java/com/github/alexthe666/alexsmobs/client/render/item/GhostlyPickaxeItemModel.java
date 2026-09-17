@@ -1,17 +1,32 @@
 package com.github.alexthe666.alexsmobs.client.render.item;
 
 import com.github.alexthe666.alexsmobs.client.render.AMRenderTypes;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.geometry.ItemQuads;
 import net.minecraft.world.entity.ItemOwner;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.jspecify.annotations.Nullable;
 
 public final class GhostlyPickaxeItemModel implements ItemModel {
+
+    private static final Field LAYER_QUADS;
+
+    static {
+        try {
+            LAYER_QUADS = ItemStackRenderState.LayerRenderState.class.getDeclaredField("quads");
+            LAYER_QUADS.setAccessible(true);
+        } catch (ReflectiveOperationException e) {
+            throw new ExceptionInInitializerError(e);
+        }
+    }
 
     private final ItemModel inner;
 
@@ -24,23 +39,36 @@ public final class GhostlyPickaxeItemModel implements ItemModel {
         this.inner.update(state, stack, resolver, displayContext, level, owner, seed);
         int n = state.activeLayerCount;
         for (int i = 0; i < n; i++) {
-            var layer = state.layers[i];
-            var quads = layer.prepareQuadList();
-            for (int q = 0; q < quads.size(); q++) {
-                quads.set(q, fullbrightGhost(quads.get(q)));
+            ItemStackRenderState.LayerRenderState layer = state.layers[i];
+            ItemQuads quads;
+            try {
+                quads = (ItemQuads) LAYER_QUADS.get(layer);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
             }
+            if (quads == null || quads.isEmpty()) {
+                continue;
+            }
+            List<BakedQuad> rewritten = new ArrayList<>(quads.all().size());
+            for (BakedQuad quad : quads.all()) {
+                rewritten.add(fullbrightGhost(quad));
+            }
+            layer.setQuads(ItemQuads.split(rewritten));
         }
     }
 
     private static BakedQuad fullbrightGhost(BakedQuad quad) {
-        var mi = quad.materialInfo();
-        var newMi = new BakedQuad.MaterialInfo(
+        BakedQuad.MaterialInfo mi = quad.materialInfo();
+        BakedQuad.MaterialInfo newMi = new BakedQuad.MaterialInfo(
                 mi.sprite(),
                 mi.layer(),
                 AMRenderTypes.getGhostPickaxe(mi.sprite().atlasLocation()),
+                mi.itemGlintRenderType(),
+                mi.itemGlintSpecialRenderType(),
                 mi.tintIndex(),
-                mi.shade(),
-                15);
+                mi.shadeDirectionOverride(),
+                15,
+                mi.ambientOcclusion());
         return new BakedQuad(
                 quad.position0(),
                 quad.position1(),
@@ -51,6 +79,8 @@ public final class GhostlyPickaxeItemModel implements ItemModel {
                 quad.packedUV2(),
                 quad.packedUV3(),
                 quad.direction(),
-                newMi);
+                newMi,
+                quad.bakedNormals(),
+                quad.bakedColors());
     }
 }

@@ -8,7 +8,8 @@ import com.github.alexthe666.alexsmobs.item.AMItemRegistry;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ItemInHandRenderer;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
@@ -50,10 +51,13 @@ public class LayerUnderminerItem extends RenderLayer<HumanoidRenderState, Citade
         this.underminerRenderer.translateUnderminerHand(entitylivingbaseIn, entitylivingbaseIn.getMainArm(), matrixStackIn, state);
         matrixStackIn.translate(f, f1, -0.15F);
 
-        matrixStackIn.mulPose(Axis.XP.rotationDegrees(-90));
-        matrixStackIn.mulPose(Axis.YP.rotationDegrees(180));
-        ItemInHandRenderer renderer = Minecraft.getInstance().getEntityRenderDispatcher().getItemInHandRenderer();
-        renderer.renderItem(entitylivingbaseIn, itemstack, ItemDisplayContext.THIRD_PERSON_RIGHT_HAND, matrixStackIn, collector, packedLightIn);
+        matrixStackIn.rotate(Axis.XP.rotationDegrees(-90));
+        matrixStackIn.rotate(Axis.YP.rotationDegrees(180));
+        ItemStackRenderState itemRenderState = new ItemStackRenderState();
+
+        Minecraft.getInstance().getItemModelResolver().updateForLiving(itemRenderState, itemstack, ItemDisplayContext.THIRD_PERSON_RIGHT_HAND, entitylivingbaseIn);
+
+        itemRenderState.submit(matrixStackIn, collector, packedLightIn, OverlayTexture.NO_OVERLAY, 0);
         matrixStackIn.popPose();
         matrixStackIn.popPose();
     }

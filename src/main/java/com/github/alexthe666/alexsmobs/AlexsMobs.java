@@ -93,12 +93,14 @@ public class AlexsMobs {
 
         final DeferredRegister<com.mojang.serialization.MapCodec<? extends BiomeModifier>> biomeModifiers = DeferredRegister.create(net.neoforged.neoforge.registries.NeoForgeRegistries.Keys.BIOME_MODIFIER_SERIALIZERS, AlexsMobs.MODID);
         biomeModifiers.register(modBusEvent);
-        biomeModifiers.register("am_mob_spawns", AMMobSpawnBiomeModifier::makeCodec);
-        biomeModifiers.register("am_leafcutter_ant_spawns", AMLeafcutterAntBiomeModifier::makeCodec);
+        AMMobSpawnBiomeModifier.SERIALIZER = biomeModifiers.register("am_mob_spawns", AMMobSpawnBiomeModifier::makeCodec);
+        AMLeafcutterAntBiomeModifier.SERIALIZER = biomeModifiers.register("am_leafcutter_ant_spawns", AMLeafcutterAntBiomeModifier::makeCodec);
         final DeferredRegister<com.mojang.serialization.MapCodec<? extends StructureModifier>> structureModifiers = DeferredRegister.create(net.neoforged.neoforge.registries.NeoForgeRegistries.Keys.STRUCTURE_MODIFIER_SERIALIZERS, AlexsMobs.MODID);
         structureModifiers.register(modBusEvent);
-        structureModifiers.register("am_structure_spawns", AMMobSpawnStructureModifier::makeCodec);
+        AMMobSpawnStructureModifier.SERIALIZER = structureModifiers.register("am_structure_spawns", AMMobSpawnStructureModifier::makeCodec);
         modContainer.registerConfig(ModConfig.Type.COMMON, ConfigHolder.COMMON_SPEC);
+        // Initialize biome spawn config early so NeoForge biome modifiers see it when applied
+        BiomeConfig.init();
         PROXY.init(modBusEvent);
         // ServerEvents uses @EventBusSubscriber annotation for auto-registration
         Calendar calendar = Calendar.getInstance();

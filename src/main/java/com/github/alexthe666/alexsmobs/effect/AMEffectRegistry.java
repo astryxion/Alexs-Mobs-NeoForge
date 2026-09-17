@@ -1,8 +1,9 @@
 package com.github.alexthe666.alexsmobs.effect;
 
 import com.github.alexthe666.alexsmobs.AlexsMobs;
-import com.github.alexthe666.alexsmobs.item.AMItemRegistry;
 import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -10,17 +11,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionContents;
-import net.minecraft.world.item.alchemy.Potions;
-import net.minecraft.world.item.alchemy.PotionBrewing;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.level.ItemLike;
-import net.neoforged.neoforge.registries.DeferredRegister;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class AMEffectRegistry {
-    public static final DeferredRegister<MobEffect> EFFECT_DEF_REG = DeferredRegister.create(BuiltInRegistries.MOB_EFFECT, AlexsMobs.MODID);
-    public static final DeferredRegister<Potion> POTION_DEF_REG = DeferredRegister.create(BuiltInRegistries.POTION, AlexsMobs.MODID);
+    public static final DeferredRegister<MobEffect> EFFECT_DEF_REG = DeferredRegister.create(Registries.MOB_EFFECT, AlexsMobs.MODID);
+    public static final DeferredRegister<Potion> POTION_DEF_REG = DeferredRegister.create(Registries.POTION, AlexsMobs.MODID);
 
     public static final DeferredHolder<MobEffect, MobEffect> KNOCKBACK_RESISTANCE = EFFECT_DEF_REG.register("knockback_resistance", ()-> new EffectKnockbackResistance());
     public static final DeferredHolder<MobEffect, MobEffect> LAVA_VISION = EFFECT_DEF_REG.register("lava_vision", ()-> new EffectLavaVision());
@@ -42,56 +38,35 @@ public class AMEffectRegistry {
     public static final DeferredHolder<MobEffect, MobEffect> POWER_DOWN = EFFECT_DEF_REG.register("power_down", ()-> new EffectPowerDown());
 
     public static final DeferredHolder<MobEffect, MobEffect> MOSQUITO_REPELLENT = EFFECT_DEF_REG.register("mosquito_repellent", ()-> new EffectMosquitoRepellent());
-    // Potions - use the DeferredHolder directly as it implements Holder<MobEffect>
-    public static final DeferredHolder<Potion, Potion> KNOCKBACK_RESISTANCE_POTION = POTION_DEF_REG.register("knockback_resistance", ()-> new Potion("knockback_resistance", new MobEffectInstance(KNOCKBACK_RESISTANCE, 3600)));
-    public static final DeferredHolder<Potion, Potion> LONG_KNOCKBACK_RESISTANCE_POTION = POTION_DEF_REG.register("long_knockback_resistance", ()-> new Potion("long_knockback_resistance", new MobEffectInstance(KNOCKBACK_RESISTANCE, 9600)));
-    public static final DeferredHolder<Potion, Potion> STRONG_KNOCKBACK_RESISTANCE_POTION = POTION_DEF_REG.register("strong_knockback_resistance", ()-> new Potion("strong_knockback_resistance", new MobEffectInstance(KNOCKBACK_RESISTANCE, 1800, 1)));
-    public static final DeferredHolder<Potion, Potion> LAVA_VISION_POTION = POTION_DEF_REG.register("lava_vision", ()-> new Potion("lava_vision", new MobEffectInstance(LAVA_VISION, 3600)));
-    public static final DeferredHolder<Potion, Potion> LONG_LAVA_VISION_POTION = POTION_DEF_REG.register("long_lava_vision", ()-> new Potion("long_lava_vision", new MobEffectInstance(LAVA_VISION, 9600)));
-    public static final DeferredHolder<Potion, Potion> SPEED_III_POTION = POTION_DEF_REG.register("speed_iii", ()-> new Potion("speed_iii", new MobEffectInstance(MobEffects.SPEED, 2200, 2)));
-    public static final DeferredHolder<Potion, Potion> POISON_RESISTANCE_POTION = POTION_DEF_REG.register("poison_resistance", ()-> new Potion("poison_resistance", new MobEffectInstance(POISON_RESISTANCE, 3600)));
-    public static final DeferredHolder<Potion, Potion> LONG_POISON_RESISTANCE_POTION = POTION_DEF_REG.register("long_poison_resistance", ()-> new Potion("long_poison_resistance", new MobEffectInstance(POISON_RESISTANCE, 9600)));
-    public static final DeferredHolder<Potion, Potion> BUG_PHEROMONES_POTION = POTION_DEF_REG.register("bug_pheromones", ()-> new Potion("bug_pheromones", new MobEffectInstance(BUG_PHEROMONES, 3600)));
-    public static final DeferredHolder<Potion, Potion> LONG_BUG_PHEROMONES_POTION = POTION_DEF_REG.register("long_bug_pheromones", ()-> new Potion("long_bug_pheromones", new MobEffectInstance(BUG_PHEROMONES, 9600)));
-    public static final DeferredHolder<Potion, Potion> SOULSTEAL_POTION = POTION_DEF_REG.register("soulsteal", ()-> new Potion("soulsteal", new MobEffectInstance(SOULSTEAL, 3600)));
-    public static final DeferredHolder<Potion, Potion> LONG_SOULSTEAL_POTION = POTION_DEF_REG.register("long_soulsteal", ()-> new Potion("long_soulsteal", new MobEffectInstance(SOULSTEAL, 9600)));
-    public static final DeferredHolder<Potion, Potion> STRONG_SOULSTEAL_POTION = POTION_DEF_REG.register("strong_soulsteal", ()-> new Potion("strong_soulsteal", new MobEffectInstance(SOULSTEAL, 1800, 1)));
-    public static final DeferredHolder<Potion, Potion> CLINGING_POTION = POTION_DEF_REG.register("clinging", ()-> new Potion("clinging", new MobEffectInstance(CLINGING, 3600)));
-    public static final DeferredHolder<Potion, Potion> LONG_CLINGING_POTION = POTION_DEF_REG.register("long_clinging", ()-> new Potion("long_clinging", new MobEffectInstance(CLINGING, 9600)));
+    public static final DeferredHolder<Potion, Potion> KNOCKBACK_RESISTANCE_POTION = POTION_DEF_REG.register("knockback_resistance", ()-> potion("knockback_resistance", new MobEffectInstance(effect(KNOCKBACK_RESISTANCE), 3600)));
+    public static final DeferredHolder<Potion, Potion> LONG_KNOCKBACK_RESISTANCE_POTION = POTION_DEF_REG.register("long_knockback_resistance", ()-> potion("long_knockback_resistance", new MobEffectInstance(effect(KNOCKBACK_RESISTANCE), 9600)));
+    public static final DeferredHolder<Potion, Potion> STRONG_KNOCKBACK_RESISTANCE_POTION = POTION_DEF_REG.register("strong_knockback_resistance", ()-> potion("strong_knockback_resistance", new MobEffectInstance(effect(KNOCKBACK_RESISTANCE), 1800, 1)));
+    public static final DeferredHolder<Potion, Potion> LAVA_VISION_POTION = POTION_DEF_REG.register("lava_vision", ()-> potion("lava_vision", new MobEffectInstance(effect(LAVA_VISION), 3600)));
+    public static final DeferredHolder<Potion, Potion> LONG_LAVA_VISION_POTION = POTION_DEF_REG.register("long_lava_vision", ()-> potion("long_lava_vision", new MobEffectInstance(effect(LAVA_VISION), 9600)));
+    public static final DeferredHolder<Potion, Potion> SPEED_III_POTION = POTION_DEF_REG.register("speed_iii", ()-> potion("speed_iii", new MobEffectInstance(MobEffects.SPEED, 2200, 2)));
+    public static final DeferredHolder<Potion, Potion> POISON_RESISTANCE_POTION = POTION_DEF_REG.register("poison_resistance", ()-> potion("poison_resistance", new MobEffectInstance(effect(POISON_RESISTANCE), 3600)));
+    public static final DeferredHolder<Potion, Potion> LONG_POISON_RESISTANCE_POTION = POTION_DEF_REG.register("long_poison_resistance", ()-> potion("long_poison_resistance", new MobEffectInstance(effect(POISON_RESISTANCE), 9600)));
+    public static final DeferredHolder<Potion, Potion> BUG_PHEROMONES_POTION = POTION_DEF_REG.register("bug_pheromones", ()-> potion("bug_pheromones", new MobEffectInstance(effect(BUG_PHEROMONES), 3600)));
+    public static final DeferredHolder<Potion, Potion> LONG_BUG_PHEROMONES_POTION = POTION_DEF_REG.register("long_bug_pheromones", ()-> potion("long_bug_pheromones", new MobEffectInstance(effect(BUG_PHEROMONES), 9600)));
+    public static final DeferredHolder<Potion, Potion> SOULSTEAL_POTION = POTION_DEF_REG.register("soulsteal", ()-> potion("soulsteal", new MobEffectInstance(effect(SOULSTEAL), 3600)));
+    public static final DeferredHolder<Potion, Potion> LONG_SOULSTEAL_POTION = POTION_DEF_REG.register("long_soulsteal", ()-> potion("long_soulsteal", new MobEffectInstance(effect(SOULSTEAL), 9600)));
+    public static final DeferredHolder<Potion, Potion> STRONG_SOULSTEAL_POTION = POTION_DEF_REG.register("strong_soulsteal", ()-> potion("strong_soulsteal", new MobEffectInstance(effect(SOULSTEAL), 1800, 1)));
+    public static final DeferredHolder<Potion, Potion> CLINGING_POTION = POTION_DEF_REG.register("clinging", ()-> potion("clinging", new MobEffectInstance(effect(CLINGING), 3600)));
+    public static final DeferredHolder<Potion, Potion> LONG_CLINGING_POTION = POTION_DEF_REG.register("long_clinging", ()-> potion("long_clinging", new MobEffectInstance(effect(CLINGING), 9600)));
+
+    private static Potion potion(String name, MobEffectInstance... effects) {
+        return new Potion(name, effects);
+    }
+
+    private static Holder<MobEffect> effect(DeferredHolder<MobEffect, MobEffect> holder) {
+        return BuiltInRegistries.MOB_EFFECT.wrapAsHolder(holder.get());
+    }
 
     public static ItemStack createPotion(Holder<Potion> potion) {
         return PotionContents.createItemStack(Items.POTION, potion);
     }
 
     public static ItemStack createPotion(Potion potion) {
-        return PotionContents.createItemStack(Items.POTION, Holder.direct(potion));
-    }
-
-    public static void registerBrewingRecipes(PotionBrewing.Builder builder) {
-        try {
-            addBrewing(builder, new ProperBrewingRecipe(createPotion(Potions.STRENGTH), Ingredient.of(AMItemRegistry.BEAR_FUR.get()), createPotion(KNOCKBACK_RESISTANCE_POTION)));
-            addBrewing(builder, new ProperBrewingRecipe(createPotion(KNOCKBACK_RESISTANCE_POTION), Ingredient.of(Items.REDSTONE), createPotion(LONG_KNOCKBACK_RESISTANCE_POTION)));
-            addBrewing(builder, new ProperBrewingRecipe(createPotion(KNOCKBACK_RESISTANCE_POTION), Ingredient.of(Items.GLOWSTONE_DUST), createPotion(STRONG_KNOCKBACK_RESISTANCE_POTION)));
-            addBrewing(builder, new ProperBrewingRecipe(new ItemStack((ItemLike) AMItemRegistry.LAVA_BOTTLE.get()), Ingredient.of(AMItemRegistry.BONE_SERPENT_TOOTH.get()), createPotion(LAVA_VISION_POTION)));
-            addBrewing(builder, new ProperBrewingRecipe(createPotion(LAVA_VISION_POTION), Ingredient.of(Items.REDSTONE), createPotion(LONG_LAVA_VISION_POTION)));
-            addBrewing(builder, new ProperBrewingRecipe(createPotion(Potions.POISON), Ingredient.of(AMItemRegistry.RATTLESNAKE_RATTLE.get()), new ItemStack(AMItemRegistry.POISON_BOTTLE.get())));
-            addBrewing(builder, new ProperBrewingRecipe(new ItemStack((ItemLike) AMItemRegistry.POISON_BOTTLE.get()), Ingredient.of(AMItemRegistry.CENTIPEDE_LEG.get()), createPotion(POISON_RESISTANCE_POTION)));
-            addBrewing(builder, new ProperBrewingRecipe(new ItemStack((ItemLike) AMItemRegistry.KOMODO_SPIT_BOTTLE.get()), Ingredient.of(AMItemRegistry.CENTIPEDE_LEG.get()), createPotion(POISON_RESISTANCE_POTION)));
-            addBrewing(builder, new ProperBrewingRecipe(createPotion(POISON_RESISTANCE_POTION), Ingredient.of(AMItemRegistry.KOMODO_SPIT.get()), createPotion(LONG_POISON_RESISTANCE_POTION)));
-            addBrewing(builder, new ProperBrewingRecipe(createPotion(Potions.STRONG_SWIFTNESS), Ingredient.of(AMItemRegistry.GAZELLE_HORN.get()), createPotion(SPEED_III_POTION)));
-            addBrewing(builder, new ProperBrewingRecipe(createPotion(Potions.AWKWARD), Ingredient.of(AMItemRegistry.COCKROACH_WING.get()), createPotion(BUG_PHEROMONES_POTION)));
-            addBrewing(builder, new ProperBrewingRecipe(createPotion(BUG_PHEROMONES_POTION), Ingredient.of(Items.REDSTONE), createPotion(LONG_BUG_PHEROMONES_POTION)));
-            addBrewing(builder, new ProperBrewingRecipe(createPotion(Potions.AWKWARD), Ingredient.of(AMItemRegistry.SOUL_HEART.get()), createPotion(SOULSTEAL_POTION)));
-            addBrewing(builder, new ProperBrewingRecipe(createPotion(SOULSTEAL_POTION), Ingredient.of(Items.REDSTONE), createPotion(LONG_SOULSTEAL_POTION)));
-            addBrewing(builder, new ProperBrewingRecipe(createPotion(SOULSTEAL_POTION), Ingredient.of(Items.GLOWSTONE_DUST), createPotion(STRONG_SOULSTEAL_POTION)));
-            addBrewing(builder, new ProperBrewingRecipe(createPotion(Potions.AWKWARD), Ingredient.of(AMItemRegistry.DROPBEAR_CLAW.get()), createPotion(CLINGING_POTION)));
-            addBrewing(builder, new ProperBrewingRecipe(createPotion(CLINGING_POTION), Ingredient.of(Items.REDSTONE), createPotion(LONG_CLINGING_POTION)));
-        } catch (Throwable t) {
-            AlexsMobs.LOGGER.warn("Skipped a brewing-recipe registration pass; recipes are registered again when PotionBrewing is rebuilt.", t);
-        }
-    }
-
-    private static void addBrewing(PotionBrewing.Builder builder, ProperBrewingRecipe recipe) {
-        builder.addRecipe(recipe);
+        return PotionContents.createItemStack(Items.POTION, BuiltInRegistries.POTION.wrapAsHolder(potion));
     }
 }

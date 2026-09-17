@@ -56,6 +56,7 @@ import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.BonemealableBlock;
+import net.minecraft.world.level.block.BonemealSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.*;
 import net.minecraft.world.level.dimension.DimensionType;
@@ -492,7 +493,7 @@ public class EntityMungus extends Animal implements ITargetsDroppedItems, Sheara
                     if (state.getBlock() instanceof BonemealableBlock) {
                         BonemealableBlock igrowable = (BonemealableBlock) state.getBlock();
                         boolean flag = false;
-                        if (igrowable.isValidBonemealTarget(this.level(), t, state)) {
+                        if (igrowable.isValidBonemealTarget(this.level(), t, state, BonemealSource.MOB)) {
                             for (int i = 0; i < 5; i++) {
                                 float r1 = 3F * (this.getRandom().nextFloat() - 0.5F);
                                 float r2 = 2F * (this.getRandom().nextFloat() - 0.5F);
@@ -501,7 +502,7 @@ public class EntityMungus extends Animal implements ITargetsDroppedItems, Sheara
                             }
                             if (!this.level().isClientSide()) {
                                 this.level().levelEvent(2005, t, 0);
-                                igrowable.performBonemeal((ServerLevel) this.level(), this.level().getRandom(), t, state);
+                                igrowable.performBonemeal((ServerLevel) this.level(), this.level().getRandom(), t, state, BonemealSource.MOB);
                                 flag = level().getBlockState(t).getBlock() != state.getBlock();
                             }
                         }

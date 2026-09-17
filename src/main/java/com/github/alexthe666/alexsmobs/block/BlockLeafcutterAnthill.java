@@ -1,6 +1,5 @@
 package com.github.alexthe666.alexsmobs.block;
 
-import com.mojang.serialization.MapCodec;
 
 import com.github.alexthe666.alexsmobs.entity.EntityLeafcutterAnt;
 import com.github.alexthe666.alexsmobs.entity.EntityManedWolf;
@@ -39,10 +38,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import javax.annotation.Nullable;
 import java.util.List;
 
-import static net.minecraft.world.level.block.state.BlockBehaviour.simpleCodec;
 
 public class BlockLeafcutterAnthill extends BaseEntityBlock {
-    public static final MapCodec<BlockLeafcutterAnthill> CODEC = simpleCodec(BlockLeafcutterAnthill::new);
 
     public static BlockBehaviour.Properties defaultProperties() {
         return BlockBehaviour.Properties.of().sound(SoundType.GRAVEL).strength(0.75F);
@@ -50,11 +47,6 @@ public class BlockLeafcutterAnthill extends BaseEntityBlock {
 
     public BlockLeafcutterAnthill(BlockBehaviour.Properties props) {
         super(props);
-    }
-
-    @Override
-    public MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
     }
 
     public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
@@ -117,7 +109,7 @@ public class BlockLeafcutterAnthill extends BaseEntityBlock {
         super.fallOn(worldIn, state, pos, entityIn, fallDistance);
     }
 
-    public void playerDestroy(Level worldIn, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity te, ItemStack stack) {
+    public void playerDestroy(net.minecraft.server.level.ServerLevel worldIn, net.minecraft.server.level.ServerPlayer player, BlockPos pos, BlockState state, @Nullable BlockEntity te, ItemStack stack) {
         super.playerDestroy(worldIn, player, pos, state, te, stack);
         if (!worldIn.isClientSide() && te instanceof TileEntityLeafcutterAnthill) {
             TileEntityLeafcutterAnthill beehivetileentity = (TileEntityLeafcutterAnthill) te;

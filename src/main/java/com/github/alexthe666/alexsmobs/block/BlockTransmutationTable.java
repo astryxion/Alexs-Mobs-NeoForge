@@ -1,6 +1,5 @@
 package com.github.alexthe666.alexsmobs.block;
 
-import com.mojang.serialization.MapCodec;
 import com.github.alexthe666.alexsmobs.AlexsMobs;
 import com.github.alexthe666.alexsmobs.config.AMConfig;
 import com.github.alexthe666.alexsmobs.inventory.MenuTransmutationTable;
@@ -38,10 +37,8 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 import javax.annotation.Nullable;
 
-import static net.minecraft.world.level.block.state.BlockBehaviour.simpleCodec;
 
 public class BlockTransmutationTable extends BaseEntityBlock implements AMSpecialRenderBlock {
-    public static final MapCodec<BlockTransmutationTable> CODEC = simpleCodec(BlockTransmutationTable::new);
 
 
     private static final Component CONTAINER_TITLE = Component.translatable("alexsmobs.container.transmutation_table");
@@ -53,17 +50,12 @@ public class BlockTransmutationTable extends BaseEntityBlock implements AMSpecia
     private static final VoxelShape EW_AABB = Shapes.or(BASE_AABB, ARMS_EW);
 
     public static BlockBehaviour.Properties defaultProperties() {
-        return BlockBehaviour.Properties.of().pushReaction(PushReaction.BLOCK).mapColor(DyeColor.BLACK).noOcclusion().lightLevel((block) -> 2).emissiveRendering(state -> true).sound(SoundType.STONE).strength(1F).requiresCorrectToolForDrops();
+        return BlockBehaviour.Properties.of().pushReaction(PushReaction.IMMOVEABLE).mapColor(DyeColor.BLACK).noOcclusion().lightLevel((block) -> 2).emissiveRendering(state -> true).sound(SoundType.STONE).strength(1F).requiresCorrectToolForDrops();
     }
 
     public BlockTransmutationTable(BlockBehaviour.Properties props) {
         super(props);
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
-    }
-
-    @Override
-    public MapCodec<BlockTransmutationTable> codec() {
-        return CODEC;
     }
 
     public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {

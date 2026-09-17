@@ -1,6 +1,5 @@
 package com.github.alexthe666.alexsmobs.block;
 
-import com.mojang.serialization.MapCodec;
 
 import com.github.alexthe666.alexsmobs.misc.AMSoundRegistry;
 import com.google.common.collect.Lists;
@@ -29,10 +28,8 @@ import javax.annotation.Nullable;
 
 import java.util.Queue;
 
-import static net.minecraft.world.level.block.state.BlockBehaviour.simpleCodec;
 
 public class BlockBananaSlugSlime extends HalfTransparentBlock {
-    public static final MapCodec<BlockBananaSlugSlime> CODEC = simpleCodec(BlockBananaSlugSlime::new);
 
     protected static final VoxelShape SHAPE = Block.box(1.0D, 1.0D, 1.0D, 15.0D, 15.0D, 15.0D);
     private static final int MAXIMUM_BLOCKS_DRAINED = 64;
@@ -44,11 +41,6 @@ public class BlockBananaSlugSlime extends HalfTransparentBlock {
 
     public BlockBananaSlugSlime(BlockBehaviour.Properties props) {
         super(props);
-    }
-
-    @Override
-    public MapCodec<? extends HalfTransparentBlock> codec() {
-        return CODEC;
     }
 
     public VoxelShape getVisualShape(BlockState p_48735_, BlockGetter p_48736_, BlockPos p_48737_, CollisionContext p_48738_) {

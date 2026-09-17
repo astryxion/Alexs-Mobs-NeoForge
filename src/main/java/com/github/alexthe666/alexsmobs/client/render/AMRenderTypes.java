@@ -1,14 +1,14 @@
 package com.github.alexthe666.alexsmobs.client.render;
 
 import com.github.alexthe666.alexsmobs.AlexsMobs;
-import com.mojang.blaze3d.PrimitiveTopology;
-import com.mojang.blaze3d.pipeline.BlendFunction;
-import com.mojang.blaze3d.pipeline.ColorTargetState;
-import com.mojang.blaze3d.pipeline.DepthStencilState;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.platform.CompareOp;
+import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
+import com.mojang.renderpearl.api.pipeline.BlendFunction;
+import com.mojang.renderpearl.api.pipeline.ColorTargetState;
+import com.mojang.renderpearl.api.pipeline.DepthStencilState;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
+import com.mojang.renderpearl.api.pipeline.CompareOp;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.renderpearl.api.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexSorting;
 import java.util.HashMap;
@@ -18,7 +18,6 @@ import net.minecraft.client.renderer.BindGroupLayouts;
 import net.minecraft.client.renderer.StagedVertexBuffer;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.util.Util;
-import net.minecraft.client.renderer.rendertype.OutputTarget;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
@@ -143,7 +142,7 @@ public final class AMRenderTypes {
     /** Same layered end portal as vanilla {@link RenderTypes#endPortal()}. */
     public static final RenderType VOID_WORM_PORTAL_OVERLAY = RenderTypes.endPortal();
 
-    private static final com.mojang.blaze3d.pipeline.RenderPipeline EYES_SHADER = RenderPipelines.ENTITY_TRANSLUCENT_EMISSIVE;
+    private static final RenderPipeline EYES_SHADER = RenderPipelines.ENTITY_TRANSLUCENT_EMISSIVE;
 
     private static final TextureTransform WORM_TRANSPARENCY = new TextureTransform("worm_translucent", () -> new Matrix4f());
 
@@ -284,7 +283,7 @@ public final class AMRenderTypes {
     /**
      * Same visual pipeline as 1.21.1 {@code getGhostPickaxe}: item-entity translucent entity shader, lightning blend,
      * no cull, item-entity output target (see {@link RenderTypes} {@code ENTITY_TRANSLUCENT_CULL_ITEM_TARGET} but with
-     * {@link RenderTypes#entityTranslucentCullItemTarget} ({@link RenderPipelines#ENTITY_TRANSLUCENT_CULL}) but with
+     * {@link RenderTypes#entityTranslucentCull} ({@link RenderPipelines#ENTITY_TRANSLUCENT_CULL}) but with
      * {@link BlendFunction#LIGHTNING} and no cull. {@link BindGroupLayouts#SAMPLER1} matches vanilla translucent-cull
      * item-entity layout without duplicating {@code Sampler0} from {@link RenderPipelines#ENTITY_SNIPPET}.
      */
@@ -300,7 +299,6 @@ public final class AMRenderTypes {
             texture -> {
                 RenderSetup state = RenderSetup.builder(GHOST_PICKAXE_PIPELINE)
                         .withTexture("Sampler0", texture)
-                        .setOutputTarget(OutputTarget.ITEM_ENTITY_TARGET)
                         .useLightmap()
                         .useOverlay()
                         .affectsCrumbling()
@@ -344,7 +342,7 @@ public final class AMRenderTypes {
             return stagedVertexBuffer.getVertexBuilder(draw);
         }
 
-        public void endBatch() {
+        public void endBatch(com.mojang.renderpearl.api.commands.RenderPass renderPass) {
             if (draws.isEmpty()) {
                 return;
             }
@@ -352,7 +350,7 @@ public final class AMRenderTypes {
             for (Map.Entry<RenderType, StagedVertexBuffer.Draw> entry : draws.entrySet()) {
                 StagedVertexBuffer.ExecuteInfo info = stagedVertexBuffer.getExecuteInfo(entry.getValue());
                 if (info != null) {
-                    entry.getKey().prepare().drawFromBuffer(info);
+                    entry.getKey().prepare().drawFromBuffer(info, renderPass);
                 }
             }
             stagedVertexBuffer.endDraw();
@@ -412,6 +410,13 @@ public final class AMRenderTypes {
         }
 
         @Override
+        public VertexConsumer setUv3(float u, float v) {
+            this.first.setUv3(u, v);
+            this.second.setUv3(u, v);
+            return this;
+        }
+
+        @Override
         public VertexConsumer setNormal(float x, float y, float z) {
             this.first.setNormal(x, y, z);
             this.second.setNormal(x, y, z);
@@ -444,7 +449,7 @@ public final class AMRenderTypes {
         if (!foil) {
             return buffer.getBuffer(base);
         }
-        return createMergedVertexConsumer(buffer.getBuffer(base), buffer.getBuffer(RenderTypes.entityGlint()));
+        return createMergedVertexConsumer(buffer.getBuffer(base), buffer.getBuffer(RenderTypes.entitySolidGlint(net.minecraft.client.renderer.feature.ItemFeatureRenderer.ENCHANTED_GLINT_ITEM)));
     }
 
     /** Replaces removed {@code ItemRenderer#getArmorFoilBuffer} for armor cutouts. */
@@ -452,6 +457,6 @@ public final class AMRenderTypes {
         if (!foil) {
             return buffer.getBuffer(base);
         }
-        return createMergedVertexConsumer(buffer.getBuffer(base), buffer.getBuffer(RenderTypes.armorEntityGlint()));
+        return createMergedVertexConsumer(buffer.getBuffer(base), buffer.getBuffer(RenderTypes.trimmedArmorGlint()));
     }
 }

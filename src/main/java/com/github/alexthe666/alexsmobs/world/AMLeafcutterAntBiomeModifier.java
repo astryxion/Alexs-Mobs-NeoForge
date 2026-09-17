@@ -1,26 +1,18 @@
 package com.github.alexthe666.alexsmobs.world;
 
-import com.github.alexthe666.alexsmobs.AlexsMobs;
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
-import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.neoforged.neoforge.common.world.BiomeModifier;
 import net.neoforged.neoforge.common.world.ModifiableBiomeInfo;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.neoforged.neoforge.registries.DeferredHolder;
-import net.neoforged.neoforge.registries.NeoForgeRegistries;
+
+import java.util.function.Supplier;
 
 public class AMLeafcutterAntBiomeModifier implements BiomeModifier {
-    public static final MapCodec<AMLeafcutterAntBiomeModifier> CODEC = RecordCodecBuilder.mapCodec((config) -> {
-        return config.group(PlacedFeature.LIST_CODEC.fieldOf("features").forGetter((otherConfig) -> {
-            return otherConfig.features;
-        })).apply(config, AMLeafcutterAntBiomeModifier::new);
-    });
+    public static Supplier<? extends MapCodec<? extends BiomeModifier>> SERIALIZER;
     private final HolderSet<PlacedFeature> features;
 
     public AMLeafcutterAntBiomeModifier(HolderSet<PlacedFeature> features) {
@@ -34,10 +26,12 @@ public class AMLeafcutterAntBiomeModifier implements BiomeModifier {
     }
 
     public MapCodec<? extends BiomeModifier> codec() {
-        return CODEC;
+        return SERIALIZER.get();
     }
 
     public static MapCodec<AMLeafcutterAntBiomeModifier> makeCodec() {
-        return CODEC;
+        return RecordCodecBuilder.mapCodec((config) -> config.group(
+                PlacedFeature.LIST_CODEC.fieldOf("features").forGetter((otherConfig) -> otherConfig.features)
+        ).apply(config, AMLeafcutterAntBiomeModifier::new));
     }
 }

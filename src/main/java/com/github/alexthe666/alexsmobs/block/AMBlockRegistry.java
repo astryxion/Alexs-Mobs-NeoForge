@@ -15,6 +15,7 @@ import net.minecraft.world.level.block.FallingBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders;
 import net.minecraft.core.registries.Registries;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -29,7 +30,7 @@ public class AMBlockRegistry {
     }
 
     public static final DeferredRegister.Blocks DEF_REG = DeferredRegister.createBlocks(AlexsMobs.MODID);
-    public static final DeferredHolder<Block, Block> BANANA_PEEL = registerBlockAndItem("banana_peel", key -> new BlockBananaPeel(withBlockId(key, BlockBananaPeel.defaultProperties())));
+    public static final DeferredHolder<Block, Block> BANANA_PEEL = registerBlockAndItem("banana_peel", key -> new BlockBananaPeel(withBlockId(key, BlockBananaPeel.defaultProperties())), new Item.Properties().compostable(ContextIntProviders.COMPOSTABLE_ALWAYS_ADD_ONE), false);
     public static final DeferredHolder<Block, Block> HUMMINGBIRD_FEEDER = registerBlockAndItem("hummingbird_feeder", key -> new BlockHummingbirdFeeder(withBlockId(key, BlockHummingbirdFeeder.defaultProperties())));
     public static final DeferredHolder<Block, Block> CROCODILE_EGG = registerBlockAndItem("crocodile_egg", key -> new BlockReptileEgg(AMEntityRegistry.CROCODILE, withBlockId(key, BlockReptileEgg.defaultProperties())));
     public static final DeferredHolder<Block, Block> GUSTMAKER = registerBlockAndItem("gustmaker", key -> new BlockGustmaker(withBlockId(key, BlockGustmaker.defaultProperties())));
@@ -68,6 +69,9 @@ public class AMBlockRegistry {
     public static final DeferredHolder<Block, Block> PHANTOM_SAIL = registerBlockAndItem("phantom_sail", key -> new BlockEndPirateSail(false, withBlockId(key, BlockEndPirateSail.defaultProperties())));
     public static final DeferredHolder<Block, Block> SPECTRE_SAIL = registerBlockAndItem("spectre_sail", key -> new BlockEndPirateSail(true, withBlockId(key, BlockEndPirateSail.defaultProperties())));
 
+    private static BlockBehaviour.Properties purpurPlanksProperties() {
+        return BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_PINK).strength(0.5F, 1.0F).sound(SoundType.WOOD);
+    }
      */
 
     public static DeferredHolder<Block, Block> registerBlockAndItem(String name, Function<Identifier, Block> block) {

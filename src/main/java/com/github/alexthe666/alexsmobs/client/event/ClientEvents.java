@@ -37,7 +37,6 @@ import net.minecraft.ReportedException;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -207,9 +206,9 @@ public class ClientEvents {
             int packedLight = ((EntityRenderState) event.getRenderState()).lightCoords;
             boolean foil = entity.getItemBySlot(EquipmentSlot.CHEST).hasFoil();
             event.getPoseStack().translate(0.0D, entity.getBbHeight() - entity.getBbHeight() * 0.5F, 0.0D);
-            event.getPoseStack().mulPose(Axis.YN.rotationDegrees(180F + yRot));
-            event.getPoseStack().mulPose(Axis.ZP.rotationDegrees(180.0F));
-            event.getPoseStack().mulPose(Axis.XP.rotationDegrees(100F * roll));
+            event.getPoseStack().rotate(Axis.YN.rotationDegrees(180F + yRot));
+            event.getPoseStack().rotate(Axis.ZP.rotationDegrees(180.0F));
+            event.getPoseStack().rotate(Axis.XP.rotationDegrees(100F * roll));
             ROCKY_CHESTPLATE_MODEL.setupAnim(entity, limbSwing, limbSwingAmount, entity.tickCount + event.getPartialTick(), 0, 0);
             SubmitNodeCollector collector = event.getSubmitNodeCollector();
             collector.submitCustomGeometry(event.getPoseStack(), RenderTypes.armorCutoutNoCull(ROCKY_CHESTPLATE_TEXTURE), (pose, vertexConsumer) -> {
@@ -220,7 +219,7 @@ public class ClientEvents {
                 local.popPose();
             });
             if (foil) {
-                collector.submitCustomGeometry(event.getPoseStack(), RenderTypes.armorEntityGlint(), (pose, vertexConsumer) -> {
+                collector.submitCustomGeometry(event.getPoseStack(), RenderTypes.trimmedArmorGlint(), (pose, vertexConsumer) -> {
                     PoseStack local = new PoseStack();
                     local.pushPose();
                     local.last().set(pose);
@@ -250,7 +249,7 @@ public class ClientEvents {
         if (entity != null && (entity.hasEffect(AMEffectRegistry.CLINGING) && EffectClinging.isUpsideDown(entity) || entity.hasEffect(AMEffectRegistry.DEBILITATING_STING) && entity.entityTags().contains("arthropod") && entity.getBbWidth() > entity.getBbHeight())) {
             event.getPoseStack().pushPose();
             event.getPoseStack().translate(0.0D, entity.getBbHeight() + 0.1F, 0.0D);
-            event.getPoseStack().mulPose(Axis.ZP.rotationDegrees(180.0F));
+            event.getPoseStack().rotate(Axis.ZP.rotationDegrees(180.0F));
             entity.yBodyRotO = -entity.yBodyRotO;
             entity.yBodyRot = -entity.yBodyRot;
             entity.yHeadRotO = -entity.yHeadRotO;
@@ -258,7 +257,7 @@ public class ClientEvents {
         }
         if (entity != null && entity.hasEffect(AMEffectRegistry.ENDER_FLU)) {
             event.getPoseStack().pushPose();
-            event.getPoseStack().mulPose(Axis.YP.rotationDegrees((float) (Math.cos((double) entity.tickCount * 7F) * Math.PI * (double) 1.2F)));
+            event.getPoseStack().rotate(Axis.YP.rotationDegrees((float) (Math.cos((double) entity.tickCount * 7F) * Math.PI * (double) 1.2F)));
             float vibrate = 0.05F;
             event.getPoseStack().translate((entity.getRandom().nextFloat() - 0.5F) * vibrate, (entity.getRandom().nextFloat() - 0.5F) * vibrate, (entity.getRandom().nextFloat() - 0.5F) * vibrate);
         }
@@ -339,11 +338,11 @@ public class ClientEvents {
                     matrixStackIn.pushPose();
                     matrixStackIn.scale(0.5F, 0.5F, 0.5F);
                     matrixStackIn.translate(leftHand ? -falconry.getHandOffset() : falconry.getHandOffset(), -0.6F, -1F);
-                    matrixStackIn.mulPose(Axis.YP.rotationDegrees(yaw));
+                    matrixStackIn.rotate(Axis.YP.rotationDegrees(yaw));
                     if (leftHand) {
-                        matrixStackIn.mulPose(Axis.YP.rotationDegrees(90));
+                        matrixStackIn.rotate(Axis.YP.rotationDegrees(90));
                     } else {
-                        matrixStackIn.mulPose(Axis.YN.rotationDegrees(90));
+                        matrixStackIn.rotate(Axis.YN.rotationDegrees(90));
                     }
                     renderEntity(entity, 0, 0, 0, 0, event.getPartialTick(), matrixStackIn, event.getSubmitNodeCollector());
                     matrixStackIn.popPose();
@@ -354,9 +353,9 @@ public class ClientEvents {
         if (Minecraft.getInstance().player.getUseItem().getItem() instanceof ItemDimensionalCarver && event.getItemStack().getItem() instanceof ItemDimensionalCarver) {
             PoseStack matrixStackIn = event.getPoseStack();
             matrixStackIn.pushPose();
-            ItemInHandRenderer renderer = Minecraft.getInstance().getEntityRenderDispatcher().getItemInHandRenderer();
-            InteractionHand hand = MoreObjects.firstNonNull(Minecraft.getInstance().player.swingingArm, InteractionHand.MAIN_HAND);
-            float f = Minecraft.getInstance().player.getAttackAnim(event.getPartialTick());
+            LivingEntity.SwingDescription currentSwing = Minecraft.getInstance().player.getCurrentSwing();
+            InteractionHand hand = currentSwing != null ? currentSwing.hand() : InteractionHand.MAIN_HAND;
+            float f = Minecraft.getInstance().player.getSwingAnimation(event.getPartialTick());
             //float f1 = Mth.lerp(event.getPartialTick(), Minecraft.getInstance().player.xRotO, Minecraft.getInstance().player.getXRot());
             float f5 = -0.4F * Mth.sin(Mth.sqrt(f) * Mth.PI);
             float f6 = 0.2F * Mth.sin(Mth.sqrt(f) * Mth.TWO_PI);

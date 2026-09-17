@@ -53,8 +53,8 @@ public class RenderCachalotEcho extends EntityRenderer<EntityCachalotEcho, Rende
     public void submit(CachalotEchoRenderState state, PoseStack matrixStackIn, SubmitNodeCollector collector, CameraRenderState cameraState) {
         matrixStackIn.pushPose();
         matrixStackIn.translate(0.0D, 0.25F, 0.0D);
-        matrixStackIn.mulPose(Axis.YP.rotationDegrees(state.yRot - 90.0F));
-        matrixStackIn.mulPose(Axis.XP.rotationDegrees(state.xRot));
+        matrixStackIn.rotate(Axis.YP.rotationDegrees(state.yRot - 90.0F));
+        matrixStackIn.rotate(Axis.XP.rotationDegrees(state.xRot));
         int arcs = Mth.clamp(Mth.floor(state.ageInTicks / 5F), 1, 4);
         matrixStackIn.translate(0.0D, 0.0F, 0.4D);
         for (int i = 0; i < arcs; i++) {

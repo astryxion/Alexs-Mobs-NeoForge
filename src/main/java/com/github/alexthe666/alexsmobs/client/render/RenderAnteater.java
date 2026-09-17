@@ -33,11 +33,11 @@ public class RenderAnteater extends MobRenderer<EntityAnteater, LivingEntityRend
         getModel().setCitadelYoung(entity.isBaby());
     }
 
-    public boolean shouldRender(EntityAnteater anteater, Frustum p_225626_2_, double p_225626_3_, double p_225626_5_, double p_225626_7_) {
+    public boolean shouldRender(EntityAnteater anteater, Frustum frustum, double camX, double camY, double camZ, float partialTicks) {
         if(anteater.isBaby() && anteater.isPassenger() && anteater.getVehicle() instanceof EntityAnteater){
             return false;
         }
-        return super.shouldRender(anteater, p_225626_2_, p_225626_3_, p_225626_5_, p_225626_7_);
+        return super.shouldRender(anteater, frustum, camX, camY, camZ, partialTicks);
     }
 
     @Override
