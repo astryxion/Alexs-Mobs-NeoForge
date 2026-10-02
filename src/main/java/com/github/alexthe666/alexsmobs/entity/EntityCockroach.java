@@ -201,8 +201,10 @@ public class EntityCockroach extends Animal implements Shearable, net.neoforged.
         } else if (lvt_3_1_.getItem() != AMItemRegistry.MARACA.get() && this.isAlive() && this.hasMaracas()) {
             this.setMaracas(false);
             this.setDancing(false);
-            this.spawnAtLocation((ServerLevel) this.level(), new ItemStack(AMItemRegistry.MARACA.get()));
-            return InteractionResult.SUCCESS;
+            if (this.level() instanceof ServerLevel serverLevel) {
+                this.spawnAtLocation(serverLevel, new ItemStack(AMItemRegistry.MARACA.get()));
+            }
+            return this.level().isClientSide() ? InteractionResult.SUCCESS : InteractionResult.CONSUME;
         } else {
             return super.mobInteract(p_230254_1_, p_230254_2_);
         }
