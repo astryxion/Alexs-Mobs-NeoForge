@@ -5,13 +5,13 @@ issueTrackerURL="https://github.com/astryxion/Alexs-Mobs-NeoForge/issues"
 
 [[mods]]
 modId="alexsmobs"
-version="26.3-1.0.0"
+version="26.3-1.1.0"
 displayName="Alex's Mobs (NeoForge)"
 displayURL="https://github.com/astryxion/Alexs-Mobs-NeoForge"
 bannerFile="alexs_mobs.png"
 iconFile="alexs_mobs.png"
 authors="Astryxion"
-credits="Alexthe666, Carro1001, Paint_Ninja, Raguto"
+credits="Alexthe668, Carro1001, Paint_Ninja, Raguto"
 description='''New, original, engaging, and aesthetic mobs for Minecraft.'''
 
 [[mixins]]
@@ -20,7 +20,7 @@ config = "mixins.alexsmobs.json"
 [[dependencies.alexsmobs]]
     modId="citadel"
     mandatory=true
-    versionRange="[26.3-1.0.0,)"
+    versionRange="[26.3-1.1.0,)"
     ordering="AFTER"
     side="BOTH"
 

@@ -1,0 +1,39 @@
+package com.github.alexthe668.alexsmobs.world;
+
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.Holder;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.HolderSet;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
+import net.neoforged.neoforge.common.world.BiomeModifier;
+import net.neoforged.neoforge.common.world.ModifiableBiomeInfo;
+
+import java.util.function.Supplier;
+
+public class AMLeafcutterAntBiomeModifier implements BiomeModifier {
+    public static Supplier<? extends MapCodec<? extends BiomeModifier>> SERIALIZER;
+    private final HolderSet<PlacedFeature> features;
+
+    public AMLeafcutterAntBiomeModifier(HolderSet<PlacedFeature> features) {
+        this.features = features;
+    }
+
+    @Override
+    public void modify(RegistryAccess registries, Holder<Biome> biome, Phase phase, ModifiableBiomeInfo.BiomeInfo.Builder builder) {
+        if (phase == Phase.ADD) {
+            AMWorldRegistry.addLeafcutterAntSpawns(biome, this.features, builder);
+        }
+    }
+
+    public MapCodec<? extends BiomeModifier> codec() {
+        return SERIALIZER.get();
+    }
+
+    public static MapCodec<AMLeafcutterAntBiomeModifier> makeCodec() {
+        return RecordCodecBuilder.mapCodec((config) -> config.group(
+                PlacedFeature.LIST_CODEC.fieldOf("features").forGetter((otherConfig) -> otherConfig.features)
+        ).apply(config, AMLeafcutterAntBiomeModifier::new));
+    }
+}

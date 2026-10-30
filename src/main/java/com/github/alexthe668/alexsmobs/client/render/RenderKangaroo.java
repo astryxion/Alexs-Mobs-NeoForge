@@ -1,0 +1,47 @@
+package com.github.alexthe668.alexsmobs.client.render;
+import com.github.alexthe668.alexsmobs.client.render.CitadelEntityModelBridge;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+
+import com.github.alexthe668.alexsmobs.client.model.ModelKangaroo;
+import com.github.alexthe668.alexsmobs.client.render.layer.LayerKangarooArmor;
+import com.github.alexthe668.alexsmobs.client.render.layer.LayerKangarooBaby;
+import com.github.alexthe668.alexsmobs.client.render.layer.LayerKangarooItem;
+import com.github.alexthe668.alexsmobs.entity.EntityKangaroo;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.renderer.culling.Frustum;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.MobRenderer;
+import net.minecraft.resources.Identifier;
+
+public class RenderKangaroo extends MobRenderer<EntityKangaroo, LivingEntityRenderState, CitadelEntityModelBridge<EntityKangaroo>> {
+    private static final Identifier TEXTURE = Identifier.parse("alexsmobs:textures/entity/kangaroo.png");
+
+    public RenderKangaroo(EntityRendererProvider.Context renderManagerIn) {
+        super(renderManagerIn, new CitadelEntityModelBridge<>(new ModelKangaroo()),  0.5F);
+        this.addLayer(new LayerKangarooItem(this));
+        this.addLayer(new LayerKangarooArmor(this, renderManagerIn));
+        this.addLayer(new LayerKangarooBaby(this));
+
+    }
+
+    @Override
+    public LivingEntityRenderState createRenderState() {
+        return new LivingEntityRenderState();
+    }
+
+    public boolean shouldRender(EntityKangaroo kangaroo, Frustum frustum, double camX, double camY, double camZ, float partialTicks) {
+        if(kangaroo.isBaby() && kangaroo.isPassenger() && kangaroo.getVehicle() instanceof EntityKangaroo){
+            return false;
+        }
+        return super.shouldRender(kangaroo, frustum, camX, camY, camZ, partialTicks);
+    }
+
+    @Override
+    protected void scale(LivingEntityRenderState state, PoseStack matrixStackIn) {
+    }
+
+    @Override
+    public Identifier getTextureLocation(LivingEntityRenderState state) {
+        return TEXTURE;
+    }
+}

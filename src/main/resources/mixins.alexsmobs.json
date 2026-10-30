@@ -1,6 +1,6 @@
 {
   "required": true,
-  "package": "com.github.alexthe666.alexsmobs.mixin",
+  "package": "com.github.alexthe668.alexsmobs.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "EntityMixin"

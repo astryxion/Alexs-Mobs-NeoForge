@@ -1,0 +1,106 @@
+package com.github.alexthe668.alexsmobs.client.render;
+
+import com.github.alexthe668.alexsmobs.client.AlexsMobsClientKeys;
+import com.github.alexthe668.alexsmobs.client.model.AlexAdvancedEntityModel;
+import com.github.alexthe668.alexsmobs.client.model.ModelKangaroo;
+import com.github.alexthe668.citadel.client.model.AdvancedEntityModel;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.world.entity.LivingEntity;
+
+import java.util.Collections;
+import java.util.Map;
+
+public final class CitadelEntityModelBridge<E extends LivingEntity> extends EntityModel<LivingEntityRenderState> {
+
+    private final AdvancedEntityModel<E> citadel;
+
+    public CitadelEntityModelBridge(AdvancedEntityModel<E> citadel) {
+        super(new ModelPart(Collections.emptyList(), Map.of()), RenderTypes::entityCutout);
+        this.citadel = citadel;
+    }
+
+    public AdvancedEntityModel<E> citadel() {
+        return citadel;
+    }
+
+    /**
+     * Vanilla {@link net.minecraft.client.model.Model#renderToBuffer} only draws {@link ModelPart} geometry; this bridge uses an empty root
+     * and must delegate to Citadel's mesh. {@code Model.renderToBuffer} is opened via access transformer for this override.
+     */
+    @Override
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, int color) {
+        this.citadel.renderToBuffer(poseStack, buffer, packedLight, packedOverlay, color);
+    }
+
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay) {
+        this.citadel.renderToBuffer(poseStack, buffer, packedLight, packedOverlay, -1);
+    }
+
+    /** Citadel mesh draw for layers and custom submit (same as {@link #renderToBuffer(PoseStack, VertexConsumer, int, int, int)}). */
+    public void renderCitadelToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, int color) {
+        this.citadel.renderToBuffer(poseStack, buffer, packedLight, packedOverlay, color);
+    }
+
+    /**
+     * Convenience overload for deferred submit callbacks that provide a baked pose instead of a mutable stack.
+     * Must copy onto the scratch root (no extra identity frame) so Citadel tentacles/limbs match vanilla {@code submitModel}.
+     */
+    public void renderCitadelToBuffer(PoseStack.Pose pose, VertexConsumer buffer, int packedLight, int packedOverlay, int color) {
+        AlexAdvancedEntityModel.renderSubmitted(pose, this.citadel, buffer, packedLight, packedOverlay, color);
+    }
+
+    /**
+     * Queues the Citadel mesh and restores {@link #setupAnim(LivingEntityRenderState)} at replay so a shared model
+     * is not left in another entity's pose (or {@code resetToDefaultPose}) when translucent overlays draw.
+     */
+    public void submitAnimatedCitadel(PoseStack poseStack, SubmitNodeCollector collector, RenderType renderType,
+            LivingEntityRenderState state, int light, int overlay, int tint, PoseStack scratch) {
+        collector.submitCustomGeometry(poseStack, renderType, (pose, consumer) -> {
+            this.setupAnim(state);
+            AlexAdvancedEntityModel.withCitadelSubmitPose(pose, scratch, s ->
+                    this.citadel.renderToBuffer(s, consumer, light, overlay, tint));
+        });
+    }
+
+    /**
+     * Sets {@link AlexAdvancedEntityModel#young} on the wrapped Citadel model (replaces removed {@code EntityModel#young}).
+     */
+    public void setCitadelYoung(boolean young) {
+        ((AlexAdvancedEntityModel<?>) this.citadel).young = young;
+    }
+
+    @Override
+    public void setupAnim(LivingEntityRenderState state) {
+        LivingEntity raw = AlexsMobsClientKeys.getLiving(state);
+        if (raw == null) {
+            return;
+        }
+        @SuppressWarnings("unchecked")
+        E entity = (E) raw;
+        float limbSwing = state.walkAnimationPos;
+        float limbSwingAmount = Math.min(1.0F, state.walkAnimationSpeed);
+        float ageInTicks = state.ageInTicks;
+        // Vanilla LivingEntityRenderer.extractRenderState: state.yRot is already head yaw relative to body (wrapped).
+        float netHeadYaw = state.yRot;
+        float headPitch = state.xRot;
+        if (citadel instanceof AlexAdvancedEntityModel<?> alexModel) {
+            alexModel.young = state.isBaby;
+        }
+        citadel.prepareMobModel(entity, limbSwing, limbSwingAmount, ageInTicks);
+        citadel.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
+    }
+
+    public void copyPropertiesTo(HumanoidModel<?> model) {
+        if (citadel instanceof ModelKangaroo kangaroo) {
+            kangaroo.copyArmorPoseToHumanoid(model);
+        }
+    }
+}

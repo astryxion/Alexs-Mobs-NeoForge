@@ -1,0 +1,41 @@
+package com.github.alexthe668.alexsmobs.entity.ai;
+
+import net.minecraft.world.item.component.SwingAnimation;
+
+import com.github.alexthe668.alexsmobs.entity.EntityCrocodile;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
+
+public class CrocodileAIMelee extends MeleeAttackGoal {
+
+    private final EntityCrocodile crocodile;
+
+    public CrocodileAIMelee(EntityCrocodile crocodile, double speedIn, boolean useLongMemory) {
+        super(crocodile, speedIn, useLongMemory);
+        this.crocodile = crocodile;
+    }
+
+    public boolean canUse() {
+
+        return super.canUse() && crocodile.getPassengers().isEmpty();
+    }
+
+    public boolean canContinueToUse() {
+        return super.canContinueToUse() && crocodile.getPassengers().isEmpty();
+    }
+
+    protected void checkAndPerformAttack(LivingEntity enemy, double distToEnemySqr) {
+        double d0 = (this.mob.getBbWidth() * 2.0F * this.mob.getBbWidth() * 2.0F + enemy.getBbWidth());
+        if (distToEnemySqr <= d0) {
+            this.resetAttackCooldown();
+            this.mob.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, false);
+            if (this.mob.level() instanceof ServerLevel serverLevel) {
+                this.mob.doHurtTarget(serverLevel, enemy);
+            }
+        }
+
+    }
+
+}

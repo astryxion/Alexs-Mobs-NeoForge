@@ -2,7 +2,11 @@
   "display": {
     "icon": {
       "id": "citadel:effect_item",
-      "nbt": "{DisplayEffect:\"alexsmobs:ender_flu\"}"
+      "components": {
+        "citadel:effect_item_display": {
+          "effect": "alexsmobs:ender_flu"
+        }
+      }
     },
     "title": {
       "translate": "advancements.alexsmobs.ender_flu.title"
