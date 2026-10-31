@@ -1,8 +1,6 @@
 {
   "ingredients": [
-    {
-      "item": "minecraft:cod"
-    }
+    "minecraft:cod"
   ],
   "result": {
     "item": "alexsmobs:cosmic_cod",
