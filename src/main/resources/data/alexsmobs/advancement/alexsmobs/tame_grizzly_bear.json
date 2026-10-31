@@ -16,7 +16,7 @@
       "trigger": "minecraft:tame_animal",
       "conditions": {
         "entity": {
-          "type": "alexsmobs:grizzly_bear"
+          "minecraft:entity_type": "alexsmobs:grizzly_bear"
         }
       }
     }

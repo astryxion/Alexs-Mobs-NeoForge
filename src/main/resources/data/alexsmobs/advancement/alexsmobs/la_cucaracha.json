@@ -28,7 +28,7 @@
           ]
         },
         "entity": {
-          "type": "alexsmobs:cockroach"
+          "minecraft:entity_type": "alexsmobs:cockroach"
         }
       }
     }

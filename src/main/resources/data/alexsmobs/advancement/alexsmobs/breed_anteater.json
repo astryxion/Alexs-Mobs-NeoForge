@@ -21,7 +21,7 @@
       "trigger": "minecraft:bred_animals",
       "conditions": {
         "child": {
-          "type": "alexsmobs:anteater"
+          "minecraft:entity_type": "alexsmobs:anteater"
         }
       }
     }

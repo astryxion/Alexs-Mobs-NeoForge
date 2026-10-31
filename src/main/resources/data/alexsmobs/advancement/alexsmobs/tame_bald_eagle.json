@@ -21,7 +21,7 @@
       "trigger": "minecraft:tame_animal",
       "conditions": {
         "entity": {
-          "type": "alexsmobs:bald_eagle"
+          "minecraft:entity_type": "alexsmobs:bald_eagle"
         }
       }
     }

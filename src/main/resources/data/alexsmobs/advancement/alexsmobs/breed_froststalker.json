@@ -22,7 +22,7 @@
       "trigger": "minecraft:bred_animals",
       "conditions": {
         "child": {
-          "type": "alexsmobs:froststalker"
+          "minecraft:entity_type": "alexsmobs:froststalker"
         }
       }
     }

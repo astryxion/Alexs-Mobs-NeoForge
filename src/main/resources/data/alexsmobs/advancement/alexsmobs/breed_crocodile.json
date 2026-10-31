@@ -16,7 +16,7 @@
       "trigger": "minecraft:bred_animals",
       "conditions": {
         "child": {
-          "type": "alexsmobs:crocodile"
+          "minecraft:entity_type": "alexsmobs:crocodile"
         }
       }
     }

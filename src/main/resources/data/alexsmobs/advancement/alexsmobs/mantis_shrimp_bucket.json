@@ -19,10 +19,10 @@
           "id": "minecraft:water_bucket"
         },
         "entity": {
-          "type": "alexsmobs:mantis_shrimp"
+          "minecraft:entity_type": "alexsmobs:mantis_shrimp"
         },
         "player": {
-          "flags":{
+          "minecraft:flags": {
             "is_sneaking": true
           }
         }

@@ -56,7 +56,7 @@ tasks.withType(Jar).configureEach { jarTask ->
 sourceSets {
     main {
         java {
-            exclude 'com/github/alexthe666/alexsmobs/compat/jei/**'
+            exclude 'com/github/alexthe668/alexsmobs/compat/jei/**'
         }
     }
 }

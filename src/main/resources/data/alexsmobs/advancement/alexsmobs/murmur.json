@@ -21,7 +21,7 @@
       "trigger": "minecraft:player_killed_entity",
       "conditions": {
         "entity": {
-          "type": "alexsmobs:murmur"
+          "minecraft:entity_type": "alexsmobs:murmur"
         }
       }
     },
@@ -29,7 +29,7 @@
       "trigger": "minecraft:player_hurt_entity",
       "conditions": {
         "entity": {
-          "type": "alexsmobs:murmur"
+          "minecraft:entity_type": "alexsmobs:murmur"
         }
       }
     },
@@ -37,7 +37,7 @@
       "trigger": "minecraft:player_interacted_with_entity",
       "conditions": {
         "entity": {
-          "type": "alexsmobs:murmur"
+          "minecraft:entity_type": "alexsmobs:murmur"
         }
       }
     },
@@ -45,7 +45,7 @@
       "trigger": "minecraft:player_killed_entity",
       "conditions": {
         "entity": {
-          "type": "alexsmobs:murmur_head"
+          "minecraft:entity_type": "alexsmobs:murmur_head"
         }
       }
     },
@@ -53,7 +53,7 @@
       "trigger": "minecraft:player_hurt_entity",
       "conditions": {
         "entity": {
-          "type": "alexsmobs:murmur_head"
+          "minecraft:entity_type": "alexsmobs:murmur_head"
         }
       }
     },
@@ -61,7 +61,7 @@
       "trigger": "minecraft:player_interacted_with_entity",
       "conditions": {
         "entity": {
-          "type": "alexsmobs:murmur_head"
+          "minecraft:entity_type": "alexsmobs:murmur_head"
         }
       }
     }
